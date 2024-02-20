@@ -1,0 +1,77 @@
+{% extends "../homepage/navbar.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section  -->
+<div class="container col-xxl-8 px-4 py-5" style="margin-top:20px; margin-bottom:20px">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5" style="background: #f3e4f7" >
+      <div class="col-10 col-sm-8 col-lg-6" >
+        <img src="{% static 'homepage/images/hero1.png' %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+      </div>
+      <div class="col-lg-6">
+        <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3" style="color: #600d91 !important; margin-left: 20px;">Elevate Education</h1>
+        <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3" style="color: #600d91 !important; margin-left: 20px;">Empower Minds</h1>
+
+        <p class="lead" style="color: #696969; margin-left: 20px;">Your Path to Academic Success</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+          <button type="button" class="btn btn-primary btn-lg px-4 me-md-2" style="background: #600d91; border-color: #600d91; margin-left: 20px;">Register Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Feature Section  -->
+  <div class="container px-4 py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom" style="text-align: center; color: #696969; white-space: pre-line;">Find the Best Tutor For You
+        Among NYU Students</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3" style="margin:20px;">
+      <div class="feature col">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+          <img src="{% static 'homepage/images/user.png' %}" alt="user" width="80px">
+
+        </div>
+        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;">High School And 
+            College Students</h3>
+        <p style="color: #696969">Students who are looking for in-person or virtual tutoring for academic support</p>
+        
+      </div>
+      <div class="feature col">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+            <img src="{% static 'homepage/images/user.png' %}" alt="user" width="80px">
+        </div>
+        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important;">Parents</h3>
+        <p style="color: #696969">Parents who are looking for affordable and reliable tutors for their children</p>
+        
+      </div>
+      <div class="feature col">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+            <img src="{% static 'homepage/images/user.png' %}" alt="user" width="80px">
+        </div>
+        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important;"> NYU Students</h3>
+        <p style="color: #696969">NYU Students who are looking for part-time tutoring jobs or seeking academic support</p>
+       
+      </div>
+    </div>
+  </div>
+
+  <!--Footer-->
+  <div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+            <img src="{% static 'homepage/images/logo.png' %}" alt="Logo" width = "80">          
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2023 TutorNYU, Inc</span>
+      </div>
+  
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+      </ul>
+    </footer>
+  </div>
+
+{% endblock %}
