@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Registration</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #registration-container {
+            text-align: left;
+            width: 320px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: red;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .reminder {
+            color: #888;
+            margin-top: 8px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            display: inline-block;
+        }
+
+        input[type="submit"],
+        input[type="button"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        #verification-code-container {
+            display: none;
+        }
+    </style>
+    <script>
+        var isEmailVerified = false;
+
+        function verifyEmail() {
+            var email = document.getElementById("email").value;
+            var emailError = document.getElementById("emailError");
+            var reminder = document.getElementById("reminder");
+
+            // Reset previous error messages
+            emailError.textContent = "";
+            reminder.textContent = "";
+
+            // Check if the email is empty
+            if (!email || !email.endsWith("@nyu.edu")) {
+                emailError.textContent = "Please enter a NYU email address";
+                isEmailVerified = false;
+                return;
+            }
+
+            // Perform email verification logic here
+            // For simplicity, assume the email is verified successfully
+            isEmailVerified = true;
+            document.getElementById("verification-code-container").style.display = "block";
+        }
+
+        function nextPage() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var verificationCode = document.getElementById("verificationCode").value;
+            var emailError = document.getElementById("emailError");
+            var passwordError = document.getElementById("passwordError");
+            var verificationCodeError = document.getElementById("verificationCodeError");
+            var reminder = document.getElementById("reminder");
+
+            // Reset previous error messages
+            emailError.textContent = "";
+            passwordError.textContent = "";
+            verificationCodeError.textContent = "";
+            reminder.textContent = "";
+
+            // Check if the email is empty
+            if (!email) {
+                emailError.textContent = "Please enter your email";
+                return;
+            }
+
+            // Check if the email is verified
+            if (!isEmailVerified) {
+                reminder.textContent = "Reminder: Verify your email to proceed";
+                return;
+            }
+
+            // Check if the password is empty
+            if (!password) {
+                passwordError.textContent = "Please enter your password";
+                return;
+            }
+
+            // Check if the verification code is entered
+            if (!verificationCode) {
+                verificationCodeError.textContent = "Please enter the verification code";
+                return;
+            }
+
+            // Check if the verification code is correct
+            if (verificationCode !== "111111") {
+                verificationCodeError.textContent = "Incorrect verification code. Please try again.";
+                return;
+            }
+
+            // Direct to Test2.html
+            window.location.href = "TutorInformation.html";
+        }
+
+        function validateForm() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var verificationCode = document.getElementById("verificationCode").value;
+            var emailError = document.getElementById("emailError");
+            var passwordError = document.getElementById("passwordError");
+            var confirmPasswordError = document.getElementById("confirmPasswordError");
+            var verificationCodeError = document.getElementById("verificationCodeError");
+
+            // Reset previous error messages
+            emailError.textContent = "";
+            passwordError.textContent = "";
+            confirmPasswordError.textContent = "";
+            verificationCodeError.textContent = "";
+
+            // Check if the email ends with "nyu.edu"
+            if (!email.endsWith("@nyu.edu")) {
+                emailError.textContent = "Please enter a NYU email address";
+            }
+            
+            if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/.test(password) || password.length < 6) {
+                passwordError.textContent = "Password must be at least 6 characters long and must contain at least one uppercase letter, one lowercase letter, and one number";
+            }
+
+            // Check if the confirm password matches the original password
+            if (confirmPassword !== password) {
+                confirmPasswordError.textContent = "Password do not match";
+            }
+
+            // If there are any error messages, prevent form submission
+            if (emailError.textContent || passwordError.textContent || confirmPasswordError.textContent || verificationCodeError.textContent) {
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+    <div id="registration-container">
+        <h2>Tutor Registration</h2>
+
+        <form action="Test2.html" method="post" onsubmit="return validateForm()">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <input type="button" value="Verify Email" onclick="verifyEmail()">
+            <span class="error" id="emailError"></span>
+            <span class="reminder" id="reminder"></span>
+
+            <div id="verification-code-container">
+                <label for="verificationCode">Verification Code:</label>
+                <input type="text" id="verificationCode" name="verificationCode" required>
+                <span class="error" id="verificationCodeError"></span>
+            </div>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <span class="error" id="passwordError"></span>
+
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <span class="error" id="confirmPasswordError"></span>
+
+            <input type="button" value="Next Page" onclick="nextPage()">
+            <span class="error" id="verificationCodeError"></span>
+        </form>
+    </div>
+
+</body>
+</html>
