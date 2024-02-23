@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "TutorRegister.apps.TutorRegisterConfig",
+    "TutorRegister.apps.HomepageConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
