@@ -64,6 +64,66 @@
     </div>
   </div>
 
+<!-- FAQs  -->
+<script src="https://unpkg.com/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<section class="bg-white py-3 py-md-5">
+  <div class="container">
+    <div class="row gy-5 gy-lg-0 align-items-lg-center">
+      <div class="col-12 col-lg-6">
+        <img class="img-fluid rounded" loading="lazy" src="{% static 'images/faqs.png' %}" alt="How can we help you?">
+      </div>
+      <div class="col-12 col-lg-6">    
+        <div class="row justify-content-xl-end">
+          <div class="col-12 col-xl-11">
+            <h2 class="pb-2 border-bottom" style="text-align: center; color: #696969; white-space: pre-line;">Frequently Asked Questions</h2>
+            <div class="accordion accordion-flush" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Who are our tutors?
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <a name="faqs"></a>
+
+                    <p>Our tutors are all current students at New York University, bringing a fresh and dynamic approach to the tutoring experience. 
+                      What sets them apart is not only their academic excellence but also their passion for teaching, sharing knowledge, and helping students thrive.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    How do I schedule a tutoring session?
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    To schedule a session, simply log in to your account, choose your preferred subject, and select a tutor based on availability. You can then book a session that fits your schedule.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Can I use your platform for homework help?
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Absolutely! Our tutors are available to assist with homework, assignments, exam preparation, and general subject-related inquiries.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
   <!--Footer-->
   <div class="container">
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
@@ -81,5 +141,9 @@
       </ul>
     </footer>
   </div>
+
+
+    
+
 
 {% endblock %}
