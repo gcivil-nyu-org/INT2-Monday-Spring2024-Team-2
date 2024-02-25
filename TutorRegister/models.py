@@ -30,10 +30,14 @@ class ProfileT(models.Model):
     mname = models.CharField(max_length=255, blank=True)
     lname = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
-    school = models.CharField(max_length=255)
+    major = models.CharField(max_length=255)
     zip = models.CharField(max_length=255)
     grade = models.CharField(max_length=255)
     preferred_mode = models.CharField(max_length=255)
     intro = models.TextField()
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
+
+class UserType(User):
+    user_type = models.CharField(max_length=100, null=True, blank=True)
+
