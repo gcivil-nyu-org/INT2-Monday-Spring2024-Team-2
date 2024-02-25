@@ -1,160 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Information</title>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+{% extends 'TutorRegister/base.html' %}
 
-        #personal-info-container {
-            text-align: left;
-            width: 320px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
+{% block title %}Information - TutorNYU{% endblock %}
 
-        .error {
-            color: red;
-            display: block;
-            margin-top: 8px;
-        }
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card p-4">
+    <h2 class="text-center mb-4">Student Information</h2>
+    <form method="post" action="{% url 'TutorRegister:studentinformation' %}" class="form">
+      {% csrf_token %}
 
-        form {
-            margin-top: 20px;
-        }
+      <div class="mb-3">
+        <label for="{{ form.gender.id_for_label }}" class="form-label">Gender:</label>
+        {{ form.gender }}
+      </div>
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+      <div class="mb-3">
+        <label for="{{ form.zip_code.id_for_label }}" class="form-label">Zip Code:</label>
+        {{ form.zip_code }}
+        {% for error in form.zip_code.errors %}
+          <div class="invalid-feedback" style="display: block;">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-        input, select {
-            width: calc(100% - 20px);
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            display: inline-block;
-        }
+      <div class="mb-3">
+        <label for="{{ form.major.id_for_label }}" class="form-label">School:</label>
+        {{ form.school }}
+      </div>
 
-        input[type="submit"] {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
+      <div class="mb-3">
+        <label for="{{ form.preferred_mode.id_for_label }}" class="form-label">Preferred Mode:</label>
+        {{ form.preferred_mode }}
+      </div>
 
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
-    <script>
-        function validateForm() {
-            var firstName = document.getElementById("firstName").value;
-            var lastName = document.getElementById("lastName").value;
-            var middleName = document.getElementById("middleName").value;
-            var gender = document.getElementById("gender").value;
-            var school = document.getElementById("school").value;
-            var zipCode = document.getElementById("zipCode").value;
-            var firstNameError = document.getElementById("firstNameError");
-            var lastNameError = document.getElementById("lastNameError");
-            var genderError = document.getElementById("genderError");
-            var majorError = document.getElementById("majorError");
-            var zipCodeError = document.getElementById("zipCodeError");
+      <div class="mb-3">
+        <label for="{{ form.introduction.id_for_label }}" class="form-label">Introduction:</label>
+        {% if form.introduction.help_text %}
+          <div class="form-text mb-2" style="color: #6c757d;">{{ form.introduction.help_text }}</div>
+        {% endif %}
+        {{ form.introduction }}
+      </div>
 
-            // Reset previous error messages
-            firstNameError.textContent = "";
-            lastNameError.textContent = "";
-            genderError.textContent = "";
-            schoolError.textContent = "";
-            zipCodeError.textContent = "";
-
-            // Check if first name is empty
-            if (!firstName) {
-                firstNameError.textContent = "Please enter your first name";
-            } else if (!/^[a-zA-Z]+$/.test(firstName)) {
-                firstNameError.textContent = "Please enter a valid first name";
-            }
-
-            // Check if last name is empty
-            if (!lastName) {
-                lastNameError.textContent = "Please enter your last name";
-            } else if (!/^[a-zA-Z]+$/.test(lastName)) {
-                lastNameError.textContent = "Please enter a valid last name";
-            }
-
-            // Check if gender is selected
-            if (gender === "") {
-                genderError.textContent = "Please select your gender";
-            }
-
-            // Check if major is empty and contains only English words
-            if (!school) {
-                schoolError.textContent = "Please enter your major";
-            } else if (!/^[a-zA-Z\s]+$/.test(major)) {
-                schoolError.textContent = "Please enter a valid major";
-            }
-
-            // Check if zip code is exactly 5 digits
-            if (zipCode.length !== 5 || isNaN(zipCode)) {
-                zipCodeError.textContent = "Please enter a valid zip code";
-            }
-
-            // If there are any error messages, prevent form submission
-            if (firstNameError.textContent || lastNameError.textContent || genderError.textContent || schoolError.textContent || zipCodeError.textContent) {
-                return false;
-            }
-
-            return true;
-        }
-    </script>
-</head>
-<body>
-
-    <div id="personal-info-container">
-        <h2>Student Information</h2>
-
-        <form action="/process_personal_info" method="post" onsubmit="return validateForm()">
-            <label for="firstName">First Name:</label>
-            <input type="text" id="firstName" name="firstName" required>
-            <span class="error" id="firstNameError"></span>
-
-            <label for="middleName">Middle Name (Optional):</label>
-            <input type="text" id="middleName" name="middleName">
-
-            <label for="lastName">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" required>
-            <span class="error" id="lastNameError"></span>
-
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender" required>
-                <option value="">Select</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
-            <span class="error" id="genderError"></span>
-
-            <label for="school">School:</label>
-            <input type="text" id="school" name="school" required>
-            <span class="error" id="schoolError"></span>
-
-            <label for="zipCode">Zip Code:</label>
-            <input type="text" id="zipCode" name="zipCode" required>
-            <span class="error" id="zipCodeError"></span>
-
-            <input type="submit" value="Tutor Register">
-        </form>
-    </div>
-
-</body>
-</html>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

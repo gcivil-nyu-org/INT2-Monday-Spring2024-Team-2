@@ -52,3 +52,8 @@ class RegisterUserForm(UserCreationForm):
             
         return user
     
+    def isTutor(self):
+        return super().clean().get('user_type') == 'tutor'
+    
+    def isStudent(self):
+        return super().clean().get('user_type') == 'student'

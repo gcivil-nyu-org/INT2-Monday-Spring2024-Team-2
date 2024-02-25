@@ -3,31 +3,54 @@
 {% block title %}Register - TutorNYU{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Register</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3">
-                {% if field.name == 'user_type' %}
-                    <label for="{{ field.id_for_label }}">I am a :</label><br>
+<div class="container mt-5 d-flex flex-column align-items-center justify-content-center">
+    <div class="card p-4">
+        <h2 class="text-center mb-4">Registration</h2>
+        <form method="post" onsubmit="highlightClickedButton()" class="text-center">
+            {% csrf_token %}
+            <div class="mb-3 d-flex align-items-center justify-content-center">
+                <label for="{{ form.user_type.id_for_label }}" class="form-label me-3">I am a:</label>
+                <div class="btn-group" role="group" aria-label="User Type">
                     {% for value, label in form.user_type.field.choices %}
                         <input type="radio" class="btn-check" name="user_type" id="user_type_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
-                        <label class="btn btn-secondary" for="user_type_{{ forloop.counter }}">{{ label }}</label>
+                        <label class="btn btn-secondary" onclick="highlightClickedButton(this)" style="background-color: purple; color: white; margin-right: 5px;" for="user_type_{{ forloop.counter }}">{{ label }}</label>
                     {% endfor %}
-                {% else %}
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                        {% if field.help_text %}
-                            <div id="emailHelp" class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                {% endif %}
-                {% for error in field.errors %}
-                    <div class="invalid-feedback" style="display: block;">{{ error }}</div>
-                {% endfor %}
+                </div>
             </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+            {% for field in form %}
+                {% if field.name != 'user_type' %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text and field.name == 'password' %}
+                            <div class="form-text" style="color: #6c757d; font-size: 0.9em; list-style: none; padding-left: 1.2em;">&bull; {{ field.help_text }}</div>
+                        {% elif field.help_text %}
+                            <div class="form-text" style="color: #6c757d;">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary" style="background-color: purple; color: white;">Register</button>
+        </form>
+    </div>
 </div>
+
+<script>
+    function highlightClickedButton(clickedLabel) {
+        // Remove highlight from all buttons
+        var buttons = document.querySelectorAll('.btn-secondary');
+        buttons.forEach(function(button) {
+            button.style.backgroundColor = 'purple';
+            button.style.color = 'white';
+        });
+
+        // Highlight the clicked button with a darker shade of purple
+        clickedLabel.style.backgroundColor = '#4d004d';  // You can set any desired darker shade of purple
+        clickedLabel.style.color = 'white';  // You can set any desired text color
+    }
+</script>
+
 {% endblock %}

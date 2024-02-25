@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 
 from .forms import RegisterUserForm
+from .TutorForm import TutorForm
+from .StudentForm import StudentForm
 
 
 # register.html
@@ -13,14 +15,42 @@ def register(request):
         form = RegisterUserForm(request.POST)
         if form.is_valid():
             user = form.save()
+            print(form.isTutor)
             # Redirect to a success page or login page
-            return HttpResponseRedirect(reverse('TutorRegister:success'))
+            if(form.isTutor()):
+                return HttpResponseRedirect(reverse('TutorRegister:tutorinformation'))
+            elif(form.isStudent()):
+                return HttpResponseRedirect(reverse('TutorRegister:studentinformation'))
         else:
             print("Invalid form")
     else:
         form = RegisterUserForm()
     return render(request, 'TutorRegister/register.html', {'form': form})
 
+def TutorInformation(request):
+    if request.method == 'POST':
+        form = TutorForm(request.POST)
+        if form.is_valid():
+            # Process the form data as needed
+            # For example, save to the database
+            # user = form.save()
+            return render(request, "TutorRegister/successful_register.html")  # Redirect to a thank you page or another page
+    else:
+        form = TutorForm()
+    return render(request, "TutorRegister/TutorInformation.html", {'form': form})
+
+def StudentInformation(request):
+    if request.method == 'POST':
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            # Process the form data as needed
+            # For example, save to the database
+            # user = form.save()
+            return render(request, "TutorRegister/successful_register.html")  # Redirect to a thank you page or another page
+    else:
+        form = StudentForm()
+    return render(request, "TutorRegister/StudentInformation.html", {'form': form})
 
 def success(request):
     return render(request, "TutorRegister/successful_register.html")
+
