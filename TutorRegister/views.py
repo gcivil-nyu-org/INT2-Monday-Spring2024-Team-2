@@ -14,7 +14,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             # Redirect to a success page or login page
-            return HttpResponseRedirect(reverse('success'))
+            return HttpResponseRedirect(reverse('TutorRegister:success'))
         else:
             print("Invalid form")
     else:
@@ -23,4 +23,4 @@ def register(request):
 
 
 def success(request):
-    return render(request, "TutorRegistration/successful_register.html")
+    return render(request, "TutorRegister/successful_register.html")

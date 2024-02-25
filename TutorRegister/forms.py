@@ -20,12 +20,16 @@ class RegisterUserForm(UserCreationForm):
         model = User
         fields = ['user_type', 'email', 'first_name', 'last_name', 'password1', 'password2']
 
+
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('email')
+        email = cleaned_data.get('email').lower()
         user_type = cleaned_data.get('user_type')
         first_name = cleaned_data.get('first_name')
         last_name = cleaned_data.get('last_name')
+        
+        if User.objects.filter(username=email).exists():
+            raise ValidationError({'email': "A user with that email already exists."})
         
         if user_type == 'tutor' and not email.endswith('@nyu.edu'):
             raise ValidationError({'email': "Tutor email address must end with '@nyu.edu'."})
@@ -36,5 +40,15 @@ class RegisterUserForm(UserCreationForm):
         if not last_name:
             raise ValidationError({'first_name': "First name cannot be empty."})
         
-        
         return cleaned_data
+    
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data['email']
+        
+        if commit:
+            user.save()
+            
+        return user
+    
