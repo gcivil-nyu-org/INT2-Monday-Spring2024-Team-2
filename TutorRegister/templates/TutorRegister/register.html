@@ -1,0 +1,33 @@
+{% extends 'TutorRegister/base.html' %}
+
+{% block title %}Register - TutorNYU{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                {% if field.name == 'user_type' %}
+                    <label for="{{ field.id_for_label }}">I am a :</label><br>
+                    {% for value, label in form.user_type.field.choices %}
+                        <input type="radio" class="btn-check" name="user_type" id="user_type_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
+                        <label class="btn btn-secondary" for="user_type_{{ forloop.counter }}">{{ label }}</label>
+                    {% endfor %}
+                {% else %}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                        {% if field.help_text %}
+                            <div id="emailHelp" class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="invalid-feedback" style="display: block;">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+{% endblock %}
