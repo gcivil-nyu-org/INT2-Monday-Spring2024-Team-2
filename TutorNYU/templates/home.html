@@ -7,7 +7,7 @@
 <div class="container col-xxl-8 px-4 py-5" style="margin-top:20px; margin-bottom:20px">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5" style="background: #f3e4f7" >
       <div class="col-10 col-sm-8 col-lg-6" >
-        <img src="{% static 'images/hero.png' %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+        <img src="{% static 'images/hero_final.png' %}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3" style="color: #600d91 !important; margin-left: 20px;">Elevate Education</h1>
@@ -24,37 +24,160 @@
 
   <!-- Feature Section  -->
   <div class="container px-4 py-5" id="featured-3">
+    <a name="feature"></a>
     <h2 class="pb-2 border-bottom" style="text-align: center; color: #696969; white-space: pre-line;">Find the Best Tutor For You
         Among NYU Students</h2>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3" style="margin:20px;">
       <div class="feature col">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-          <img src="{% static 'images/user.png' %}" alt="user" width="80px">
+          <img src="{% static 'images/feature1.png' %}" alt="user" width="220px" style="background-color: #fcfcfc">
 
         </div>
-        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;">High School And 
-            College Students</h3>
-        <p style="color: #696969">Students who are looking for in-person or virtual tutoring for academic support</p>
+        <h3 class="fs-3 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;">At Anytime
+          From Anywhere
+        </h3>
+        <p style="color: #696969">Our tutoring service allows you to access help at any time that suits your schedule, 
+          providing in-person and virtual options.</p>
         
       </div>
       <div class="feature col">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-            <img src="{% static 'images/user.png' %}" alt="user" width="80px">
+            <img src="{% static 'images/feature2.png' %}" alt="user" width="220px" style="background-color: #fcfcfc">
         </div>
-        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important;">Parents</h3>
-        <p style="color: #696969">Parents who are looking for affordable and reliable tutors for their children</p>
+        <h3 class="fs-3 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;">All Grade Levels
+          All Subjects
+        </h3>
+        <p style="color: #696969">Our tutors cover a wide range of grade levels, from elementary to high school and beyond. 
+          We provide support across all subjects, including math, science, languages, humanities, and more.</p>
         
       </div>
       <div class="feature col">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-            <img src="{% static 'images/user.png' %}" alt="user" width="80px">
+            <img src="{% static 'images/feature3.png' %}" alt="user" width="220px" style="background-color: #fcfcfc; white-space: pre-line;">
         </div>
-        <h3 class="fs-2 text-body-emphasis" style="color: #696969 !important;"> NYU Students</h3>
-        <p style="color: #696969">NYU Students who are looking for part-time tutoring jobs or seeking academic support</p>
+        <h3 class="fs-3 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;"> Reliable 
+          Affordable
+        </h3>
+        <p style="color: #696969"> All tutors are current NYU students who are carefully selected based on their expertise in specific subjects. Our tutoring services are designed to be affordable, with transparent pricing structures.</p>
        
       </div>
     </div>
   </div>
+
+<!-- FAQs  -->
+<script src="https://unpkg.com/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<section class="bg-white py-3 py-md-5">
+  <div class="container">
+    <a name="faqs"></a>
+    <div class="row gy-5 gy-lg-0 align-items-lg-center">
+      <div class="col-12 col-lg-6">
+        <img class="img-fluid rounded" loading="lazy" src="{% static 'images/faqs.png' %}" alt="How can we help you?">
+      </div>
+      <div class="col-12 col-lg-6">    
+        <div class="row justify-content-xl-end">
+          <div class="col-12 col-xl-11">
+            <h2 class="pb-2 border-bottom" style="text-align: center; color: #696969; white-space: pre-line;">Frequently Asked Questions</h2>
+            <div class="accordion accordion-flush" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Who are our tutors?
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Our tutors are all current students at New York University, bringing a fresh and dynamic approach to the tutoring experience. 
+                      What sets them apart is not only their academic excellence but also their passion for teaching, sharing knowledge, and helping students thrive.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    How do I schedule a tutoring session?
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    To schedule a session, simply log in to your account, choose your preferred subject, and select a tutor based on availability. You can then book a session that fits your schedule.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Can I use your platform for homework help?
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <p>Absolutely! Our tutors are available to assist with homework, assignments, exam preparation, and general subject-related inquiries.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--About Us-->
+
+<h3 class="fs-3 text-body-emphasis" style="color: #696969 !important; white-space: pre-line;">About Us
+</h3>
+<div class="row text-center">
+<a name="about"></a>
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Henry Quan</h5><span class="small text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Samkit Shah</h5><span class="small text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Shihui Huang</h5><span class="small text text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Theresa Van</h5><span class="small text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Wanli Ma</h5><span class="small text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+  <!-- Team item-->
+  <div class="col-xl-3 col-sm-4 mb-5">
+    <div class="bg-white rounded shadow-sm py-5 px-4"><img src="{% static 'images/profile_icon.png' %}" alt="" width="100" class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+      <h5 class="mb-0">Ziyi Wang</h5><span class="small text-muted">  </span>
+    </div>
+  </div>
+  <!-- End-->
+
+</div>
 
   <!--Footer-->
   <div class="container">
