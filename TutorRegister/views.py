@@ -73,9 +73,9 @@ def login_request(request):
                     return render(request, "TutorRegister/student_dashboard.html")
                 return render(request, "TutorRegister/successful_register.html")
             else:
-                messages.error(request, "Invalid username or password.")
+                messages.error(request, "Invalid email or password.")
         else:
-            messages.error(request, "Invalid username or password.")
+            messages.error(request, "Invalid email or password.")
     form = AuthenticationForm()
     return render(request, "TutorRegister/login.html", {"login_form": form})
 
