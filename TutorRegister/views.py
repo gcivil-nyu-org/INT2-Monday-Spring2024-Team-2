@@ -7,14 +7,15 @@ from django.contrib.auth.models import User
 from .forms import RegisterUserForm
 from .TutorForm import TutorForm
 from .StudentForm import StudentForm
-
+from verify_email.email_handler import send_verification_email
 
 # register.html
 def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            #user = form.save()
+            inactive_user = send_verification_email(request, form)
             print(form.isTutor)
             # Redirect to a success page or login page
             if(form.isTutor()):
