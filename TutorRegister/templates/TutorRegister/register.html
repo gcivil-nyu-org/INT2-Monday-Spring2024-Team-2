@@ -8,17 +8,21 @@
         <h2 class="text-center mb-4">Registration</h2>
         <form method="post" onsubmit="highlightClickedButton()" class="text-center">
             {% csrf_token %}
-            <div class="mb-3 d-flex align-items-center justify-content-center">
-                <label for="{{ form.user_type.id_for_label }}" class="form-label me-3">I am a:</label>
-                <div class="btn-group" role="group" aria-label="User Type">
-                    {% for value, label in form.user_type.field.choices %}
-                        <input type="radio" class="btn-check" name="user_type" id="user_type_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
-                        <label class="btn btn-secondary" onclick="highlightClickedButton(this)" style="background-color: purple; color: white; margin-right: 5px;" for="user_type_{{ forloop.counter }}">{{ label }}</label>
-                    {% endfor %}
-                </div>
-            </div>
             {% for field in form %}
-                {% if field.name != 'user_type' %}
+                {% if field.name == 'user_type' %}
+                    <div class="mb-3 d-flex align-items-center justify-content-center">
+                        <label for="{{ form.user_type.id_for_label }}" class="form-label me-3">I am a:</label>
+                        <div class="btn-group" role="group" aria-label="User Type">
+                            {% for value, label in form.user_type.field.choices %}
+                                <input type="radio" class="btn-check" name="user_type" id="user_type_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
+                                <label class="btn btn-secondary" onclick="highlightClickedButton(this)" style="background-color: purple; color: white; margin-right: 5px;" for="user_type_{{ forloop.counter }}">{{ label }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                    {% endfor %}
+                {% else %}
                     <div class="mb-3">
                         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                         {{ field }}

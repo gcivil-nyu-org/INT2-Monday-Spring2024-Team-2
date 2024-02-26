@@ -46,7 +46,7 @@ class RegisterUserForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = self.cleaned_data['email']
-        
+
         if commit:
             user.save()
             user.usertype.user_type = self.cleaned_data['user_type']
