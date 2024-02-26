@@ -49,6 +49,8 @@ class RegisterUserForm(UserCreationForm):
         
         if commit:
             user.save()
+            user.usertype.user_type = self.cleaned_data['user_type']
+            user.usertype.save()
             
         return user
     
