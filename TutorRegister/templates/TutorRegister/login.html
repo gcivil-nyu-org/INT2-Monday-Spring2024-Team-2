@@ -1,18 +1,46 @@
 <!-- templates/login.html -->
-{% extends "TutorRegister/base.html" %}
+
+
+{% extends 'TutorRegister/base.html' %}
+
+{% block title %}Login - TutorNYU{% endblock %}
 
 {% block content %}
-  <h2>Login</h2>
-  <form method="post" action="{% url 'TutorRegister:login' %}">
-    {% csrf_token %}
-    {{ login_form.as_p }}
-    <button type="submit">Login</button>
-  </form>
-  {% if messages %}
-    <ul>
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+<div class="container mt-5 d-flex flex-column align-items-center justify-content-center">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h2 class="fw-bold mb-0 fs-2 text-center">Log in</h2>
+            </div>
+
+            <div class="modal-body p-5 pt-0">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {% for field in login_form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {% if field.name == 'username' %}
+                                    Email:
+                                {% else %}
+                                    {{ field.label }}:
+                                {% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text" style="color: #6c757d;">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">Log in</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

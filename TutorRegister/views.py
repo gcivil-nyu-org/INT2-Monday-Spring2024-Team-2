@@ -66,8 +66,11 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # if user.groups.filter(name='Tutors').exists():
-                #     return redirect('tutor_dashboard')
+                # print(user.usertype.user_type)
+                if user.usertype.user_type == 'tutor':
+                    return render(request, "TutorRegister/tutor_dashboard.html")
+                elif user.usertype.user_type == 'student':
+                    return render(request, "TutorRegister/student_dashboard.html")
                 return render(request, "TutorRegister/successful_register.html")
             else:
                 messages.error(request, "Invalid username or password.")

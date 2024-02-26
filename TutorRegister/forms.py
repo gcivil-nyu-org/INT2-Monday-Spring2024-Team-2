@@ -1,5 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
@@ -65,4 +66,14 @@ class RegisterUserForm(UserCreationForm):
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
             'class': 'form-control'
+            })
+
+class CustomLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super(CustomLoginForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['username', 'password']:
+            self.fields[fieldname].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': self.fields[fieldname].label
             })
