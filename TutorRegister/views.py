@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
 
 from .forms import RegisterUserForm
 from .TutorForm import TutorForm
@@ -54,4 +56,23 @@ def StudentInformation(request):
 
 def success(request):
     return render(request, "TutorRegister/successful_register.html")
+
+def login_request(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                # if user.groups.filter(name='Tutors').exists():
+                #     return redirect('tutor_dashboard')
+                return render(request, "TutorRegister/successful_register.html")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request, "TutorRegister/login.html", {"login_form": form})
 

@@ -1,0 +1,18 @@
+<!-- templates/login.html -->
+{% extends "TutorRegister/base.html" %}
+
+{% block content %}
+  <h2>Login</h2>
+  <form method="post" action="{% url 'TutorRegister:login' %}">
+    {% csrf_token %}
+    {{ login_form.as_p }}
+    <button type="submit">Login</button>
+  </form>
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
