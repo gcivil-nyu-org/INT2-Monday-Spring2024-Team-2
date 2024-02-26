@@ -1,0 +1,68 @@
+{% extends 'TutorRegister/base.html' %}
+
+{% block title %}Register - TutorNYU{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex flex-column align-items-center justify-content-center">
+    {% comment %} <div class="card p-4"> {% endcomment %}
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h2 class="fw-bold mb-0 fs-2 text-center">Sign up</h2>
+            </div>
+
+            <div class="modal-body p-5 pt-0">
+                <form method="post" onsubmit="highlightClickedButton()">
+                    {% csrf_token %}
+                    <div class="mb-2 d-flex">
+                        <label for="{{ form.user_type.id_for_label }}" class="form-label me-3">I am a:</label>
+                        <div class="btn-group" role="group" aria-label="User Type">
+                            {% for value, label in form.user_type.field.choices %}
+                                <input type="radio" class="btn-check" name="user_type" id="user_type_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
+                                <label class="btn btn-secondary" onclick="highlightClickedButton(this)" style="background-color: white; color: #600E90; border-color: #600E90; margin-right: 5px;" for="user_type_{{ forloop.counter }}">{{ label }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {% for field in form %}
+                            {% if field.name != 'user_type' %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}: </label>
+                                        {{ field }}           
+                                    {% if field.help_text and field.name == 'password' %}
+                                        <div class="form-text" style="color: #6c757d; font-size: 0.9em; list-style: none; padding-left: 1.2em;">&bull; {{ field.help_text }}</div>
+                                    {% elif field.help_text %}
+                                        <div class="form-text" style="color: #6c757d;">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function highlightClickedButton(clickedLabel) {
+        // Remove highlight from all buttons
+        var buttons = document.querySelectorAll('.btn-secondary');
+        buttons.forEach(function(button) {
+            button.style.backgroundColor = 'white';
+            button.style.color = '#600E90';
+            button.style.bordercolor = '#600E90';
+        });
+
+        // Highlight the clicked button with a darker shade of purple
+        clickedLabel.style.backgroundColor = '#600E90';  // You can set any desired darker shade of purple
+        clickedLabel.style.color = 'white';  // You can set any desired text color
+    }
+</script>
+
+{% endblock %}
