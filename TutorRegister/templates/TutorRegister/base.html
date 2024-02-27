@@ -18,8 +18,12 @@
             </div>
       
             <div class="col-md-3 text-end">
-              <button type="button" class="btn btn-light" style="color: #600d91; border-color: #600d91; margin:5px" >Login</button>
-              <button type="button" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Sign Up</button>
+              <a href="{% url 'TutorRegister:login' %}">
+                <button type="button" class="btn btn-light" style="color: #600d91; border-color: #600d91; margin:5px" >Login</button>
+              </a>
+              <a href="{% url 'TutorRegister:register' %}">
+                <button type="button" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Sign Up</button>
+              </a>
             </div>
     
           </header>
