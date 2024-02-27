@@ -15,7 +15,7 @@
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <div class="col-md-3 mb-2 mb-md-0">
-          <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+          <a href="{% url 'home' %}" class="d-inline-flex link-body-emphasis text-decoration-none">
             <img src="{% static 'images/logo.png' %}" alt="Logo" width = "120">          
         </a>
         </div>
@@ -28,8 +28,12 @@
         </ul>
   
         <div class="col-md-3 text-end">
-          <button type="button" class="btn btn-light" style="color: #600d91; border-color: #600d91; margin:5px" >Login</button>
-          <button type="button" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Sign Up</button>
+          <a href="{% url 'TutorRegister:login' %}">
+            <button type="button" class="btn btn-light" style="color: #600d91; border-color: #600d91; margin:5px" >Login</button>
+          </a>
+          <a href="{% url 'TutorRegister:register' %}">
+            <button type="button" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Sign Up</button>
+          </a>
         </div>
 
         {% block content %}
