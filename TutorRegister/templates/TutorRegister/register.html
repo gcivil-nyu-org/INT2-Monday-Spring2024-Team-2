@@ -28,7 +28,7 @@
                         {% for field in form %}
                             {% if field.name != 'user_type' %}
                                 <div class="mb-3">
-                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}: </label>
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}<span style="color: red;">*</span>: </label>
                                         {{ field }}           
                                     {% if field.help_text and field.name == 'password' %}
                                         <div class="form-text" style="color: #6c757d; font-size: 0.9em; list-style: none; padding-left: 1.2em;">&bull; {{ field.help_text }}</div>
