@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Information</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #personal-info-container {
+            text-align: left;
+            width: 320px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: red;
+            display: block;
+            margin-top: 8px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            display: inline-block;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        function validateForm() {
+            var firstName = document.getElementById("firstName").value;
+            var lastName = document.getElementById("lastName").value;
+            var middleName = document.getElementById("middleName").value;
+            var gender = document.getElementById("gender").value;
+            var major = document.getElementById("major").value;
+            var zipCode = document.getElementById("zipCode").value;
+            var firstNameError = document.getElementById("firstNameError");
+            var lastNameError = document.getElementById("lastNameError");
+            var genderError = document.getElementById("genderError");
+            var majorError = document.getElementById("majorError");
+            var zipCodeError = document.getElementById("zipCodeError");
+
+            // Reset previous error messages
+            firstNameError.textContent = "";
+            lastNameError.textContent = "";
+            genderError.textContent = "";
+            majorError.textContent = "";
+            zipCodeError.textContent = "";
+
+            // Check if first name is empty
+            if (!firstName) {
+                firstNameError.textContent = "Please enter your first name";
+            } else if (!/^[a-zA-Z]+$/.test(firstName)) {
+                firstNameError.textContent = "Please enter a valid first name";
+            }
+
+            // Check if last name is empty
+            if (!lastName) {
+                lastNameError.textContent = "Please enter your last name";
+            } else if (!/^[a-zA-Z]+$/.test(lastName)) {
+                lastNameError.textContent = "Please enter a valid last name";
+            }
+
+            // Check if gender is selected
+            if (gender === "") {
+                genderError.textContent = "Please select your gender";
+            }
+
+            // Check if major is empty and contains only English words
+            if (!major) {
+                majorError.textContent = "Please enter your major";
+            } else if (!/^[a-zA-Z\s]+$/.test(major)) {
+                majorError.textContent = "Please enter a valid major";
+            }
+
+            // Check if zip code is exactly 5 digits
+            if (zipCode.length !== 5 || isNaN(zipCode)) {
+                zipCodeError.textContent = "Please enter a valid zip code";
+            }
+
+            // If there are any error messages, prevent form submission
+            if (firstNameError.textContent || lastNameError.textContent || genderError.textContent || majorError.textContent || zipCodeError.textContent) {
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+    <div id="personal-info-container">
+        <h2>Tutor Information</h2>
+
+        <form action="/process_personal_info" method="post" onsubmit="return validateForm()">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+            <span class="error" id="firstNameError"></span>
+
+            <label for="middleName">Middle Name (Optional):</label>
+            <input type="text" id="middleName" name="middleName">
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+            <span class="error" id="lastNameError"></span>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <span class="error" id="genderError"></span>
+
+            <label for="major">Major:</label>
+            <input type="text" id="major" name="major" required>
+            <span class="error" id="majorError"></span>
+
+            <label for="zipCode">Zip Code:</label>
+            <input type="text" id="zipCode" name="zipCode" required>
+            <span class="error" id="zipCodeError"></span>
+
+            <input type="submit" value="Tutor Register">
+        </form>
+    </div>
+
+</body>
+</html>

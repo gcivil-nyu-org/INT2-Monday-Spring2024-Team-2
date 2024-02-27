@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>{% block title %}TutorNYU{% endblock %}</title>
+</head>
+<body>
+
+    <div class="container">
+        <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <div class="col-md-3 mb-2 mb-md-0">
+              <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+                <img src="{% static 'TutorRegister/logo.png' %}" alt="Logo" width = "120">          
+            </a>
+            </div>
+      
+            <div class="col-md-3 text-end">
+              <button type="button" class="btn btn-light" style="color: #600d91; border-color: #600d91; margin:5px" >Login</button>
+              <button type="button" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Sign Up</button>
+            </div>
+    
+          </header>
+    </div>
+    
+    {% block content %}
+    <!-- Page content will be overridden here -->
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
