@@ -138,4 +138,4 @@ EMAIL_HOST_PASSWORD = 'mkysmehradxduvgg'
 DEFAULT_FROM_EMAIL = 'tutornyuengineeringverify@gmail.com'
 
 #VERIFICATION_SUCCESS_TEMPLATE = "TutorRegister/templates/TutprRegister/successful_register.html"
-LOGIN_URL = 'TutorRegister:success'
+LOGIN_URL = 'TutorRegister:login'
