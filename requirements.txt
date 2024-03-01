@@ -3,3 +3,8 @@ Django==5.0.2
 sqlparse==0.4.4
 tzdata==2024.1
 Django-Verify-Email==2.0.3
+black
+flake8
+coverage
+coveralls
+PyYAML
