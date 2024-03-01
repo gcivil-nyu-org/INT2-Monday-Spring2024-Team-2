@@ -3,16 +3,19 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 class Expertise(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.CharField(max_length=255)
     level = models.CharField(max_length=255)
+
 
 class Availability(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=255)
     start_time = models.TimeField()
     end_time = models.TimeField()
+
 
 class ProfileS(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -25,6 +28,7 @@ class ProfileS(models.Model):
     grade = models.CharField(max_length=255)
     preferred_mode = models.CharField(max_length=255)
     intro = models.TextField()
+
 
 class ProfileT(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -40,9 +44,11 @@ class ProfileT(models.Model):
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
 
+
 class UserType(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(max_length=100, null=True, blank=True)
+
 
 # Signal to automatically create or update UserType when a User instance is saved
 @receiver(post_save, sender=User)
