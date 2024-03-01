@@ -1,6 +1,5 @@
-from typing import Any
 from django import forms
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import RegexValidator
 
 
 class StudentForm(forms.Form):

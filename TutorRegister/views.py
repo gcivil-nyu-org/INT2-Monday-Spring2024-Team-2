@@ -1,15 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
 from .forms import RegisterUserForm
 from .TutorForm import TutorForm
 from .StudentForm import StudentForm
-from verify_email.email_handler import send_verification_email
+# from verify_email.email_handler import send_verification_email
 
 
 # register.html
@@ -17,8 +17,8 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            inactive_user = send_verification_email(request, form)
+            # user = form.save()
+            # inactive_user = send_verification_email(request, form)
             print(form.isTutor)
             # Redirect to a success page or login page
             if form.isTutor():
