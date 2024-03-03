@@ -37,32 +37,32 @@ def register(request):
 
 
 def TutorInformation(request):
-    if request.method == "POST":
-        form = TutorForm(request.POST)
-        if form.is_valid():
-            # Process the form data as needed
-            # For example, save to the database
-            # user = form.save()
-            return render(
-                request, "TutorRegister/successful_register.html"
-            )  # Redirect to a thank you page or another page
-    else:
-        form = TutorForm()
+    # if request.method == "POST":
+    #     form = TutorForm(request.POST)
+    #     if form.is_valid():
+    #         # Process the form data as needed
+    #         # For example, save to the database
+    #         # user = form.save()
+    #         return render(
+    #             request, "TutorRegister/successful_register.html"
+    #         )  # Redirect to a thank you page or another page
+    # else:
+    #     form = TutorForm()
     return render(request, "TutorRegister/TutorInformation.html", {"form": form})
 
 
 def StudentInformation(request):
-    if request.method == "POST":
-        form = StudentForm(request.POST)
-        if form.is_valid():
-            # Process the form data as needed
-            # For example, save to the database
-            # user = form.save()
-            return render(
-                request, "TutorRegister/successful_register.html"
-            )  # Redirect to a thank you page or another page
-    else:
-        form = StudentForm()
+    # if request.method == "POST":
+    #     form = StudentForm(request.POST)
+    #     if form.is_valid():
+    #         # Process the form data as needed
+    #         # For example, save to the database
+    #         # user = form.save()
+    #         return render(
+    #             request, "TutorRegister/successful_register.html"
+    #         )  # Redirect to a thank you page or another page
+    # else:
+    #     form = StudentForm()
     return render(request, "TutorRegister/StudentInformation.html", {"form": form})
 
 
