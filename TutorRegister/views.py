@@ -47,7 +47,7 @@ def TutorInformation(request):
     #             request, "TutorRegister/successful_register.html"
     #         )  # Redirect to a thank you page or another page
     # else:
-    #     form = TutorForm()
+    form = TutorForm()
     return render(request, "TutorRegister/TutorInformation.html", {"form": form})
 
 
@@ -62,7 +62,7 @@ def StudentInformation(request):
     #             request, "TutorRegister/successful_register.html"
     #         )  # Redirect to a thank you page or another page
     # else:
-    #     form = StudentForm()
+    form = StudentForm()
     return render(request, "TutorRegister/StudentInformation.html", {"form": form})
 
 
