@@ -1,36 +1,80 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
+from django.forms import ModelForm
+from TutorRegister.models import ProfileT, Expertise
 
 
-class TutorForm(forms.Form):
+class TutorForm(ModelForm):
     GENDER_CHOICES = [
-        ("male", "Male"),
-        ("female", "Female"),
+        ('female', 'Female'),
+        ('male', 'Male'),
+        ('prefernottosay','Prefer not to say'),
     ]
 
-    PREFERRED_MODE_CHOICES = [
-        ("online", "Online"),
-        ("in_person", "In-person"),
+    MODE_CHOICES = [
+        ('inperson', 'In-person'),
+        ('remote', 'Remote'),
+        ('both', 'Both'),
     ]
+    
+    DEGREE_CHOICES = [
+        ('freshman', 'Freshman'),
+        ('sophomore', 'Sophomore'),
+        ('junior', 'Junior'),
+        ('senior', 'Senior'),
+        ('grad', 'Graduate Student'),
+        ('phd', 'PhD Student'),
+    ]   
+    
+    
+    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
+    preferred_mode = forms.ChoiceField(choices=MODE_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
+    grade = forms.ChoiceField(choices=DEGREE_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
 
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, label="Gender")
-    zip_code = forms.CharField(
-        max_length=10,
-        label="Zip Code",
-        validators=[RegexValidator(r"^\d{5}$", message="Enter a valid ZIP code.")],
-    )
-    major = forms.CharField(max_length=100, label="Major")
-    preferred_mode = forms.ChoiceField(
-        choices=PREFERRED_MODE_CHOICES, label="Preferred Mode"
-    )
-    introduction = forms.CharField(widget=forms.Textarea, label="Introduction")
-    min_salary = forms.IntegerField(
-        validators=[MinValueValidator(0)], label="Minimum Salary ($)"
-    )
-    max_salary = forms.IntegerField(
-        validators=[MinValueValidator(0)], label="Maximum Salary ($)"
-    )
+    # expertise = forms.ModelMultipleChoiceField(
+    #     queryset=Expertise.objects.all(),
+    #     widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+    # )
 
+    class Meta:
+        model = ProfileT
+        fields = [
+            "fname",
+            "lname",
+            "gender",
+            "zip",
+            "grade",
+            "major",
+            "preferred_mode",
+            "salary_min",
+            "salary_max",
+            "intro",
+        ]
+        labels = {
+            "fname": "First Name",
+            "lname": "Last Name",
+            "gender": "Gender",
+            "zip": "Zip Code",
+            "grade": "Grade",
+            "major": "Major",
+            "preferred_mode": "Preferred Tutoring Mode",
+            "intro": "Introduction",
+            "salary_min": "Minimum Hourly Rate",
+            "salary_max": "Maximum Hourly Rate",
+        }
+        
+        widgets = {
+            'fname': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'lname': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'zip': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'major': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'salary_min': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'salary_max': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+            'intro': forms.Textarea(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
+
+        }
+        
+    
     def clean(self):
         cleaned_data = super().clean()
         min_salary = cleaned_data.get("min_salary")

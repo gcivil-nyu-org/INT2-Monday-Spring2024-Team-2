@@ -37,18 +37,18 @@ def register(request):
 
 
 def TutorInformation(request):
-    # if request.method == "POST":
-    #     form = TutorForm(request.POST)
-    #     if form.is_valid():
-    #         # Process the form data as needed
-    #         # For example, save to the database
-    #         # user = form.save()
-    #         return render(
-    #             request, "TutorRegister/successful_register.html"
-    #         )  # Redirect to a thank you page or another page
-    # else:
-    form = TutorForm()
-    return render(request, "TutorRegister/TutorInformation.html", {"form": form})
+    if request.method == 'POST':
+        form = TutorForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
+            return redirect('TutorRegister/successful_register.html')
+    else:
+        form = TutorForm()
+    context = {'form': form}
+    return render(request, "TutorRegister/TutorInformation.html", context)
 
 
 def StudentInformation(request):
