@@ -1,79 +1,96 @@
 from django import forms
-from django.core.validators import RegexValidator, MinValueValidator
+# from django.core.validators import RegexValidator, MinValueValidator
 from django.forms import ModelForm
 from TutorRegister.models import ProfileT, Availability
 
 
 class TutorForm(ModelForm):
     GENDER_CHOICES = [
-        ('female', 'Female'),
-        ('male', 'Male'),
-        ('prefernottosay','Prefer not to say'),
+        ("female", "Female"),
+        ("male", "Male"),
+        ("prefernottosay", "Prefer not to say"),
     ]
 
     MODE_CHOICES = [
-        ('inperson', 'In-person'),
-        ('remote', 'Remote'),
-        ('both', 'Both'),
+        ("inperson", "In-person"),
+        ("remote", "Remote"),
+        ("both", "Both"),
     ]
-    
+
     GRADE_CHOICE = [
-        ('freshman', 'Freshman'),
-        ('sophomore', 'Sophomore'),
-        ('junior', 'Junior'),
-        ('senior', 'Senior'),
-        ('grad', 'Graduate Student'),
-        ('phd', 'PhD Student'),
-    ]   
-    
-    EXPERTISE_CHOICES = [
-        ('math', 'Mathematics'),
-        ('algebra', 'Algebra'),
-        ('calculus', 'Calculus'),
-        ('computer_sci', 'Computer Science'),
-        ('elementary_math', 'Elementary Math'),
-        ('geometry', 'Geometry'),
-        ('high_school_math', 'High School Math'),
-        ('regents_math', 'Regents Math'),
-        ('act', 'ACT'),
-        ('gmat', 'GMAT'),
-        ('gre', 'GRE'),
-        ('ielts', 'IELTS'),
-        ('lsat', 'LSAT'),
-        ('sat', 'SAT'),
-        ('toefl', 'TOEFL'),
-        ('esl', 'ESL'),
-        ('economics', 'Economics'),
-        ('elementry_reading', "Elementary Reading"),
-        ('history', 'History'),
-        ('english', 'English'),
-        ('social_studies', 'Social Studies'),
-        ('writing', 'Writing'),
-        ('biology', 'Biology'),
-        ('physics', 'Physics'),
-        ('arabic', 'Arabic'),
-        ('chinese', 'Chinese'),
-        ('french', 'French'),
-        ('italian', 'Italian'),
-        ('german', 'German'),
-        ('russian', 'Russian'),
-        ('spanish', 'Spanish'),
-        ('cello', 'Cello'),
-        ('piano', 'Piano'),
-        ('singing', 'Singing'),
-        ('violin', 'Violin'),
+        ("freshman", "Freshman"),
+        ("sophomore", "Sophomore"),
+        ("junior", "Junior"),
+        ("senior", "Senior"),
+        ("grad", "Graduate Student"),
+        ("phd", "PhD Student"),
     ]
-    
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
-    preferred_mode = forms.ChoiceField(choices=MODE_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
-    grade = forms.ChoiceField(choices=GRADE_CHOICE, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
+
+    EXPERTISE_CHOICES = [
+        ("math", "Mathematics"),
+        ("algebra", "Algebra"),
+        ("calculus", "Calculus"),
+        ("computer_sci", "Computer Science"),
+        ("elementary_math", "Elementary Math"),
+        ("geometry", "Geometry"),
+        ("high_school_math", "High School Math"),
+        ("regents_math", "Regents Math"),
+        ("act", "ACT"),
+        ("gmat", "GMAT"),
+        ("gre", "GRE"),
+        ("ielts", "IELTS"),
+        ("lsat", "LSAT"),
+        ("sat", "SAT"),
+        ("toefl", "TOEFL"),
+        ("esl", "ESL"),
+        ("economics", "Economics"),
+        ("elementry_reading", "Elementary Reading"),
+        ("history", "History"),
+        ("english", "English"),
+        ("social_studies", "Social Studies"),
+        ("writing", "Writing"),
+        ("biology", "Biology"),
+        ("physics", "Physics"),
+        ("arabic", "Arabic"),
+        ("chinese", "Chinese"),
+        ("french", "French"),
+        ("italian", "Italian"),
+        ("german", "German"),
+        ("russian", "Russian"),
+        ("spanish", "Spanish"),
+        ("cello", "Cello"),
+        ("piano", "Piano"),
+        ("singing", "Singing"),
+        ("violin", "Violin"),
+    ]
+
+    gender = forms.ChoiceField(
+        choices=GENDER_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+    )
+    preferred_mode = forms.ChoiceField(
+        choices=MODE_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+    )
+    grade = forms.ChoiceField(
+        choices=GRADE_CHOICE,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+    )
 
     expertise = forms.MultipleChoiceField(
         choices=EXPERTISE_CHOICES,
-        widget=forms.SelectMultiple(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}),
+        widget=forms.SelectMultiple(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
         required=False,
     )
-    
+
     class Meta:
         model = ProfileT
         fields = [
@@ -100,42 +117,49 @@ class TutorForm(ModelForm):
             "salary_min": "Minimum Hourly Rate",
             "salary_max": "Maximum Hourly Rate",
         }
-        
-        widgets = {
-            'fname': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-            'lname': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-            'zip': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-            'major': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-            'salary_min': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px; col: sm'}),
-            'salary_max': forms.TextInput(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-            'intro': forms.Textarea(attrs={'class': 'form-control', 'style': 'margin-bottom: 10px;'}),
-        }    
-    
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     min_salary = cleaned_data.get("min_salary")
-    #     max_salary = cleaned_data.get("max_salary")
 
-    #     if (
-    #         min_salary is not None
-    #         and max_salary is not None
-    #         and min_salary > max_salary
-    #     ):
-    #         raise forms.ValidationError(
-    #             "Minimum salary must be less than or equal to maximum salary"
-    #         )
+        widgets = {
+            "fname": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "lname": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "zip": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "major": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "salary_min": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px; col: sm"}
+            ),
+            "salary_max": forms.TextInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "intro": forms.Textarea(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+        }
+
+
 class AvailabilityForm(forms.ModelForm):
     DAY_CHOICES = [
-        ('monday', 'Monday'),
-        ('tuesday', 'Tuesday'),
-        ('wednesday', 'Wednesday'),
-        ('thursday', 'Thursday'),
-        ('friday', 'Friday'),
-        ('saturday', 'Saturday'),
-        ('sunday', 'Sunday'),
-        ]   
-        
-    day_of_week = forms.ChoiceField(choices=DAY_CHOICES, widget=forms.Select(attrs={'class': 'form-select', 'style': 'margin-bottom: 10px;'}))
+        ("monday", "Monday"),
+        ("tuesday", "Tuesday"),
+        ("wednesday", "Wednesday"),
+        ("thursday", "Thursday"),
+        ("friday", "Friday"),
+        ("saturday", "Saturday"),
+        ("sunday", "Sunday"),
+    ]
+
+    day_of_week = forms.ChoiceField(
+        choices=DAY_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+    )
 
     class Meta:
         model = Availability
@@ -144,8 +168,20 @@ class AvailabilityForm(forms.ModelForm):
             "start_time",
             "end_time",
         ]
-        
+
         widgets = {
-            'start_time': forms.TimeInput(attrs={'class': 'form-control', 'type':'time','style': 'margin-bottom: 10px;'}),
-            'end_time': forms.TimeInput(attrs={'class': 'form-control', 'type':'time', 'style': 'margin-bottom: 10px;'}),
+            "start_time": forms.TimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "time",
+                    "style": "margin-bottom: 10px;",
+                }
+            ),
+            "end_time": forms.TimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "time",
+                    "style": "margin-bottom: 10px;",
+                }
+            ),
         }

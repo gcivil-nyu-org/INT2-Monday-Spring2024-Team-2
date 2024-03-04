@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -20,9 +20,9 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            #user = form.save()
+            # user = form.save()
             form.save()
-            #inactive_user = send_verification_email(request, form)
+            # inactive_user = send_verification_email(request, form)
             send_verification_email(request, form)
             print(form.isTutor)
             # Redirect to a success page or login page
@@ -38,7 +38,7 @@ def register(request):
 
 
 def TutorInformation(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         tutor_form = TutorForm(request.POST)
         availability_form = AvailabilityForm(request.POST)
         if tutor_form.is_valid() and availability_form.is_valid():
@@ -47,39 +47,40 @@ def TutorInformation(request):
             profile = tutor_form.save(commit=False)
             profile.user = user
             profile.save()
-            
+
             # save availability data
             availability_data = availability_form.cleaned_data
-            availability_data['user'] = user
+            availability_data["user"] = user
             Availability.objects.create(**availability_data)
-            
+
             # save expertise data to database
-            selected_expertise = request.POST.getlist('expertise')
+            selected_expertise = request.POST.getlist("expertise")
             if selected_expertise:
                 for expertise in selected_expertise:
                     Expertise.objects.create(user=user, subject=expertise)
-            return redirect('TutorRegister/successful_register.html')
+            return redirect("TutorRegister/successful_register.html")
     else:
         tutor_form = TutorForm()
         availability_form = AvailabilityForm()
     context = {
-        'tutor_form': tutor_form,
-        'availability_form': availability_form,}
+        "tutor_form": tutor_form,
+        "availability_form": availability_form,
+    }
     return render(request, "TutorRegister/TutorInformation.html", context)
 
 
 def StudentInformation(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = StudentForm(request.POST)
         if form.is_valid():
             user = request.user
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
-            return redirect('TutorRegister/successful_register.html')
+            return redirect("TutorRegister/successful_register.html")
     else:
         form = StudentForm()
-    context = {'form': form}
+    context = {"form": form}
     return render(request, "TutorRegister/StudentInformation.html", context)
 
 
