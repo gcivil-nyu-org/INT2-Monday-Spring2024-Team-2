@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -19,9 +19,9 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            # user = form.save()
+            #user = form.save()
             form.save()
-            # inactive_user = send_verification_email(request, form)
+            #inactive_user = send_verification_email(request, form)
             send_verification_email(request, form)
             print(form.isTutor)
             # Redirect to a success page or login page
@@ -52,18 +52,18 @@ def TutorInformation(request):
 
 
 def StudentInformation(request):
-    # if request.method == "POST":
-    #     form = StudentForm(request.POST)
-    #     if form.is_valid():
-    #         # Process the form data as needed
-    #         # For example, save to the database
-    #         # user = form.save()
-    #         return render(
-    #             request, "TutorRegister/successful_register.html"
-    #         )  # Redirect to a thank you page or another page
-    # else:
-    form = StudentForm()
-    return render(request, "TutorRegister/StudentInformation.html", {"form": form})
+    if request.method == 'POST':
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
+            return redirect('TutorRegister/successful_register.html')
+    else:
+        form = StudentForm()
+    context = {'form': form}
+    return render(request, "TutorRegister/StudentInformation.html", context)
 
 
 def success(request):
