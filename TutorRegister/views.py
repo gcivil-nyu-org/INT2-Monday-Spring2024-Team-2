@@ -8,8 +8,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
 from .forms import RegisterUserForm
-from .TutorForm import TutorForm
+from .TutorForm import TutorForm, AvailabilityForm
 from .StudentForm import StudentForm
+from .models import Expertise, Availability
 
 from verify_email.email_handler import send_verification_email
 
@@ -38,16 +39,32 @@ def register(request):
 
 def TutorInformation(request):
     if request.method == 'POST':
-        form = TutorForm(request.POST)
-        if form.is_valid():
+        tutor_form = TutorForm(request.POST)
+        availability_form = AvailabilityForm(request.POST)
+        if tutor_form.is_valid() and availability_form.is_valid():
+            # save tutor profile data
             user = request.user
-            profile = form.save(commit=False)
+            profile = tutor_form.save(commit=False)
             profile.user = user
             profile.save()
+            
+            # save availability data
+            availability_data = availability_form.cleaned_data
+            availability_data['user'] = user
+            Availability.objects.create(**availability_data)
+            
+            # save expertise data to database
+            selected_expertise = request.POST.getlist('expertise')
+            if selected_expertise:
+                for expertise in selected_expertise:
+                    Expertise.objects.create(user=user, subject=expertise)
             return redirect('TutorRegister/successful_register.html')
     else:
-        form = TutorForm()
-    context = {'form': form}
+        tutor_form = TutorForm()
+        availability_form = AvailabilityForm()
+    context = {
+        'tutor_form': tutor_form,
+        'availability_form': availability_form,}
     return render(request, "TutorRegister/TutorInformation.html", context)
 
 
