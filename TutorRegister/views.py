@@ -2,6 +2,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+    PasswordResetDoneView,
+)
+from django.urls import reverse_lazy
 
 # from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
@@ -91,3 +98,21 @@ def login_request(request):
             messages.error(request, "Invalid email or password.")
     form = AuthenticationForm()
     return render(request, "TutorRegister/login.html", {"login_form": form})
+
+
+class CustomPasswordResetView(PasswordResetView):
+    email_template_name = "registration/password_reset_email.html"
+    success_url = reverse_lazy("TutorRegister:password_reset_done")
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "TutorRegister/registration/password_reset_done.html"
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "TutorRegister/registration/password_reset_confirm.html"
+    success_url = reverse_lazy("TutorRegister:password_reset_complete")
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "TutorRegister/registration/password_reset_complete.html"
