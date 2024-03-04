@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -15,8 +15,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
 from .forms import RegisterUserForm
-from .TutorForm import TutorForm
+from .TutorForm import TutorForm, AvailabilityForm
 from .StudentForm import StudentForm
+from .models import Expertise, Availability
 
 from verify_email.email_handler import send_verification_email
 
@@ -44,33 +45,50 @@ def register(request):
 
 
 def TutorInformation(request):
-    # if request.method == "POST":
-    #     form = TutorForm(request.POST)
-    #     if form.is_valid():
-    #         # Process the form data as needed
-    #         # For example, save to the database
-    #         # user = form.save()
-    #         return render(
-    #             request, "TutorRegister/successful_register.html"
-    #         )  # Redirect to a thank you page or another page
-    # else:
-    form = TutorForm()
-    return render(request, "TutorRegister/TutorInformation.html", {"form": form})
+    if request.method == "POST":
+        tutor_form = TutorForm(request.POST)
+        availability_form = AvailabilityForm(request.POST)
+        if tutor_form.is_valid() and availability_form.is_valid():
+            # save tutor profile data
+            user = request.user
+            profile = tutor_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            # save availability data
+            availability_data = availability_form.cleaned_data
+            availability_data["user"] = user
+            Availability.objects.create(**availability_data)
+
+            # save expertise data to database
+            selected_expertise = request.POST.getlist("expertise")
+            if selected_expertise:
+                for expertise in selected_expertise:
+                    Expertise.objects.create(user=user, subject=expertise)
+            return redirect("TutorRegister/successful_register.html")
+    else:
+        tutor_form = TutorForm()
+        availability_form = AvailabilityForm()
+    context = {
+        "tutor_form": tutor_form,
+        "availability_form": availability_form,
+    }
+    return render(request, "TutorRegister/TutorInformation.html", context)
 
 
 def StudentInformation(request):
-    # if request.method == "POST":
-    #     form = StudentForm(request.POST)
-    #     if form.is_valid():
-    #         # Process the form data as needed
-    #         # For example, save to the database
-    #         # user = form.save()
-    #         return render(
-    #             request, "TutorRegister/successful_register.html"
-    #         )  # Redirect to a thank you page or another page
-    # else:
-    form = StudentForm()
-    return render(request, "TutorRegister/StudentInformation.html", {"form": form})
+    if request.method == "POST":
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            profile = form.save(commit=False)
+            profile.user = user
+            profile.save()
+            return redirect("TutorRegister/successful_register.html")
+    else:
+        form = StudentForm()
+    context = {"form": form}
+    return render(request, "TutorRegister/StudentInformation.html", context)
 
 
 def success(request):
