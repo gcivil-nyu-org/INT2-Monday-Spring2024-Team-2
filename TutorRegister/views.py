@@ -20,6 +20,7 @@ from .StudentForm import StudentForm
 from .models import Expertise, Availability
 
 from verify_email.email_handler import send_verification_email
+import json
 
 
 # register.html
@@ -56,9 +57,12 @@ def TutorInformation(request):
             profile.save()
 
             # save availability data
-            availability_data = availability_form.cleaned_data
-            availability_data["user"] = user
-            Availability.objects.create(**availability_data)
+            serialized_availabilities = request.POST.get("availabilities")
+            availabilities = json.loads(serialized_availabilities)
+
+            for availability_data in availabilities:
+                availability_data["user"] = user
+                Availability.objects.create(**availability_data)
 
             # save expertise data to database
             selected_expertise = request.POST.getlist("expertise")
