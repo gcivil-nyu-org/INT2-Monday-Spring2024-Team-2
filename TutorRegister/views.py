@@ -27,15 +27,13 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            # user = form.save()
-            form.save()
-            # inactive_user = send_verification_email(request, form)
+            user = form.save()
             send_verification_email(request, form)
-            print(form.isTutor)
+
             # Redirect to a success page or login page
-            if form.isTutor():
+            if user.usertype.user_type == "tutor":
                 return HttpResponseRedirect(reverse("TutorRegister:tutorinformation"))
-            elif form.isStudent():
+            elif user.usertype.user_type == "student":
                 return HttpResponseRedirect(reverse("TutorRegister:studentinformation"))
         else:
             print("Invalid form")
@@ -107,7 +105,7 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # print(user.usertype.user_type)
+
                 if user.usertype.user_type == "tutor":
                     return render(request, "TutorRegister/tutor_dashboard.html")
                 elif user.usertype.user_type == "student":

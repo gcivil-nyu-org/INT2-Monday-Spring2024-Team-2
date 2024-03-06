@@ -63,12 +63,6 @@ class RegisterUserForm(UserCreationForm):
 
         return user
 
-    def isTutor(self):
-        return super().clean().get("user_type") == "tutor"
-
-    def isStudent(self):
-        return super().clean().get("user_type") == "student"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in iter(self.fields):
