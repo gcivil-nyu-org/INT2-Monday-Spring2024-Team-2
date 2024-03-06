@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -66,7 +66,7 @@ def TutorInformation(request):
             if selected_expertise:
                 for expertise in selected_expertise:
                     Expertise.objects.create(user=user, subject=expertise)
-            return redirect("TutorRegister/successful_register.html")
+            return HttpResponseRedirect(reverse("TutorRegister:success"))
     else:
         tutor_form = TutorForm()
         availability_form = AvailabilityForm()
@@ -85,7 +85,7 @@ def StudentInformation(request):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
-            return redirect("TutorRegister/successful_register.html")
+            return HttpResponseRedirect(reverse("TutorRegister:success"))
     else:
         form = StudentForm()
     context = {"form": form}
