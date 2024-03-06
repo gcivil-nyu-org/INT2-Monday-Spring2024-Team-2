@@ -186,4 +186,3 @@ class AvailabilityForm(forms.ModelForm):
                 }
             ),
         }
-        
