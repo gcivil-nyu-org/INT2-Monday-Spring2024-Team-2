@@ -132,10 +132,10 @@ class TutorForm(ModelForm):
             "major": forms.TextInput(
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
-            "salary_min": forms.TextInput(
+            "salary_min": forms.NumberInput(
                 attrs={"class": "form-control", "style": "margin-bottom: 10px; col: sm"}
             ),
-            "salary_max": forms.TextInput(
+            "salary_max": forms.NumberInput(
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
             "intro": forms.Textarea(

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -10,13 +10,12 @@ from django.contrib.auth.views import (
 )
 from django.urls import reverse_lazy
 
-# from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
-from .forms import RegisterUserForm
-from .TutorForm import TutorForm, AvailabilityForm
-from .StudentForm import StudentForm
+from .forms.register_login import RegisterUserForm
+from .forms.tutor_info import TutorForm, AvailabilityForm
+from .forms.student_info import StudentForm
 from .models import Expertise, Availability
 
 from verify_email.email_handler import send_verification_email
@@ -28,15 +27,13 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            # user = form.save()
-            form.save()
-            # inactive_user = send_verification_email(request, form)
+            user = form.save()
             send_verification_email(request, form)
-            print(form.isTutor)
+
             # Redirect to a success page or login page
-            if form.isTutor():
+            if user.usertype.user_type == "tutor":
                 return HttpResponseRedirect(reverse("TutorRegister:tutorinformation"))
-            elif form.isStudent():
+            elif user.usertype.user_type == "student":
                 return HttpResponseRedirect(reverse("TutorRegister:studentinformation"))
         else:
             print("Invalid form")
@@ -69,7 +66,7 @@ def TutorInformation(request):
             if selected_expertise:
                 for expertise in selected_expertise:
                     Expertise.objects.create(user=user, subject=expertise)
-            return redirect("TutorRegister/successful_register.html")
+            return HttpResponseRedirect(reverse("TutorRegister:success"))
     else:
         tutor_form = TutorForm()
         availability_form = AvailabilityForm()
@@ -77,7 +74,7 @@ def TutorInformation(request):
         "tutor_form": tutor_form,
         "availability_form": availability_form,
     }
-    return render(request, "TutorRegister/TutorInformation.html", context)
+    return render(request, "TutorRegister/tutor_info.html", context)
 
 
 def StudentInformation(request):
@@ -88,11 +85,11 @@ def StudentInformation(request):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
-            return redirect("TutorRegister/successful_register.html")
+            return HttpResponseRedirect(reverse("TutorRegister:success"))
     else:
         form = StudentForm()
     context = {"form": form}
-    return render(request, "TutorRegister/StudentInformation.html", context)
+    return render(request, "TutorRegister/student_info.html", context)
 
 
 def success(request):
@@ -108,7 +105,7 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # print(user.usertype.user_type)
+
                 if user.usertype.user_type == "tutor":
                     return render(request, "TutorRegister/tutor_dashboard.html")
                 elif user.usertype.user_type == "student":
