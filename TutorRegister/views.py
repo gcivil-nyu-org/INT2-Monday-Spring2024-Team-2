@@ -10,13 +10,12 @@ from django.contrib.auth.views import (
 )
 from django.urls import reverse_lazy
 
-# from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
-from .forms import RegisterUserForm
-from .TutorForm import TutorForm, AvailabilityForm
-from .StudentForm import StudentForm
+from .forms.register_login import RegisterUserForm
+from .forms.tutor_info import TutorForm, AvailabilityForm
+from .forms.student_info import StudentForm
 from .models import Expertise, Availability
 
 from verify_email.email_handler import send_verification_email
