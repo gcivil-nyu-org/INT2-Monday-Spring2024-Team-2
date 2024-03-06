@@ -82,7 +82,7 @@
 
         $("#id_availabilities").val(serializedAvailabilities);
 
-        var chosenAvailability = `<div class="mb-2">${dayOfWeek} from ${startTime} to ${endTime} 
+        var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime} 
                                     <button class="btn btn-danger btn-sm ms-2" onclick="removeAvailability(this)">Remove</button>
                                   </div>`;
         $("#chosenAvailabilities").append(chosenAvailability);

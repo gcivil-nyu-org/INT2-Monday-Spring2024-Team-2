@@ -74,7 +74,7 @@ def TutorInformation(request):
         "tutor_form": tutor_form,
         "availability_form": availability_form,
     }
-    return render(request, "TutorRegister/TutorInformation.html", context)
+    return render(request, "TutorRegister/tutor_info.html", context)
 
 
 def StudentInformation(request):
@@ -89,7 +89,7 @@ def StudentInformation(request):
     else:
         form = StudentForm()
     context = {"form": form}
-    return render(request, "TutorRegister/StudentInformation.html", context)
+    return render(request, "TutorRegister/student_info.html", context)
 
 
 def success(request):
