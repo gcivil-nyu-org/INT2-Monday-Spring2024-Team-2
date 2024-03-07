@@ -11,33 +11,37 @@
                 <h2 class="fw-bold mb-0 fs-2 text-center">Student Profile</h2>
             </div>
             <div class="modal-body p-5 pt-0">
-                {% for user in user_list %}
-                    <div class="mb-3">
-                        <strong>First Name:</strong> {{ user.fname }}<br>
-                        <strong>Middle Name:</strong> {{ user.mname }}<br>
-                        <strong>Last Name:</strong> {{ user.lname }}<br>
-                        <strong>Gender:</strong> {{ user.gender }}<br>
-                        <strong>School:</strong> {{ user.school }}<br>
-                        <strong>Zip:</strong> {{ user.zip }}<br>
-                        <strong>Grade:</strong> {{ user.grade }}<br>
-                        <strong>Preferred Mode:</strong> {{ user.preferred_mode }}<br>
-                        <strong>Introduction:</strong> {{ user.intro }}<br>
-
-                        <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#editModal{{ user.id }}">
-                            Edit
-                        </button>
-
-                        <!-- Edit Modal -->
-                        <div class="modal fade" id="editModal{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <!-- Add your edit form or logic here -->
-                                    <!-- Ensure that you pass the user.id to your form for identifying the specific user -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
+                {% for user in student_P %}
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                                <th>Gender</th>
+                                <th>School</th>
+                                <th>Zip</th>
+                                <th>Grade</th>
+                                <th>Preferred Mode</th>
+                                <th>Introduction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in student_P %}
+                                <tr>
+                                    <td>{{ user.fname }}</td>
+                                    <td>{{ user.mname }}</td>
+                                    <td>{{ user.lname }}</td>
+                                    <td>{{ user.gender }}</td>
+                                    <td>{{ user.school }}</td>
+                                    <td>{{ user.zip }}</td>
+                                    <td>{{ user.grade }}</td>
+                                    <td>{{ user.preferred_mode }}</td>
+                                    <td>{{ user.intro }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 {% endfor %}
             </div>
         </div>

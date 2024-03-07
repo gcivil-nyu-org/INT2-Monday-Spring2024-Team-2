@@ -23,5 +23,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include("TutorRegister.urls")),
     path("verification/", include("verify_email.urls")),
+    path("dashboard/", include("Dashboard.urls")),
     path("", views.home, name="home"),
 ]
