@@ -8,3 +8,4 @@ exclude =
     eb-virt,
     settings,
     migrations
+ignore = F401

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["app-env.eba-ndymim3f.us-west-2.elasticbeanstalk.com", "127.0.0
 # Application definition
 
 INSTALLED_APPS = [
+    "Dashboard.apps.DashboardConfig",
     "TutorRegister.apps.HomepageConfig",
     "django.contrib.admin",
     "django.contrib.auth",
