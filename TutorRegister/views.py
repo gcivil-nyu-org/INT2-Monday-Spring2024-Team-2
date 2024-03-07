@@ -16,7 +16,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms.register_login import RegisterUserForm
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
-from .models import Expertise, Availability
+from .models import Expertise, Availability, ProfileS
 
 from verify_email.email_handler import send_verification_email
 import json
@@ -28,13 +28,11 @@ def register(request):
         form = RegisterUserForm(request.POST)
         if form.is_valid():
             user = form.save()
+            print(user.username)
             send_verification_email(request, form)
 
             # Redirect to a success page or login page
-            if user.usertype.user_type == "tutor":
-                return HttpResponseRedirect(reverse("TutorRegister:tutorinformation"))
-            elif user.usertype.user_type == "student":
-                return HttpResponseRedirect(reverse("TutorRegister:studentinformation"))
+            return HttpResponseRedirect(reverse("TutorRegister:success"))
         else:
             print("Invalid form")
     else:
@@ -107,10 +105,10 @@ def login_request(request):
                 login(request, user)
 
                 if user.usertype.user_type == "tutor":
-                    return render(request, "TutorRegister/tutor_dashboard.html")
+                    return HttpResponseRedirect(reverse("Dashboard:tutor_edit"))
                 elif user.usertype.user_type == "student":
                     return render(request, "TutorRegister/student_dashboard.html")
-                return render(request, "TutorRegister/successful_register.html")
+                return HttpResponseRedirect(reverse("Dashboard:student_edit"))
             else:
                 messages.error(request, "Invalid email or password.")
         else:
