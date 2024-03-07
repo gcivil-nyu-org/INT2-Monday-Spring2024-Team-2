@@ -17,7 +17,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterUserForm
 from .TutorForm import TutorForm, AvailabilityForm
 from .StudentForm import StudentForm
-from .models import Expertise, Availability
+from .models import Expertise, Availability, ProfileS
 
 from verify_email.email_handler import send_verification_email
 import json
