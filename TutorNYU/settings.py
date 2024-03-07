@@ -121,7 +121,6 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR / "static"),
-    "/static/",
 )
 
 # Default primary key field type
@@ -139,6 +138,6 @@ EMAIL_HOST_PASSWORD = "mkysmehradxduvgg"
 
 DEFAULT_FROM_EMAIL = "tutornyuengineeringverify@gmail.com"
 
-VERIFICATION_SUCCESS_TEMPLATE = "TutorRegister/templates/TutprRegister/successful_register.html"
+# VERIFICATION_SUCCESS_TEMPLATE = "TutorRegister/templates/TutprRegister/successful_register.html"
 LOGIN_URL = "TutorRegister:login"
 PASSWORD_RESET_EMAIL_TEMPLATE_NAME = "registration/password_reset_email.html"
