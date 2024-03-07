@@ -50,6 +50,7 @@ class UserType(models.Model):
     user_type = models.CharField(max_length=100, null=True, blank=True)
     profile_create_flg = models.BooleanField(default=False)
 
+
 # Signal to automatically create or update UserType when a User instance is saved
 @receiver(post_save, sender=User)
 def create_or_update_user_type(sender, instance, created, **kwargs):
