@@ -29,6 +29,8 @@ def register(request):
         if form.is_valid():
             user = form.save()
             print(user.username)
+            user.usertype.has_profile_complete = False
+            user.usertype.save()
             send_verification_email(request, form)
 
             # Redirect to a success page or login page
