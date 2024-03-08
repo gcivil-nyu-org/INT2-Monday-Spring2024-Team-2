@@ -1,4 +1,4 @@
-{% extends 'TutorRegister/base.html' %}
+{% extends 'Dashboard/base_tutor.html' %}
 
 {% block title %} Create Tutor Profile{% endblock %}
 
@@ -7,11 +7,11 @@
   <div class="modal-dialog" role="document">
       <div class="modal-content rounded-4 shadow">
           <div class="modal-header p-5 pb-4 border-bottom-0">
-              <h2 class="fw-bold mb-0 fs-2 text-center">Create Your Tutor Profile</h2>
+              <h2 class="fw-bold mb-0 fs-2 text-center">Your Tutor Profile</h2>
           </div>
 
           <div class="modal-body p-5 pt-0">
-              <form method="post" action="{% url 'Dashboard:tutor_edit' %}">
+              <form method="post" action="{% url 'Dashboard:tutor_profile' %}">
                   {% csrf_token %}
                   <div class="mb-3">
                     {% for field in tutor_form %}
