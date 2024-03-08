@@ -11,11 +11,11 @@ from datetime import datetime, time
 
 # Create your views here.
 def TutorInformation(request):
-    profile, created = ProfileT.objects.get_or_create(user=request.user)
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
     if request.method == "POST":
+        profile, created = ProfileT.objects.get_or_create(user=request.user)
         tutor_form = TutorForm(request.POST, instance=profile)
         availability_form = AvailabilityForm(request.POST)
         if tutor_form.is_valid() and availability_form.is_valid():
@@ -41,18 +41,26 @@ def TutorInformation(request):
                     Expertise.objects.create(user=user, subject=expertise)
             user.usertype.has_profile_complete = True
             user.usertype.save()
-            return HttpResponseRedirect(reverse("TutorRegister:success"))
+            return HttpResponseRedirect(reverse("Dashboard:tutor_dashboard"))
     else:
-        profile = ProfileT.objects.get(user=request.user)
-        existing_availabilities = Availability.objects.filter(user=request.user)
-        # existing_expertise = Expertise.objects.filter(user=request.user).values_list('subject')
-        tutor_form = TutorForm(instance=profile)
-        initial_availabilities_json = json.dumps(
-            list(
-                existing_availabilities.values("day_of_week", "start_time", "end_time")
-            ),
-            cls=DateTimeEncoder,
-        )
+        profile = None
+        existing_availabilities = None
+        tutor_form = TutorForm()
+        initial_availabilities_json = "[]"
+        try:
+            profile = ProfileT.objects.get(user=request.user)
+            existing_availabilities = Availability.objects.filter(user=request.user)
+            initial_availabilities_json = json.dumps(
+                list(
+                    existing_availabilities.values(
+                        "day_of_week", "start_time", "end_time"
+                    )
+                ),
+                cls=DateTimeEncoder,
+            )
+            tutor_form = TutorForm(instance=profile)
+        except Exception as e:
+            print("Error " + str(e))
         availability_form = AvailabilityForm()
         tutor_form.initial["expertise"] = existing_expertise
     context = {
@@ -73,7 +81,7 @@ def StudentInformation(request):
             profile.save()
             user.usertype.has_profile_complete = True
             user.usertype.save()
-            return HttpResponseRedirect(reverse("TutorRegister:success"))
+            return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         form = StudentForm()
     context = {"form": form}

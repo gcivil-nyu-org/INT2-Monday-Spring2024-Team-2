@@ -108,12 +108,16 @@ def login_request(request):
 
                 if user.usertype.user_type == "tutor":
                     if user.usertype.has_profile_complete:
-                        return HttpResponseRedirect(reverse("Dashboard:tutor"))
+                        return HttpResponseRedirect(
+                            reverse("Dashboard:tutor_dashboard")
+                        )
                     else:
                         return HttpResponseRedirect(reverse("Dashboard:tutor_edit"))
                 elif user.usertype.user_type == "student":
                     if user.usertype.has_profile_complete:
-                        return HttpResponseRedirect(reverse("Dashboard:student"))
+                        return HttpResponseRedirect(
+                            reverse("Dashboard:student_dashboard")
+                        )
                     else:
                         return HttpResponseRedirect(reverse("Dashboard:student_edit"))
             else:

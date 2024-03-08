@@ -41,8 +41,8 @@ class ProfileT(models.Model):
     grade = models.CharField(max_length=255)
     preferred_mode = models.CharField(max_length=255)
     intro = models.TextField()
-    salary_min = models.IntegerField()
-    salary_max = models.IntegerField()
+    salary_min = models.IntegerField(default=0)
+    salary_max = models.IntegerField(default=0)
 
 
 class UserType(models.Model):
