@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
 from TutorRegister.models import Expertise, Availability, ProfileT
@@ -79,9 +80,21 @@ def StudentInformation(request):
     return render(request, "TutorRegister/student_info.html", context)
 
 
+def StudentDashboard(request):
+    return render(request, "Dashboard/student_dashboard.html")
+
+
+def TutorDashboard(request):
+    return render(request, "Dashboard/tutor_dashboard.html")
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
+
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (datetime, time)):
             return obj.strftime("%H:%M")
-        # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)
