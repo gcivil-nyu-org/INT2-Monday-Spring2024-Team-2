@@ -29,6 +29,8 @@ def register(request):
         if form.is_valid():
             user = form.save()
             print(user.username)
+            user.usertype.has_profile_complete = False
+            user.usertype.save()
             send_verification_email(request, form)
 
             # Redirect to a success page or login page
@@ -105,10 +107,15 @@ def login_request(request):
                 login(request, user)
 
                 if user.usertype.user_type == "tutor":
-                    return HttpResponseRedirect(reverse("Dashboard:tutor_edit"))
+                    if user.usertype.has_profile_complete:
+                        return HttpResponseRedirect(reverse("Dashboard:tutor"))
+                    else:
+                        return HttpResponseRedirect(reverse("Dashboard:tutor_edit"))
                 elif user.usertype.user_type == "student":
-                    return render(request, "TutorRegister/student_dashboard.html")
-                return HttpResponseRedirect(reverse("Dashboard:student_edit"))
+                    if user.usertype.has_profile_complete:
+                        return HttpResponseRedirect(reverse("Dashboard:student"))
+                    else:
+                        return HttpResponseRedirect(reverse("Dashboard:student_edit"))
             else:
                 messages.error(request, "Invalid email or password.")
         else:

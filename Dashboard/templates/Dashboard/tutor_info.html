@@ -63,7 +63,34 @@
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-    var availabilities = [];
+  var initialAvailabilities = JSON.parse('{{ initial_availabilities_json | safe }}');
+  var availabilities = [];
+$(document).ready(function() {
+    function prepopulateAvailabilities() {
+        initialAvailabilities.forEach(function(availability, index,array) {
+            var dayOfWeek = availability.day_of_week; 
+            var startTime = availability.start_time;   
+            var endTime = availability.end_time;
+
+            var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime}
+                                        <button class="btn btn-danger btn-sm ms-2" onclick="removeAvailability(this)">Remove</button>
+                                      </div>`;
+            $("#chosenAvailabilities").append(chosenAvailability);
+            availabilities.push({day_of_week: dayOfWeek, start_time: startTime, end_time: endTime});
+            if (index === array.length - 1) {
+                $("input[name='start_time']").val(startTime);
+                $("input[name='end_time']").val(endTime);
+            }
+        });
+        // Update the hidden input with the serialized data
+        $("#id_availabilities").val(JSON.stringify(availabilities));
+
+    }
+
+    prepopulateAvailabilities();
+});
+
+    
     function addAvailability() {
         
         var dayOfWeek = $("select[name='day_of_week']").val(); 
