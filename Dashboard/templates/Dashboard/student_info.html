@@ -11,7 +11,7 @@
           </div>
 
           <div class="modal-body p-5 pt-0">
-              <form method="post" action="{% url 'Dashboard:tutor_edit' %}">
+              <form method="post" action="{% url 'Dashboard:student_edit' %}">
                   {% csrf_token %}
                   <div class="mb-3">
                     {{form}}

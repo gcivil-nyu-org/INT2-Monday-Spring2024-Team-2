@@ -48,6 +48,7 @@ class ProfileT(models.Model):
 class UserType(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(max_length=100, null=True, blank=True)
+    has_profile_complete = models.BooleanField(default=False, null=False)
 
 
 # Signal to automatically create or update UserType when a User instance is saved
