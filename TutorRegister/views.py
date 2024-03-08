@@ -119,7 +119,9 @@ def login_request(request):
                             reverse("Dashboard:student_dashboard")
                         )
                     else:
-                        return HttpResponseRedirect(reverse("Dashboard:student_profile"))
+                        return HttpResponseRedirect(
+                            reverse("Dashboard:student_profile")
+                        )
             else:
                 messages.error(request, "Invalid email or password.")
         else:
