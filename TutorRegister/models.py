@@ -41,13 +41,14 @@ class ProfileT(models.Model):
     grade = models.CharField(max_length=255)
     preferred_mode = models.CharField(max_length=255)
     intro = models.TextField()
-    salary_min = models.IntegerField()
-    salary_max = models.IntegerField()
+    salary_min = models.IntegerField(default=0)
+    salary_max = models.IntegerField(default=0)
 
 
 class UserType(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(max_length=100, null=True, blank=True)
+    has_profile_complete = models.BooleanField(default=False, null=False)
 
 
 # Signal to automatically create or update UserType when a User instance is saved
