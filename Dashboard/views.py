@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
 from TutorRegister.models import Expertise, Availability, ProfileS
@@ -58,3 +59,16 @@ def StudentInformation(request):
         form = StudentForm()
     context = {"form": form}
     return render(request, "TutorRegister/student_info.html", context)
+
+
+def StudentDashboard(request):
+    return render(request, "Dashboard/student_dashboard.html")
+
+
+def TutorDashboard(request):
+    return render(request, "Dashboard/tutor_dashboard.html")
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
