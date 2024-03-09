@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
-from TutorRegister.models import Expertise, Availability, ProfileT
+from TutorRegister.models import Expertise, Availability, ProfileT, ProfileS
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import json
@@ -73,19 +73,27 @@ def TutorInformation(request):
 
 def StudentInformation(request):
     if request.method == "POST":
-        form = StudentForm(request.POST)
-        if form.is_valid():
+        profile, created = ProfileS.objects.get_or_create(user=request.user)
+        print(profile)
+        student_form = StudentForm(request.POST, instance=profile)
+        if student_form.is_valid():
             user = request.user
-            profile = form.save(commit=False)
+            profile = student_form.save(commit=False)
             profile.user = user
             profile.save()
             user.usertype.has_profile_complete = True
             user.usertype.save()
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
-        form = StudentForm()
-    context = {"form": form}
-    return render(request, "TutorRegister/student_info.html", context)
+        profile = None
+        student_form = StudentForm()
+        try:
+            profile = ProfileS.objects.get(user=request.user)
+            student_form = StudentForm(instance=profile)
+        except Exception as e:
+            print("Error " + str(e))
+    context = {"student_form": student_form}
+    return render(request, "Dashboard/student_info.html", context)
 
 
 def StudentDashboard(request):

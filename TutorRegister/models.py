@@ -28,6 +28,7 @@ class ProfileS(models.Model):
     grade = models.CharField(max_length=255)
     preferred_mode = models.CharField(max_length=255)
     intro = models.TextField()
+    image = models.ImageField(upload_to="images/", default="images/profile_icon.png")
 
 
 class ProfileT(models.Model):
@@ -43,6 +44,7 @@ class ProfileT(models.Model):
     intro = models.TextField()
     salary_min = models.IntegerField(default=0)
     salary_max = models.IntegerField(default=0)
+    image = models.ImageField(upload_to="images/", default="images/profile_icon.png")
 
 
 class UserType(models.Model):
