@@ -7,14 +7,14 @@ class TutorFilterForm(forms.Form):
     # username = forms.CharField(required=False)
     # email = forms.EmailField(required=False)
     MODE_CHOICES = [
-        ("..",".."),
+        ("..", ".."),
         ("inperson", "In-person"),
         ("remote", "Remote"),
         ("both", "Both"),
     ]
 
     GRADE_CHOICE = [
-        ("..",".."),
+        ("..", ".."),
         ("freshman", "Freshman"),
         ("sophomore", "Sophomore"),
         ("junior", "Junior"),
@@ -24,7 +24,7 @@ class TutorFilterForm(forms.Form):
     ]
 
     EXPERTISE_CHOICES = [
-        ("..",".."),
+        ("..", ".."),
         ("math", "Mathematics"),
         ("algebra", "Algebra"),
         ("calculus", "Calculus"),
@@ -85,5 +85,5 @@ class TutorFilterForm(forms.Form):
         required=False,
     )
 
-    zipcode = forms.CharField(max_length=255,required = False)
+    zipcode = forms.CharField(max_length=255, required=False)
     salary_max = forms.IntegerField(required=False)
