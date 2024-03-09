@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Tutor</title>
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .card img {
+            max-width: 60%;
+            height: auto;
+            border-radius: 50%;
+        }
+        .distance {
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+        select {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input{
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-button {
+            padding: 10px 20px;
+            background-color: #600E90;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            max-height: 50px;
+            align-items: center;
+        }
+        /* Add further styling as needed */
+    </style>
+</head>
+<body>
+    <div class="container">
+    <form method="get">
+        <div style="display: flex;justify-content: space-between;text-align: center;">
+        {% for field in form %}
+            <div style="margin-right: 10px;color: #600E90; font-family: Arial;">
+                <label for="{{field.label}}">{{ field.label }}</label>
+                <div>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: #8a8a8a;">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        <button class="search-button">Search</button>
+        </div>
+       
+    </form>
+    
+    <div class="search-results">
+        <!-- Repeat this block for each tutor result -->
+        {% for user in users %}
+            <div class="card">
+                <img src="/media/images/profile_icon.png" alt="Tutor">
+                <div class="tutor-info">
+                    <p>{{ user.fname }} {{user.lname}}</p>
+                    <p>Major: {{user.major}}</p>
+                    <p>Grade: {{user.grade}}</p>
+                    <p>Preferred Mode: {{user.preferred_mode}}</p>
+                    <p>Zipcode: {{ user.zip }}</p>
+                <!-- More info as necessary -->
+                </div>
+                <button class="search-button">Details</button>
+            <!-- Add interactive elements like buttons if needed -->
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+</body>
+</html>
