@@ -24,3 +24,4 @@ tzdata==2024.1
 urllib3==2.2.1
 psycopg2-binary==2.9.9
 python-dotenv==1.0.1
+pillow==10.2.0
