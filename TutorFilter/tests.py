@@ -59,10 +59,7 @@ class TutorFilterTest(TestCase):
         }
         # form = TutorFilterForm(data=form_data)
 
-        response2 = c.post(
-            reverse("TutorFilter:filter_tutors"),
-            form_data2
-        )
+        response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
 
         # Check if the response is 200 OK
         self.assertEqual(response2.status_code, 200)
@@ -72,7 +69,4 @@ class TutorFilterTest(TestCase):
             form_data2,
         )
         # Check if the response context contains the expected user
-        users_in_context = response2.context["users"]
-        # print(users_in_context)
-        self.assertEqual(len(response2.context['users']), 0)
-        
+        self.assertEqual(len(response2.context["users"]), 0)
