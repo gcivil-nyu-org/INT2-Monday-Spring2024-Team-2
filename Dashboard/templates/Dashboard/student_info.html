@@ -14,7 +14,7 @@
               <form method="post" action="{% url 'Dashboard:student_profile' %}">
                   {% csrf_token %}
                   <div class="mb-3">
-                    {{form}}
+                    {{student_form}}
                   </div>
                   <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
               </form>
