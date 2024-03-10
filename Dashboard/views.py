@@ -86,7 +86,7 @@ def StudentInformation(request):
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         form = StudentForm()
-    context = { "form": form }
+    context = {"form": form}
     return render(request, "Dashboard/student_info.html", context)
 
 
