@@ -86,14 +86,15 @@ class TutorFilterForm(forms.Form):
     )
 
     zipcode = forms.CharField(
-        max_length=255, 
+        max_length=255,
         widget=forms.TextInput(
             attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
         ),
-        required=False, 
+        required=False,
     )
     salary_max = forms.IntegerField(
-         widget=forms.NumberInput(
+        widget=forms.NumberInput(
             attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
         ),
-        required=False)
+        required=False,
+    )
