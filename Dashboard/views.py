@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
 from TutorRegister.models import Expertise, Availability, ProfileT
@@ -9,7 +10,7 @@ import json
 from datetime import datetime, time
 
 
-# Create your views here.
+@login_required
 def TutorInformation(request):
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
@@ -71,6 +72,7 @@ def TutorInformation(request):
     return render(request, "Dashboard/tutor_info.html", context)
 
 
+@login_required
 def StudentInformation(request):
     if request.method == "POST":
         form = StudentForm(request.POST)
@@ -84,14 +86,16 @@ def StudentInformation(request):
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         form = StudentForm()
-    context = {"form": form}
-    return render(request, "TutorRegister/student_info.html", context)
+    context = { "form": form }
+    return render(request, "Dashboard/student_info.html", context)
 
 
+@login_required
 def StudentDashboard(request):
     return render(request, "Dashboard/student_dashboard.html")
 
 
+@login_required
 def TutorDashboard(request):
     return render(request, "Dashboard/tutor_dashboard.html")
 
