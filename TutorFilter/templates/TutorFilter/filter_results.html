@@ -83,7 +83,7 @@
         <!-- Repeat this block for each tutor result -->
         {% for user in users %}
             <div class="card">
-                <img src="/media/images/profile_icon.png" alt="Tutor">
+                <img src="/media/{{user.image}}" alt="Tutor">
                 <div class="tutor-info">
                     <p>{{ user.fname }} {{user.lname}}</p>
                     <p>Major: {{user.major}}</p>
