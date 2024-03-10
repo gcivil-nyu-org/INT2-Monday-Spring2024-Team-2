@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from TutorRegister.models import ProfileT, Expertise
 from .forms import TutorFilterForm
 
+
 class TutorFilterTest(TestCase):
     @classmethod
     def setUpTestData(self):
@@ -26,13 +27,13 @@ class TutorFilterTest(TestCase):
     def test_filter_tutors(self):
         # Simulate a GET request with query parameters
         form_data = {
-                "expertise": "Mathematics",
-                "preferred_mode": "remote",
-                "grade": "freshman",
-                "zipcode": "12345",
-                "salary_max": 60,
-            }
-        form = TutorFilterForm(data=form_data)
+            "expertise": "Mathematics",
+            "preferred_mode": "remote",
+            "grade": "freshman",
+            "zipcode": "12345",
+            "salary_max": 60,
+        }
+        # form = TutorFilterForm(data=form_data)
 
         response = self.client.get(
             reverse("TutorFilter:filter_tutors"),
@@ -45,4 +46,3 @@ class TutorFilterTest(TestCase):
         # Check if the response context contains the expected user
         users_in_context = response.context["users"]
         self.assertTrue(any(user.user == self.testuser for user in users_in_context))
-    
