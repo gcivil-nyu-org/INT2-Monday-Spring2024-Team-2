@@ -1,102 +1,96 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <title>Find Your Tutor</title>
-    <style>
-        .container {
-            width: 80%;
-            margin: auto;
-        }
-        .filter-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .search-results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .card img {
-            max-width: 60%;
-            height: auto;
-            border-radius: 50%;
-        }
-        .distance {
-            font-size: 0.8em;
-            margin-top: 10px;
-        }
-        select {
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        input{
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .search-button {
-            padding: 10px 20px;
-            background-color: #600E90;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            max-height: 50px;
-            align-items: center;
-        }
-        /* Add further styling as needed */
-    </style>
 </head>
+<div class="container">
+    <!-- Navigation Bar -->
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <div class="col-md-3 mb-2 mb-md-0">
+            <a href="{% url 'home' %}" class="d-inline-flex link-body-emphasis text-decoration-none">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" width = "120">          
+            </a>
+        </div>
+  
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{% url 'Dashboard:student_dashboard' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Sessions</a></li>
+          <li><a href="{% url 'TutorFilter:filter_tutors' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">Find A Tutor</a></li>
+          <li><a href="#" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Requests</a></li>
+          <li><a href="#" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Profile</a></li>
+        </ul>
+  
+        <div class="col-md-3 text-end">
+          <form method="post" action="{% url 'Dashboard:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Log Out</button>
+          </form>
+        </div>
+    </header>
+</div>
 <body>
+    <br/>
     <div class="container">
     <form method="get">
-        <div style="display: flex;justify-content: space-between;text-align: center;">
-        {% for field in form %}
-            <div style="margin-right: 10px;color: #600E90; font-family: Arial;">
-                <label for="{{field.label}}">{{ field.label }}</label>
-                <div>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small style="color: #8a8a8a;">{{ field.help_text }}</small>
-                    {% endif %}
-                </div>
+        <div class="row g-3 d-flex align-items-buttom">
+            <div class="form-group col-md-2">
+                <label style="color: #600E90"> {{ form.preferred_mode.label}}: </label>
+                {{ form.preferred_mode}}
             </div>
-        {% endfor %}
-        <button class="search-button">Search</button>
+            <div class="form-group col-md-2">
+                <label style="color: #600E90"> Tutor Grade:  </label>
+                {{ form.grade}}
+            </div>
+            <div class="form-group col-md-3">
+                <label style="color: #600E90"> Subject:  </label>
+                {{ form.expertise}}
+            </div>
+            <div class="form-group col-md-2">
+                <label style="color: #600E90"> Zip Code:  </label>
+                {{ form.zipcode}}
+            </div>
+            <div class="form-group col-md-2">
+                <label style="color: #600E90"> Max Hourly Rate: </label>
+                {{ form.salary_max}}
+            </div>
+            <div class="form-group col-md-1">
+                <label>  </label>
+                <button class="btn btn-outline-success" style="background-color: #600E90; color: white; border-color: #600E90">Search</button>
+            </div>
         </div>
-       
     </form>
-    
-    <div class="search-results">
+<br/>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
         <!-- Repeat this block for each tutor result -->
         {% for user in users %}
-            <div class="card">
-                <img src="/media/images/profile_icon.png" alt="Tutor">
-                <div class="tutor-info">
-                    <p>{{ user.fname }} {{user.lname}}</p>
-                    <p>Major: {{user.major}}</p>
-                    <p>Grade: {{user.grade}}</p>
-                    <p>Preferred Mode: {{user.preferred_mode}}</p>
-                    <p>Zipcode: {{ user.zip }}</p>
+        <div class="col">
+            <div class="card h-80">
+                <img src="/media/images/profile_icon.png" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
+                <div style="padding-top:10px">
+                    <div style="text-align:center; margin-bottom:10px">
+                        <h5>{{ user.fname }} {{user.lname}}</h5>
+                    </div>
+                    <div style="padding-left:40px">
+                    <p class="lh-sm">Major: {{user.major}}</p>
+                    <p class="lh-sm">Grade: {{user.grade}}</p>
+                    <p class="lh-sm">Preferred Mode: {{user.preferred_mode}}</p>
+                    <p class="lh-sm">Zipcode: {{ user.zip }}</p>
+                    </div>
                 <!-- More info as necessary -->
                 </div>
-                <button class="search-button">Details</button>
+                <div class="text-center mb-2">
+                    <button class="btn btn-outline-success" style="width: 100px; background-color: #600E90; color: white; border-color: #600E90;margin-bottom: 10px" > Detail </button>
+                </div>
             <!-- Add interactive elements like buttons if needed -->
+            </div>
         </div>
         {% endfor %}
     </div>
-    </div>
+</div>
 </body>
 </html>
