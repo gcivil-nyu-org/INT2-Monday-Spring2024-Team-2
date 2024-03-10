@@ -28,7 +28,7 @@
                         <div class="mb-3">
                             <label for="{{ field.id_for_label }}" class="form-label">
                                 {% if field.name == 'username' %}
-                                Email:
+                                <p style="margin-left:30px; margin-bottom:0;">Email:</p>
                                 {% else %}
                                 {{ field.label }}:
                                 {% endif %}
@@ -45,7 +45,6 @@
                         <div class="mt-3">
                             <a href="{% url 'TutorRegister:password_reset' %}">Forgot password?</a>
                         </div>
-
                     </div>
                     <button type="submit" class="btn btn-primary"
                         style="background-color: #600E90; color: white; border-color: #600E90">Log in</button>
