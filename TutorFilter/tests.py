@@ -14,7 +14,7 @@ class TutorFilterTest(TestCase):
             username="testuser@example.com",
             password="testpassword",
         )
-        Expertise.objects.create(user=self.testuser, subject="Math")
+        Expertise.objects.create(user=self.testuser, subject="math")
         ProfileT.objects.create(
             user=self.testuser,
             preferred_mode="remote",
@@ -27,9 +27,9 @@ class TutorFilterTest(TestCase):
     def test_filter_tutors(self):
         # Simulate a GET request with query parameters
         form_data = {
-            "expertise": "Mathematics",
             "preferred_mode": "remote",
             "grade": "freshman",
+            "expertise": "math",
             "zipcode": "12345",
             "salary_max": 60,
         }
@@ -50,30 +50,29 @@ class TutorFilterTest(TestCase):
     def test_filter_tutors2(self):
         c = Client()
         # Simulate a GET request with query parameters
-        form_data = {
-            "expertise": "Mathematics",
+        form_data2 = {
             "preferred_mode": "remote",
-            "grade": "freshman",
+            "grade": "grad",
+            "expertise": "math",
             "zipcode": "11111",
             "salary_max": 20,
         }
         # form = TutorFilterForm(data=form_data)
 
-        response = c.post(
+        response2 = c.post(
             reverse("TutorFilter:filter_tutors"),
-            form_data,
+            form_data2
         )
 
         # Check if the response is 200 OK
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
 
-        response = c.get(
+        response2 = c.get(
             reverse("TutorFilter:filter_tutors"),
-            form_data,
+            form_data2,
         )
         # Check if the response context contains the expected user
-        users_in_context = response.context["users"]
-        self.assertTrue(
-            any(user.user == self.testuser for user in users_in_context)
-        )
+        users_in_context = response2.context["users"]
+        # print(users_in_context)
+        self.assertEqual(len(response2.context['users']), 0)
         
