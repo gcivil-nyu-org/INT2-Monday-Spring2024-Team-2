@@ -1,10 +1,11 @@
 from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .views import StudentInformation
-from TutorRegister.models import ProfileS
+from .views import StudentInformation, TutorInformation
+from TutorRegister.models import ProfileS, ProfileT
 from .forms.student_info import StudentForm
-
+from .forms.tutor_info import TutorForm, AvailabilityForm
+import json
 
 # Create your tests here.
 class StudentDashboardTestCase(TestCase):
@@ -58,7 +59,57 @@ class HomepageTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "home.html")
 
-
+class TutorInformationTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test@example.com", password="12345"
+        )
+        self.client = Client(username="test@example.com", password="12345")
+        self.factory = RequestFactory()
+    def test_tutor_information_view_post(self):
+        url = reverse('Dashboard:tutor_profile')
+        profile, created = ProfileT.objects.get_or_create(user=self.user)
+        tutor_form_data = {
+            "fname": "test",
+            "lname": "test",
+            "gender": "female",
+            "zip": "12345",
+            "grade": "freshman",
+            "major": "test",
+            "preferred_mode": "remote",
+            "salary_min": 10,
+            "salary_max": 50,
+            "intro": "Hi",
+        }
+        availability_form_data = {
+            "day_of_week": "monday",
+            "start_time": "08:00",
+            "end_time": "20:00",        
+        }
+        tutor_form = TutorForm(data=tutor_form_data,instance=profile)
+        availability_form = AvailabilityForm(data=availability_form_data)
+        
+        self.assertTrue(tutor_form.is_valid())
+        self.assertTrue(availability_form.is_valid())
+        
+        request = self.factory.post(url, data={
+            **tutor_form_data,
+            'availabilities': json.dumps([
+                {"day_of_week": "Monday", "start_time": "08:00", "end_time": "12:00"},
+            ]),
+            'expertise': ['Math', 'Physics'],
+        })
+        request.user = self.user
+        try:
+            response = TutorInformation(request)
+        except Exception as e:
+            print("Exception:", e)
+        self.assertEqual(response.status_code, 200)
+        
+    def tearDown(self):
+        self.user.delete()
+        
+    
 class StudentInformationTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(

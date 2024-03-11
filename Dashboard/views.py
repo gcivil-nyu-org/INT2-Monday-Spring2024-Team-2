@@ -15,6 +15,8 @@ def TutorInformation(request):
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
+    initial_availabilities_json = "[]"
+
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
         tutor_form = TutorForm(request.POST, instance=profile)
