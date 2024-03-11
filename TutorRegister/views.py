@@ -14,12 +14,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
 from .forms.register_login import RegisterUserForm
-from .forms.tutor_info import TutorForm, AvailabilityForm
-from .forms.student_info import StudentForm
-from .models import Expertise, Availability, ProfileS
 
 from verify_email.email_handler import send_verification_email
-import json
 
 
 # register.html
