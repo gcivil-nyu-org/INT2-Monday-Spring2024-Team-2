@@ -90,6 +90,38 @@ class RegisterUserFormTest(TestCase):
             form.errors["last_name"],
             ["This field is required.", "Last name cannot be empty."],
         )
+    def test_save_new_user(self):
+        form_data = {
+            'user_type': 'student',
+            'email': 'test@example.com',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'password1': 'Testpassword123',
+            'password2': 'Testpassword123',
+        }
+        form = RegisterUserForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, form_data['email'])
+        self.assertEqual(user.first_name, form_data['first_name'])
+        self.assertEqual(user.last_name, form_data['last_name'])
+        self.assertTrue(user.check_password(form_data['password1']))
+
+    def test_save_existing_user(self):
+        User.objects.create_user(username='existing@example.com', password='Testpassword123')
+        form_data = {
+            'user_type': 'student',
+            'email': 'existing@example.com',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'password1': 'Testpassword123',
+            'password2': 'Testpassword123',
+        }
+        form = RegisterUserForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
 
 
 class StudentFormTestCase(TestCase):
