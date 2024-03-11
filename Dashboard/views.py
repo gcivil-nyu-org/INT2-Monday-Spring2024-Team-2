@@ -12,6 +12,8 @@ from datetime import datetime, time
 
 @login_required
 def TutorInformation(request):
+    initial_availabilities_json = "[]"
+    tutor_form = TutorForm()
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
@@ -46,8 +48,6 @@ def TutorInformation(request):
     else:
         profile = None
         existing_availabilities = None
-        tutor_form = TutorForm()
-        initial_availabilities_json = "[]"
         try:
             profile = ProfileT.objects.get(user=request.user)
             existing_availabilities = Availability.objects.filter(user=request.user)
@@ -76,7 +76,6 @@ def TutorInformation(request):
 def StudentInformation(request):
     if request.method == "POST":
         profile, created = ProfileS.objects.get_or_create(user=request.user)
-        print(profile)
         student_form = StudentForm(request.POST, instance=profile)
         if student_form.is_valid():
             user = request.user
