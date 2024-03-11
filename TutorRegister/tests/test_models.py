@@ -15,27 +15,31 @@ from django.db.models.signals import post_save
 
 class ExpertiseModelTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="test@example.com", password="12345")
-        Expertise.objects.create(user=user, subject="math", level="advanced")
+        self.user = User.objects.create_user(
+            username="test@example.com", password="12345"
+        )
+        Expertise.objects.create(user=self.user, subject="math", level="advanced")
 
     def test_expertise_content(self):
-        expertise = Expertise.objects.get(id=1)
+        expertise = Expertise.objects.get(user=self.user)
         self.assertEqual(expertise.subject, "math")
         self.assertEqual(expertise.level, "advanced")
 
 
 class AvailablilityModelTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="test@example.com", password="12345")
+        self.user = User.objects.create_user(
+            username="test@example.com", password="12345"
+        )
         Availability.objects.create(
-            user=user,
+            user=self.user,
             day_of_week="monday",
             start_time="10:00:00",
             end_time="13:00:00",
         )
 
     def test_availablility_content(self):
-        availability = Availability.objects.get(id=1)
+        availability = Availability.objects.get(user=self.user)
         self.assertEqual(availability.day_of_week, "monday")
         self.assertEqual(availability.start_time, time(10, 0))
         self.assertEqual(availability.end_time, time(13, 0))
@@ -43,9 +47,11 @@ class AvailablilityModelTest(TestCase):
 
 class ProfileSModelTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="test@example.com", password="12345")
+        self.user = User.objects.create_user(
+            username="test@example.com", password="12345"
+        )
         ProfileS.objects.create(
-            user=user,
+            user=self.user,
             fname="Test",
             lname="User",
             gender="female",
@@ -57,7 +63,7 @@ class ProfileSModelTest(TestCase):
         )
 
     def test_profiles_content(self):
-        profiles = ProfileS.objects.get(id=1)
+        profiles = ProfileS.objects.get(user=self.user)
         self.assertEqual(profiles.fname, "Test")
         self.assertEqual(profiles.lname, "User")
         self.assertEqual(profiles.gender, "female")
@@ -70,9 +76,9 @@ class ProfileSModelTest(TestCase):
 
 class ProfileTModelTest(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="test@nyu.edu", password="12345")
+        self.user = User.objects.create_user(username="test@nyu.edu", password="12345")
         ProfileT.objects.create(
-            user=user,
+            user=self.user,
             fname="Test",
             lname="User",
             gender="prefernottosay",
@@ -84,7 +90,7 @@ class ProfileTModelTest(TestCase):
         )
 
     def test_profilet_content(self):
-        profilet = ProfileT.objects.get(id=1)
+        profilet = ProfileT.objects.get(user=self.user)
         self.assertEqual(profilet.fname, "Test")
         self.assertEqual(profilet.lname, "User")
         self.assertEqual(profilet.gender, "prefernottosay")
