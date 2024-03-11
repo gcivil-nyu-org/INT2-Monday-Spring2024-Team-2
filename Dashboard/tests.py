@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import Expertise, Availability, ProfileT
 import json
-from django.contrib.auth.models import User
 from .views import StudentInformation
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
