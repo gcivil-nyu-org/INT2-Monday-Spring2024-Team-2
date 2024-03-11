@@ -48,7 +48,7 @@ class RegisterUserForm(UserCreationForm):
             raise ValidationError({"first_name": "First name cannot be empty."})
 
         if not last_name:
-            raise ValidationError({"first_name": "First name cannot be empty."})
+            raise ValidationError({"last_name": "Last name cannot be empty."})
 
         return cleaned_data
 

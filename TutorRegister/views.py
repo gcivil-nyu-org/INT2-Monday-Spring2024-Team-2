@@ -27,10 +27,7 @@ def register(request):
     if request.method == "POST":
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            print(user.username)
-            user.usertype.has_profile_complete = False
-            user.usertype.save()
+            form.save()
             send_verification_email(request, form)
 
             # Redirect to a success page or login page
@@ -40,56 +37,6 @@ def register(request):
     else:
         form = RegisterUserForm()
     return render(request, "TutorRegister/register.html", {"form": form})
-
-
-def TutorInformation(request):
-    if request.method == "POST":
-        tutor_form = TutorForm(request.POST)
-        availability_form = AvailabilityForm(request.POST)
-        if tutor_form.is_valid() and availability_form.is_valid():
-            # save tutor profile data
-            user = request.user
-            profile = tutor_form.save(commit=False)
-            profile.user = user
-            profile.save()
-
-            # save availability data
-            serialized_availabilities = request.POST.get("availabilities")
-            availabilities = json.loads(serialized_availabilities)
-
-            for availability_data in availabilities:
-                availability_data["user"] = user
-                Availability.objects.create(**availability_data)
-
-            # save expertise data to database
-            selected_expertise = request.POST.getlist("expertise")
-            if selected_expertise:
-                for expertise in selected_expertise:
-                    Expertise.objects.create(user=user, subject=expertise)
-            return HttpResponseRedirect(reverse("TutorRegister:success"))
-    else:
-        tutor_form = TutorForm()
-        availability_form = AvailabilityForm()
-    context = {
-        "tutor_form": tutor_form,
-        "availability_form": availability_form,
-    }
-    return render(request, "TutorRegister/tutor_info.html", context)
-
-
-def StudentInformation(request):
-    if request.method == "POST":
-        form = StudentForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            profile = form.save(commit=False)
-            profile.user = user
-            profile.save()
-            return HttpResponseRedirect(reverse("TutorRegister:success"))
-    else:
-        form = StudentForm()
-    context = {"form": form}
-    return render(request, "TutorRegister/student_info.html", context)
 
 
 def success(request):
