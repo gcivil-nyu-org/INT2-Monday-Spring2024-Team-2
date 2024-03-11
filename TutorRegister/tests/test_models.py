@@ -14,12 +14,9 @@ from django.db.models.signals import post_save
 
 
 class ExpertiseModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
-        Expertise.objects.create(user=cls.user, subject="math", level="advanced")
+    def setUp(self):
+        user = User.objects.create_user(username="test@example.com", password="12345")
+        Expertise.objects.create(user=user, subject="math", level="advanced")
 
     def test_expertise_content(self):
         expertise = Expertise.objects.get(id=1)
@@ -28,13 +25,10 @@ class ExpertiseModelTest(TestCase):
 
 
 class AvailablilityModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
+    def setUp(self):
+        user = User.objects.create_user(username="test@example.com", password="12345")
         Availability.objects.create(
-            user=cls.user,
+            user=user,
             day_of_week="monday",
             start_time="10:00:00",
             end_time="13:00:00",
@@ -48,13 +42,10 @@ class AvailablilityModelTest(TestCase):
 
 
 class ProfileSModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
+    def setUp(self):
+        user = User.objects.create_user(username="test@example.com", password="12345")
         ProfileS.objects.create(
-            user=cls.user,
+            user=user,
             fname="Test",
             lname="User",
             gender="female",
@@ -78,11 +69,10 @@ class ProfileSModelTest(TestCase):
 
 
 class ProfileTModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(username="test@nyu.edu", password="12345")
+    def setUp(self):
+        user = User.objects.create_user(username="test@nyu.edu", password="12345")
         ProfileT.objects.create(
-            user=cls.user,
+            user=user,
             fname="Test",
             lname="User",
             gender="prefernottosay",
