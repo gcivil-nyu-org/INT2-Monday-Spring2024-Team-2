@@ -4,6 +4,7 @@ from TutorRegister.forms.register_login import RegisterUserForm
 from TutorRegister.forms.student_info import StudentForm
 from TutorRegister.models import ProfileS
 
+
 class RegisterUserFormTest(TestCase):
     def setUp(self):
         User.objects.create_user(
@@ -90,18 +91,21 @@ class RegisterUserFormTest(TestCase):
             ["This field is required.", "Last name cannot be empty."],
         )
 
+
 class StudentFormTestCase(TestCase):
     def test_student_form_valid_data(self):
-        form = StudentForm(data={
-            'fname': 'John',
-            'lname': 'Doe',
-            'gender': 'male',
-            'zip': '12345',
-            'school': 'ABC High School',
-            'grade': '10',
-            'preferred_mode': 'inperson',
-            'intro': 'I am a 10th-grade student.',
-        })
+        form = StudentForm(
+            data={
+                "fname": "John",
+                "lname": "Doe",
+                "gender": "male",
+                "zip": "12345",
+                "school": "ABC High School",
+                "grade": "10",
+                "preferred_mode": "inperson",
+                "intro": "I am a 10th-grade student.",
+            }
+        )
         self.assertTrue(form.is_valid())
 
     def test_student_form_invalid_data(self):
@@ -111,51 +115,61 @@ class StudentFormTestCase(TestCase):
 
     def test_student_form_gender_choices(self):
         form = StudentForm()
-        self.assertEqual(form.fields['gender'].choices, [
-            ("female", "Female"),
-            ("male", "Male"),
-            ("prefernottosay", "Prefer not to say"),
-        ])
+        self.assertEqual(
+            form.fields["gender"].choices,
+            [
+                ("female", "Female"),
+                ("male", "Male"),
+                ("prefernottosay", "Prefer not to say"),
+            ],
+        )
+
     def test_student_form_grade_choices(self):
         form = StudentForm()
-        self.assertEqual(form.fields['grade'].choices, [
-            ("1", "1st Grade"),
-            ("2", "2nd Grade"),
-            ("3", "3rd Grade"),
-            ("4", "4th Grade"),
-            ("5", "5th Grade"),
-            ("6", "6th Grade"),
-            ("7", "7th Grade"),
-            ("8", "8th Grade"),
-            ("9", "9th Grade"),
-            ("10", "10th Grade"),
-            ("11", "11th Grade"),
-            ("12", "12th Grade"),
-            ("undergrad", "Undergraduate"),
-            ("grad", "Graduate"),
-            ("postgrad", "Post-graduate"),
-        ])
+        self.assertEqual(
+            form.fields["grade"].choices,
+            [
+                ("1", "1st Grade"),
+                ("2", "2nd Grade"),
+                ("3", "3rd Grade"),
+                ("4", "4th Grade"),
+                ("5", "5th Grade"),
+                ("6", "6th Grade"),
+                ("7", "7th Grade"),
+                ("8", "8th Grade"),
+                ("9", "9th Grade"),
+                ("10", "10th Grade"),
+                ("11", "11th Grade"),
+                ("12", "12th Grade"),
+                ("undergrad", "Undergraduate"),
+                ("grad", "Graduate"),
+                ("postgrad", "Post-graduate"),
+            ],
+        )
 
     def test_student_form_preferred_mode_choices(self):
         form = StudentForm()
-        self.assertEqual(form.fields['preferred_mode'].choices, [
-            ("inperson", "In-person"),
-            ("remote", "Remote"),
-            ("both", "Both"),
-        ])
+        self.assertEqual(
+            form.fields["preferred_mode"].choices,
+            [
+                ("inperson", "In-person"),
+                ("remote", "Remote"),
+                ("both", "Both"),
+            ],
+        )
 
     def test_student_form_empty_fields(self):
-        form = StudentForm(data={
-            'fname': '',
-            'lname': '',
-            'gender': '',
-            'zip': '',
-            'school': '',
-            'grade': '',
-            'preferred_mode': '',
-            'intro': '',
-        })
+        form = StudentForm(
+            data={
+                "fname": "",
+                "lname": "",
+                "gender": "",
+                "zip": "",
+                "school": "",
+                "grade": "",
+                "preferred_mode": "",
+                "intro": "",
+            }
+        )
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 8)
-
-  
