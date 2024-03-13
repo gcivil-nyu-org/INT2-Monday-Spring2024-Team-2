@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import ProfileT, Expertise
+from TutorRegister.models import ProfileT, Expertise, UserType
 from django.test import Client
 
 
@@ -22,6 +22,7 @@ class TutorFilterTest(TestCase):
             zip="12345",
             salary_min=50,
         )
+        UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
 
     def test_filter_tutors(self):
