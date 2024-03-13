@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from .forms import TutorFilterForm
 from TutorRegister.models import ProfileT, Availability, Expertise, UserType
 from django.contrib.auth.models import User
@@ -9,7 +9,11 @@ def filter_tutors(request):
     form = TutorFilterForm(request.GET)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
-    has_profile = UserType.objects.all().filter(has_profile_complete = True).values_list("user", flat=True)
+    has_profile = (
+        UserType.objects.all()
+        .filter(has_profile_complete=True)
+        .values_list("user", flat=True)
+    )
     users = users.filter(user__in=has_profile)
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
@@ -37,8 +41,18 @@ def filter_tutors(request):
         },
     )
 
+
 def view_tutor_profile(request, user_id):
     profilet = get_object_or_404(ProfileT, user=user_id)
-    expertise = Expertise.objects.all().filter(user = profilet.user)#.filter(user=profilet.user)
+    expertise = Expertise.objects.all().filter(user=profilet.user)
     availability = Availability.objects.all().filter(user=profilet.user)
-    return render(request, 'TutorFilter/view_tutor_profile.html', {'profilet': profilet,'expertise':expertise,'availability':availability,"MEDIA_URL": settings.MEDIA_URL,})
+    return render(
+        request,
+        "TutorFilter/view_tutor_profile.html",
+        {
+            "profilet": profilet,
+            "expertise": expertise,
+            "availability": availability,
+            "MEDIA_URL": settings.MEDIA_URL,
+        },
+    )
