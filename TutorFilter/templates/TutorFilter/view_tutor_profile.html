@@ -1,4 +1,5 @@
 {% load static %}
+
 <h1>{{ profilet.fname }} {{profilet.lname}}'s Profile</h1>
 <img src="/media/{{profilet.image}}">
 <p>Gender: {{ profilet.gender }}</p>
@@ -13,3 +14,6 @@
     {% for a in availability %}
     <p>{{ a.day_of_week }} {{ a.start_time }} - {{ a.end_time }}</p>
     {% endfor %}
+
+
+<button onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
