@@ -5,5 +5,11 @@
 <p>Major: {{ profilet.major }}</p>
 <p>Zipcode: {{ profilet.zip }}</p>
 <p>Grade: {{ profilet.grade }}</p>
-<p>Expertise: {{ expertise.subject }}</p>
-<p>Availability: {{ availability.day_of_week }} {{ availability.start_time }} - {{ availability.end_time }}</p>
+<p>Expertise:</p> 
+    {% for e in expertise %}
+    <p>{{ e.subject }}</p>
+    {% endfor %}
+<p>Availability:</p> 
+    {% for a in availability %}
+    <p>{{ a.day_of_week }} {{ a.start_time }} - {{ a.end_time }}</p>
+    {% endfor %}

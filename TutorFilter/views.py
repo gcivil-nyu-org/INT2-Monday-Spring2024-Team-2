@@ -9,7 +9,8 @@ def filter_tutors(request):
     form = TutorFilterForm(request.GET)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
-    # user_type = UserType.objects
+    has_profile = UserType.objects.all().filter(has_profile_complete = True).values_list("user", flat=True)
+    users = users.filter(user__in=has_profile)
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
             users_expertise_id = users_expertise.filter(
@@ -37,7 +38,7 @@ def filter_tutors(request):
     )
 
 def view_tutor_profile(request, user_id):
-    profilet = get_object_or_404(ProfileT, user_id=user_id)
-    expertise = get_object_or_404(Expertise, user_id=user_id)
-    availability = get_object_or_404(Availability, user_id=user_id)
+    profilet = get_object_or_404(ProfileT, user=user_id)
+    expertise = Expertise.objects.all().filter(user = profilet.user)#.filter(user=profilet.user)
+    availability = Availability.objects.all().filter(user=profilet.user)
     return render(request, 'TutorFilter/view_tutor_profile.html', {'profilet': profilet,'expertise':expertise,'availability':availability,"MEDIA_URL": settings.MEDIA_URL,})
