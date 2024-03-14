@@ -71,6 +71,7 @@ class TutoringSession(models.Model):
     end_time = models.TimeField(default="12:00:00")
     offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
     message = models.TextField()
+    status = models.TextField(default="Pending")
 
 
 # Two blank lines before the new function definition
