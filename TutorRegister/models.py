@@ -67,7 +67,8 @@ class TutoringSession(models.Model):
     tutoring_mode = models.CharField(max_length=100)
     subject = models.CharField(max_length=100)
     date = models.DateField()
-    time = models.TimeField()
+    start_time = models.TimeField(default="12:00:00")
+    end_time = models.TimeField(default="12:00:00")
     offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
     message = models.TextField()
 
