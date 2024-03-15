@@ -11,11 +11,27 @@
         <div class="p-5 mb-4 bg-body-tertiary rounded-3" style="margin-top:20px">
           <div class="container-fluid py-5">
             <p class="col-md-8 fs-4">Upcoming Sessions:</p>
+            {% for session, student_profile in upcomingSessions%}
+            Student Name: {{ student_profile.fname }} {{ student_profile.lname }} <br>
+            Subject: {{ session.subject}} <br>
+            Tutoring Mode:  {{ session.tutoring_mode}} <br>
+            Date: {{ session.date }} <br>
+            Time: {{ session.start_time}} - {{ session.end_time}} <br>
+            Message: {{ session.message }} <br>
+            {%endfor%}
           </div>
         </div>    
         <div class="p-5 mb-4 bg-body-tertiary rounded-3">
           <div class="container-fluid py-5">
             <p class="col-md-8 fs-4">Completed Sessions:</p>
+            {% for session, student_profile in pastSessions%}
+            Student Name: {{ student_profile.fname }} {{ student_profile.lname }} <br>
+            Subject: {{ session.subject}} <br>
+            Tutoring Mode:  {{ session.tutoring_mode}} <br>
+            Date: {{ session.date }} <br>
+            Time: {{ session.start_time}} - {{ session.end_time}} <br>
+            Message: {{ session.message }} <br>
+            {%endfor%}
           </div>
         </div> 
     </div>

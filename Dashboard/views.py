@@ -3,11 +3,13 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
-from TutorRegister.models import Expertise, Availability, ProfileT, ProfileS
+from TutorRegister.models import Expertise, Availability, ProfileT, ProfileS, TutoringSession
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
+from django.db.models import Q
+
 
 
 @login_required
@@ -106,7 +108,28 @@ def StudentDashboard(request):
 
 @login_required
 def TutorDashboard(request):
-    return render(request, "Dashboard/tutor_dashboard.html")
+    sessions = TutoringSession.objects.filter(tutor_id = request.user.id)
+    now = datetime.now()
+    upcomingSessions = sessions.filter(Q(date__gt = now.date()) | 
+                                       Q(date = now.date(), start_time__gt = now.time()))
+    pastSessions = sessions.filter(Q(date__lt = now.date()) |
+                                   Q(date = now.date(), start_time__lt = now.time()))
+    
+    upcomingSessions_studentInfo = []
+    pastSessions_studentInfo = []
+    
+    for session in upcomingSessions:
+        student_profile = ProfileS.objects.get(user = session.student_id)
+        upcomingSessions_studentInfo.append((session, student_profile))
+            
+    for session in pastSessions:
+        student_profile = ProfileS.objects.get(user = session.student_id)
+        pastSessions_studentInfo.append((session, student_profile))
+            
+    context = {'upcomingSessions': upcomingSessions_studentInfo,
+               'pastSessions': pastSessions_studentInfo,
+               }
+    return render(request, "Dashboard/tutor_dashboard.html", context)
 
 
 def logout_view(request):
@@ -119,3 +142,5 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, time)):
             return obj.strftime("%H:%M")
         return json.JSONEncoder.default(self, obj)
+
+
