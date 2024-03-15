@@ -57,6 +57,23 @@ class UserType(models.Model):
     has_profile_complete = models.BooleanField(default=False, null=False)
 
 
+class TutoringSession(models.Model):
+    student_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="student_sessions"
+    )
+    tutor_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tutor_sessions"
+    )
+    tutoring_mode = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    date = models.DateField()
+    start_time = models.TimeField(default="12:00:00")
+    end_time = models.TimeField(default="12:00:00")
+    offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
+    message = models.TextField()
+    status = models.TextField(default="Pending")
+
+
 # Two blank lines before the new function definition
 # Signal to automatically create or update UserType when a User instance is saved
 @receiver(post_save, sender=User)
