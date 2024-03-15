@@ -2,7 +2,14 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import UserType, Expertise, Availability, ProfileS, ProfileT, TutoringSession
+from .models import (
+    UserType,
+    Expertise,
+    Availability,
+    ProfileS,
+    ProfileT,
+    TutoringSession,
+)
 
 admin.site.register(UserType)
 admin.site.register(Expertise)
