@@ -132,6 +132,12 @@ def TutorDashboard(request):
     return render(request, "Dashboard/tutor_dashboard.html", context)
 
 
+def CancelSession(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.delete()
+    return redirect('Dashboard:tutor_dashboard')
+
+
 def TutorRequest(request):
     tutorRequests = TutoringSession.objects.filter(tutor_id = request.user.id, status = "Pending")
 
