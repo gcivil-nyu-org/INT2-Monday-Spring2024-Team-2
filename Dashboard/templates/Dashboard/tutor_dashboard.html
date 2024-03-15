@@ -39,11 +39,11 @@
                     <p><strong>Message: </strong>{{ session.message }}</p>
                   </div>
                   <div class="col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Cancel</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
                   </div>
 
                   {% comment %} Pop out modal {% endcomment %}
-                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal fade" id="exampleModal{{ session.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ session.id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                       <div class="modal-content">
                         <div class="modal-header">

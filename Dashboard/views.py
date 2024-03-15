@@ -134,7 +134,8 @@ def TutorDashboard(request):
 
 def CancelSession(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
-    session.delete()
+    session.status = "Cancelled"
+    session.save()
     return redirect('Dashboard:tutor_dashboard')
 
 
@@ -149,6 +150,20 @@ def TutorRequest(request):
             
     context = {'tutorRequests': tutorRequests_studentInfo,}
     return render(request, "Dashboard/tutor_request.html", context)
+
+
+def AcceptRequest(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.status = "Accepted"
+    session.save()
+    return redirect('Dashboard:tutor_request')
+
+
+def DeclineRequest(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.status = "Rejected"
+    session.save()
+    return redirect('Dashboard:tutor_request')
 
 
 def logout_view(request):

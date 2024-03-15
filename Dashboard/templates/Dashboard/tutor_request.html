@@ -39,8 +39,14 @@
                     <p><strong>Message: </strong>{{ tutorRequest.message }}</p>
                   </div>
                   <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-outline-success" style="margin-right:10px;">Accept</button>
-                    <button type="submit" class="btn btn-outline-danger">Decline</button>
+                    <form action="{% url 'Dashboard:accept_request' tutorRequest.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success" style="margin-right:10px;">Accept</button>
+                    </form>
+                    <form action="{% url 'Dashboard:decline_request' tutorRequest.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">Decline</button>
+                    </form>
                   </div>
                 </div>
               </div>
