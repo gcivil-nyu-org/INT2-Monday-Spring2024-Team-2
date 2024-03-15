@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .forms import TutorFilterForm
-from TutorRegister.models import ProfileT, Availability, Expertise, UserType
+from TutorRegister.models import ProfileT, Availability, Expertise, UserType, ProfileS
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -53,6 +53,19 @@ def view_tutor_profile(request, user_id):
             "profilet": profilet,
             "expertise": expertise,
             "availability": availability,
+            "MEDIA_URL": settings.MEDIA_URL,
+        },
+    )
+
+
+def view_student_profile(request, user_id):
+    profiles = get_object_or_404(ProfileS, user=user_id)
+
+    return render(
+        request,
+        "TutorFilter/view_student_profile.html",
+        {
+            "profiles": profiles,
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )

@@ -1,19 +1,51 @@
-{% load static %}
+{% extends 'Dashboard/base_student.html' %}
 
-<h1>{{ profilet.fname }} {{profilet.lname}}'s Profile</h1>
-<img src="/media/{{profilet.image}}">
-<p>Gender: {{ profilet.gender }}</p>
-<p>Major: {{ profilet.major }}</p>
-<p>Zipcode: {{ profilet.zip }}</p>
-<p>Grade: {{ profilet.grade }}</p>
-<p>Expertise:</p> 
-    {% for e in expertise %}
-    <p>{{ e.subject }}</p>
-    {% endfor %}
-<p>Availability:</p> 
-    {% for a in availability %}
-    <p>{{ a.day_of_week }} {{ a.start_time }} - {{ a.end_time }}</p>
-    {% endfor %}
+{% block title %} View Tutor Profile{% endblock %}
 
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <img src="/media/{{profilet.image}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
+                        <h2 class="fw-bold mb-0 fs-2">{{ profilet.fname }} {{profilet.lname}}</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>{{ profilet.introduction }}</p>
+                    <hr>
+                    <h3 class="fw-bold mb-3 fs-4">About {{ profilet.fname }}:</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Gender: {{ profilet.gender }}</p>
+                            <p>Major: {{ profilet.major }}</p>
+                            <p>Zipcode: {{ profilet.zip }}</p>
+                            <p>Grade: {{ profilet.grade }}</p>
+                            <p>Preferred Mode: {{ profilet.preferred_mode }}</p>
+                            <p>Salaray Range: {{ profilet.salary_min }} - {{ profilet.salary_max }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>Expertise: 
+                                {% for e in expertise %}
+                                    {% if not forloop.first %}, {% endif %}
+                                    {{ e.subject }}
+                                {% endfor %}
+                            </p>
+                            <p>Availability:</p>
+                            <ul>
+                                {% for a in availability %}
+                                    <li>{{ a.day_of_week }} {{ a.start_time }} - {{ a.end_time }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<button onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
+<button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
+{% endblock %}
