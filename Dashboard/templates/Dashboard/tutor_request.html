@@ -1,0 +1,55 @@
+{% extends 'Dashboard/base_tutor.html' %}
+{% load static %}
+
+
+{% block title %}Tutor Dashboard{% endblock %}
+
+{% block content %}
+    <!-- Dashboard Content -->
+    <div class="mt-4">
+        <h3 style="color: #600d91">Your Tutoring Requests: </h3>
+            <br>
+            {% for tutorRequest, student_profile in tutorRequests%} 
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5 pt-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/media/{{ student_profile.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                  </div>
+                  <div class="col-md-4">
+                    <p><strong>Student Name:</strong> {{ student_profile.fname }} {{ student_profile.lname }}</p>
+                    <p><strong>Subject:</strong> {{ tutorRequest.subject | title }}</p>
+                    <p><strong>Tutoring Mode: </strong>
+                      {% if tutorRequest.tutoring_mode == "inperson"  %} 
+                      In Person
+                      {% else %}
+                      Remote
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                      <p><strong>Date: </strong>{{ tutorRequest.date }}</p>
+                      <p><strong>Time: </strong>{{ tutorRequest.start_time }} - {{ tutorRequest.end_time }}</p>
+                      <P><strong>Offering Rate: </strong>  ${{ tutorRequest.offering_rate}} / hour </p>
+                  </div>
+                  <div class="col-md-2">
+
+                  </div>
+                  <div class="col-md-7">
+                    <p><strong>Message: </strong>{{ tutorRequest.message }}</p>
+                  </div>
+                  <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-success" style="margin-right:10px;">Accept</button>
+                    <button type="submit" class="btn btn-outline-danger">Decline</button>
+                  </div>
+                </div>
+              </div>
+           </div>
+          <br>
+          {%endfor%}
+        </div>    
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+{% endblock %}

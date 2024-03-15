@@ -108,7 +108,7 @@ def StudentDashboard(request):
 
 @login_required
 def TutorDashboard(request):
-    sessions = TutoringSession.objects.filter(tutor_id = request.user.id)
+    sessions = TutoringSession.objects.filter(tutor_id = request.user.id, status = "Accepted")
     now = datetime.now()
     upcomingSessions = sessions.filter(Q(date__gt = now.date()) | 
                                        Q(date = now.date(), start_time__gt = now.time()))
@@ -130,6 +130,19 @@ def TutorDashboard(request):
                'pastSessions': pastSessions_studentInfo,
                }
     return render(request, "Dashboard/tutor_dashboard.html", context)
+
+
+def TutorRequest(request):
+    tutorRequests = TutoringSession.objects.filter(tutor_id = request.user.id, status = "Pending")
+
+    tutorRequests_studentInfo = []
+    
+    for tutorRequest in tutorRequests:
+        student_profile = ProfileS.objects.get(user = tutorRequest.student_id)
+        tutorRequests_studentInfo.append((tutorRequest, student_profile))
+            
+    context = {'tutorRequests': tutorRequests_studentInfo,}
+    return render(request, "Dashboard/tutor_request.html", context)
 
 
 def logout_view(request):

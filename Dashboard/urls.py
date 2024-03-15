@@ -8,5 +8,6 @@ urlpatterns = [
     path("tutor", views.TutorDashboard, name="tutor_dashboard"),
     path("student/profile", views.StudentInformation, name="student_profile"),
     path("tutor/profile", views.TutorInformation, name="tutor_profile"),
+    path("tutor/request", views.TutorRequest, name="tutor_request"),
     path("logout/", views.logout_view, name="logout"),
 ]
