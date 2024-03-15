@@ -8,32 +8,79 @@
     <!-- Dashboard Content -->
     <div class="mt-4">
         <h3 style="color: #600d91">Welcome to Your Tutor Dashboard</h3>
-        <div class="p-5 mb-4 bg-body-tertiary rounded-3" style="margin-top:20px">
-          <div class="container-fluid py-5">
             <p class="col-md-8 fs-4">Upcoming Sessions:</p>
-            {% for session, student_profile in upcomingSessions%}
-            Student Name: {{ student_profile.fname }} {{ student_profile.lname }} <br>
-            Subject: {{ session.subject}} <br>
-            Tutoring Mode:  {{ session.tutoring_mode}} <br>
-            Date: {{ session.date }} <br>
-            Time: {{ session.start_time}} - {{ session.end_time}} <br>
-            Message: {{ session.message }} <br>
-            {%endfor%}
-          </div>
+            {% for session, student_profile in upcomingSessions%} 
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5 pt-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/media/{{ student_profile.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                  </div>
+                  <div class="col-md-4">
+                    <p>Student Name: {{ student_profile.fname }} {{ student_profile.lname }}</p>
+                    <p>Subject: {{ session.subject | title }}</p>
+                    <p>Tutoring Mode: 
+                      {% if session.tutoring_mode == "inperson"  %} 
+                      In Person
+                      {% else %}
+                      Remote
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                      <p>Date: {{ session.date }}</p>
+                      <p>Time: {{ session.start_time }} - {{ session.end_time }}</p>
+                  </div>
+                  <div class="col-md-2">
+                        
+                  </div>
+                  <div class="col-md-6">
+                    <p>Message: {{ session.message }}</p>
+                  </div>
+                  <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary"
+                          style="background-color: white; color: #600E90; border-color: #600E90;">Cancel</button>
+                  </div>
+                </div>
+              </div>
+           </div>
+          <br>
+          {%endfor%}
         </div>    
-        <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-          <div class="container-fluid py-5">
+        
+          
             <p class="col-md-8 fs-4">Completed Sessions:</p>
             {% for session, student_profile in pastSessions%}
-            Student Name: {{ student_profile.fname }} {{ student_profile.lname }} <br>
-            Subject: {{ session.subject}} <br>
-            Tutoring Mode:  {{ session.tutoring_mode}} <br>
-            Date: {{ session.date }} <br>
-            Time: {{ session.start_time}} - {{ session.end_time}} <br>
-            Message: {{ session.message }} <br>
-            {%endfor%}
-          </div>
-        </div> 
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5 pt-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/media/{{ student_profile.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                  </div>
+                  <div class="col-md-4">
+                    <p>Student Name: {{ student_profile.fname }} {{ student_profile.lname }}</p>
+                    <p>Subject: {{ session.subject | title }}</p>
+                    <p>Tutoring Mode: 
+                      {% if session.tutoring_mode == "inperson"  %} 
+                      In Person
+                      {% else %}
+                      Remote
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-md-4">
+                      <p>Date: {{ session.date }}</p>
+                      <p>Time: {{ session.start_time }} - {{ session.end_time }}</p>
+                  </div>
+                  <div class="col-md-10" style="margin-left: 175px">
+                    <p>Message: {{ session.message }}</p>
+                  </div>
+                </div>
+              </div>
+           </div>
+          <br>
+          {%endfor%}
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
