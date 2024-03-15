@@ -6,7 +6,6 @@ import json
 from .views import StudentInformation
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
-from .forms.tutor_info import TutorForm, AvailabilityForm
 
 
 # Create your tests here.
