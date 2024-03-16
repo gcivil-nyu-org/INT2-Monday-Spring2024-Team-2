@@ -8,17 +8,105 @@
     <!-- Dashboard Content -->
     <div class="mt-4">
         <h3 style="color: #600d91">Welcome to Your Tutor Dashboard</h3>
-        <div class="p-5 mb-4 bg-body-tertiary rounded-3" style="margin-top:20px">
-          <div class="container-fluid py-5">
+          <br>
             <p class="col-md-8 fs-4">Upcoming Sessions:</p>
-          </div>
+            {% for session, student_profile in upcomingSessions%} 
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5 pt-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/media/{{ student_profile.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                  </div>
+                  <div class="col-md-4">
+                    <p><strong>Student Name:</strong> {{ student_profile.fname }} {{ student_profile.lname }}</p>
+                    <p><strong>Subject:</strong> {{ session.subject | title }}</p>
+                    <p><strong>Tutoring Mode: </strong>
+                      {% if session.tutoring_mode == "inperson"  %} 
+                      In Person
+                      {% else %}
+                      Remote
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                      <p><strong>Date: </strong>{{ session.date }}</p>
+                      <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+                  </div>
+                  <div class="col-md-2">
+                        
+                  </div>
+                  <div class="col-md-8">
+                    <p><strong>Message: </strong>{{ session.message }}</p>
+                  </div>
+                  <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
+                  </div>
+
+                   <!-- Cancel confirmation Modal -->
+                  <div class="modal fade" id="exampleModal{{ session.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ session.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Cancel Confirmation</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p>Are you sure you want to cancel this session?</p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                          <form action="{% url 'Dashboard:cancel_session' session.id %}" method="post">
+                              {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+           </div>
+          <br>
+          {%endfor%}
         </div>    
-        <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-          <div class="container-fluid py-5">
+        
+            <br>
             <p class="col-md-8 fs-4">Completed Sessions:</p>
-          </div>
-        </div> 
+            {% for session, student_profile in pastSessions%}
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5 pt-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="/media/{{ student_profile.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                  </div>
+                  <div class="col-md-4">
+                    <p><strong>Student Name:</strong> {{ student_profile.fname }} {{ student_profile.lname }}</p>
+                    <p><strong>Subject:</strong> {{ session.subject | title }}</p>
+                    <p><strong>Tutoring Mode: </strong>
+                      {% if session.tutoring_mode == "inperson"  %} 
+                      In Person
+                      {% else %}
+                      Remote
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div class="col-md-4">
+                      <p><strong>Date:</strong> {{ session.date }}</p>
+                      <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+                  </div>
+                  <div class="col-md-10" style="margin-left: 175px">
+                    <p><strong>Message:</strong> {{ session.message }}</p>
+                  </div>
+                </div>
+              </div>
+           </div>
+          <br>
+          {%endfor%}
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 {% endblock %}

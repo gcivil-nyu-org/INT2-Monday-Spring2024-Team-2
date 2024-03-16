@@ -3,11 +3,18 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm
 from .forms.student_info import StudentForm
-from TutorRegister.models import Expertise, Availability, ProfileT, ProfileS
+from TutorRegister.models import (
+    Expertise,
+    Availability,
+    ProfileT,
+    ProfileS,
+    TutoringSession,
+)
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
+from django.db.models import Q
 
 
 @login_required
@@ -17,6 +24,7 @@ def TutorInformation(request):
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
+
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
         tutor_form = TutorForm(request.POST, instance=profile)
@@ -104,7 +112,69 @@ def StudentDashboard(request):
 
 @login_required
 def TutorDashboard(request):
-    return render(request, "Dashboard/tutor_dashboard.html")
+    sessions = TutoringSession.objects.filter(
+        tutor_id=request.user.id, status="Accepted"
+    )
+    now = datetime.now()
+    upcomingSessions = sessions.filter(
+        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
+    )
+    pastSessions = sessions.filter(
+        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
+    )
+
+    upcomingSessions_studentInfo = []
+    pastSessions_studentInfo = []
+
+    for session in upcomingSessions:
+        student_profile = ProfileS.objects.get(user=session.student_id)
+        upcomingSessions_studentInfo.append((session, student_profile))
+
+    for session in pastSessions:
+        student_profile = ProfileS.objects.get(user=session.student_id)
+        pastSessions_studentInfo.append((session, student_profile))
+
+    context = {
+        "upcomingSessions": upcomingSessions_studentInfo,
+        "pastSessions": pastSessions_studentInfo,
+    }
+    return render(request, "Dashboard/tutor_dashboard.html", context)
+
+
+def CancelSession(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.status = "Cancelled"
+    session.save()
+    return redirect("Dashboard:tutor_dashboard")
+
+
+def TutorRequest(request):
+    tutorRequests = TutoringSession.objects.filter(
+        tutor_id=request.user.id, status="Pending"
+    )
+
+    tutorRequests_studentInfo = []
+
+    for tutorRequest in tutorRequests:
+        student_profile = ProfileS.objects.get(user=tutorRequest.student_id)
+        tutorRequests_studentInfo.append((tutorRequest, student_profile))
+
+    context = {"tutorRequests": tutorRequests_studentInfo}
+    return render(request, "Dashboard/tutor_request.html", context)
+
+
+def AcceptRequest(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.status = "Accepted"
+    session.save()
+    return redirect("Dashboard:tutor_request")
+
+
+def DeclineRequest(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    session.status = "Rejected"
+    session.save()
+    return redirect("Dashboard:tutor_request")
 
 
 def logout_view(request):
