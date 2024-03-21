@@ -42,6 +42,25 @@ def filter_tutors(request):
     )
 
 
+def get_type(user_id):
+    u_t = get_object_or_404(UserType, user=user_id)
+    t = u_t.user_type
+
+    return t
+
+
+def view_profile(request, user_id):
+    type = get_type(user_id)
+
+    print(type + "\n")
+
+    if type == "tutor":
+        return view_tutor_profile(request, user_id)
+
+    elif type == "student":
+        return view_student_profile(request, user_id)
+
+
 def view_tutor_profile(request, user_id):
     profilet = get_object_or_404(ProfileT, user=user_id)
     expertise = Expertise.objects.all().filter(user=profilet.user)

@@ -10,42 +10,44 @@
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <img src="/media/{{profilet.image}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
-                        <h2 class="fw-bold mb-0 fs-2">{{ profilet.fname }} {{profilet.lname}}</h2>
+                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
                     </div>
                 </div>
                 <div class="card-body">
-                    <p>{{ profilet.introduction }}</p>
+                    <p>{{ profilet.intro }}</p>
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">About {{ profilet.fname }}:</h3>
                     <div class="row">
                         <div class="col-md-6">
-                            <p>Gender: {{ profilet.gender }}</p>
-                            <p>Major: {{ profilet.major }}</p>
+                            <p>Gender: {{ profilet.gender|capfirst }}</p>
+                            <p>Major: {{ profilet.major|capfirst  }}</p>
                             <p>Zipcode: {{ profilet.zip }}</p>
-                            <p>Grade: {{ profilet.grade }}</p>
-                            <p>Preferred Mode: {{ profilet.preferred_mode }}</p>
+                            <p>Grade: {{ profilet.grade|capfirst  }}</p>
+                            <p>Preferred Mode: {{ profilet.preferred_mode|capfirst  }}</p>
                             <p>Salaray Range: {{ profilet.salary_min }} - {{ profilet.salary_max }}</p>
                         </div>
                         <div class="col-md-6">
                             <p>Expertise: 
                                 {% for e in expertise %}
                                     {% if not forloop.first %}, {% endif %}
-                                    {{ e.subject }}
+                                    {{ e.subject|capfirst  }}
                                 {% endfor %}
                             </p>
                             <p>Availability:</p>
                             <ul>
                                 {% for a in availability %}
-                                    <li>{{ a.day_of_week }} {{ a.start_time }} - {{ a.end_time }}</li>
+                                    <li>{{ a.day_of_week|capfirst  }} {{ a.start_time|capfirst  }} - {{ a.end_time|capfirst  }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
+                </div>
+                <div class="card-footer d-flex justify-content-center">
+                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
 {% endblock %}
