@@ -30,7 +30,7 @@
                             <p>Expertise: 
                                 {% for e in expertise %}
                                     {% if not forloop.first %}, {% endif %}
-                                    {{ e.subject|capfirst  }}
+                                    {{ e|capfirst  }}
                                 {% endfor %}
                             </p>
                             <p>Availability:</p>

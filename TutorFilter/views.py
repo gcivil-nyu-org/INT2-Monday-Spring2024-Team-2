@@ -52,8 +52,6 @@ def get_type(user_id):
 def view_profile(request, user_id):
     type = get_type(user_id)
 
-    print(type + "\n")
-
     if type == "tutor":
         return view_tutor_profile(request, user_id)
 
@@ -64,13 +62,16 @@ def view_profile(request, user_id):
 def view_tutor_profile(request, user_id):
     profilet = get_object_or_404(ProfileT, user=user_id)
     expertise = Expertise.objects.all().filter(user=profilet.user)
+
+    expertises = [get_display_expertise(e.subject) for e in expertise]
+
     availability = Availability.objects.all().filter(user=profilet.user)
     return render(
         request,
         "TutorFilter/view_tutor_profile.html",
         {
             "profilet": profilet,
-            "expertise": expertise,
+            "expertise": expertises,
             "availability": availability,
             "MEDIA_URL": settings.MEDIA_URL,
         },
@@ -88,3 +89,9 @@ def view_student_profile(request, user_id):
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
+
+
+def get_display_expertise(expertise):
+    expertise_dict = dict(TutorFilterForm.EXPERTISE_CHOICES)
+
+    return expertise_dict.get(expertise, expertise)
