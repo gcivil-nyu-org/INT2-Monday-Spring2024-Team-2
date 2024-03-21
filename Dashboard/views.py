@@ -124,7 +124,7 @@ def StudentInformation(request):
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
                 )
-            
+
             profile.user = user
             profile.save()
             user.usertype.has_profile_complete = True
