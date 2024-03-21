@@ -105,6 +105,7 @@ class TutorForm(ModelForm):
             "salary_min",
             "salary_max",
             "intro",
+            "image",
         ]
         labels = {
             "fname": "First Name",
@@ -117,6 +118,7 @@ class TutorForm(ModelForm):
             "intro": "Introduction",
             "salary_min": "Minimum Hourly Rate",
             "salary_max": "Maximum Hourly Rate",
+            "image": "Profile Image",
         }
 
         widgets = {
@@ -139,6 +141,9 @@ class TutorForm(ModelForm):
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
             "intro": forms.Textarea(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "image": forms.FileInput(  # Widget for the image field
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
         }

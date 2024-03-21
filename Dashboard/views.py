@@ -15,6 +15,9 @@ from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
 from django.db.models import Q
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 @login_required
@@ -27,12 +30,29 @@ def TutorInformation(request):
 
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
-        tutor_form = TutorForm(request.POST, instance=profile)
+        tutor_form = TutorForm(request.POST, request.FILES, instance=profile)
         availability_form = AvailabilityForm(request.POST)
         if tutor_form.is_valid() and availability_form.is_valid():
             # save tutor profile data
             user = request.user
             profile = tutor_form.save(commit=False)
+
+            if "image" in request.FILES:
+                image = Image.open(request.FILES["image"])
+
+                # Resize the image, preserving aspect ratio
+                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+
+                # Save the resized image to a BytesIO object
+                image_io = BytesIO()
+                image.save(image_io, format="JPEG")
+
+                # Create a new Django file-like object to save to the model
+                image_name = request.FILES["image"].name
+                profile.image.save(
+                    image_name, ContentFile(image_io.getvalue()), save=False
+                )
+
             profile.user = user
             profile.save()
 
@@ -84,7 +104,7 @@ def TutorInformation(request):
 def StudentInformation(request):
     if request.method == "POST":
         profile, created = ProfileS.objects.get_or_create(user=request.user)
-        student_form = StudentForm(request.POST, instance=profile)
+        student_form = StudentForm(request.POST, request.FILES, instance=profile)
         if student_form.is_valid():
             user = request.user
             profile = student_form.save(commit=False)
@@ -101,7 +121,7 @@ def StudentInformation(request):
             student_form = StudentForm(instance=profile)
         except Exception as e:
             print("Error " + str(e))
-    context = {"student_form": student_form}
+    context = {"student_form": student_form, "profile": profile}
     return render(request, "Dashboard/student_info.html", context)
 
 
