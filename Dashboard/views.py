@@ -43,6 +43,12 @@ def TutorInformation(request):
                 # Resize the image, preserving aspect ratio
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
 
+                # If the image is in RGBA mode, create a white background and paste the image on it
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
+
                 # Save the resized image to a BytesIO object
                 image_io = BytesIO()
                 image.save(image_io, format="JPEG")
@@ -114,6 +120,12 @@ def StudentInformation(request):
 
                 # Resize the image, preserving aspect ratio
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+
+                # If the image is in RGBA mode, create a white background and paste the image on it
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
 
                 # Save the resized image to a BytesIO object
                 image_io = BytesIO()
