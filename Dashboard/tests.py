@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import Expertise, Availability, ProfileT, TutoringSession
 import json
-from .views import StudentInformation
+from .views import StudentInformation, TutorRequest
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
 from django.core import mail
@@ -208,6 +208,110 @@ class CancelSessionTestCase(TestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Cancelled")
         self.assertEqual(len(mail.outbox), 1)
+
+
+class TutorRequestTestCase(TestCase):
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username="testuser@example.com",
+            password="testpassword",
+        )
+        self.tutor = User.objects.create_user(
+            username="testuser@nyu.com",
+            password="testpassword",
+        )
+        self.session = TutoringSession.objects.create(
+            student_id=self.student,
+            tutor_id=self.tutor,
+            date="2024-03-20",
+            start_time="10:00:00",
+            end_time="11:00:00",
+            status="Pending",
+            message="test",
+            offering_rate=10,
+            subject="test",
+            tutoring_mode="remote",
+        )
+        self.student_profile = ProfileS.objects.create(
+            user=self.student,
+            fname="test",
+            lname="test",
+            gender="female",
+            zip="12345",
+            school="test",
+            preferred_mode="remote",
+            intro="test",
+        )
+
+    def test_tutor_request(self):
+        request = RequestFactory().get(reverse("Dashboard:tutor_request"))
+        request.user = self.tutor
+        response = TutorRequest(request)
+        self.assertEqual(response.status_code, 200)
+
+
+class AcceptRequestTestCase(TestCase):
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username="testuser@example.com",
+            password="testpassword",
+        )
+        self.tutor = User.objects.create_user(
+            username="testuser@nyu.com",
+            password="testpassword",
+        )
+        self.session = TutoringSession.objects.create(
+            student_id=self.student,
+            tutor_id=self.tutor,
+            date="2024-03-20",
+            start_time="10:00:00",
+            end_time="11:00:00",
+            status="Pending",
+            message="test",
+            offering_rate=10,
+            subject="test",
+            tutoring_mode="remote",
+        )
+
+    def test_accept_request(self):
+        response = self.client.get(
+            reverse("Dashboard:accept_request", args=(self.session.pk,))
+        )
+        self.assertEqual(response.status_code, 302)
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "Accepted")
+
+
+class DeclineRequestTestCase(TestCase):
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username="testuser@example.com",
+            password="testpassword",
+        )
+        self.tutor = User.objects.create_user(
+            username="testuser@nyu.com",
+            password="testpassword",
+        )
+        self.session = TutoringSession.objects.create(
+            student_id=self.student,
+            tutor_id=self.tutor,
+            date="2024-03-20",
+            start_time="10:00:00",
+            end_time="11:00:00",
+            status="Pending",
+            message="test",
+            offering_rate=10,
+            subject="test",
+            tutoring_mode="remote",
+        )
+
+    def test_accept_request(self):
+        response = self.client.get(
+            reverse("Dashboard:decline_request", args=(self.session.pk,))
+        )
+        self.assertEqual(response.status_code, 302)
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "Rejected")
 
 
 class LogoutTestCase(TestCase):
