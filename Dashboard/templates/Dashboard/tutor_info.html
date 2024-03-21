@@ -7,12 +7,17 @@
   <div class="modal-dialog" role="document">
       <div class="modal-content rounded-4 shadow">
           <div class="modal-header p-5 pb-4 border-bottom-0">
-              <h2 class="fw-bold mb-0 fs-2 text-center">Your Tutor Profile</h2>
+              <h2 class="fw-bold mb-0 fs-2 text-center w-100">Your Tutor Profile</h2>
           </div>
 
           <div class="modal-body p-5 pt-0">
-              <form method="post" action="{% url 'Dashboard:tutor_profile' %}">
+            <form method="post" action="{% url 'Dashboard:tutor_profile' %}" enctype="multipart/form-data">
                   {% csrf_token %}
+                  <div class="mb-3 text-center">
+                    {% if tutor_form.instance.image %}
+                        <img src="{{ tutor_form.instance.image.url }}" alt="Profile Image" class="img-thumbnail mb-3">
+                    {% endif %}
+                  </div>
                   <div class="mb-3">
                     {% for field in tutor_form %}
                       {% if field.name != "salary_min" and field.name != "salary_max" %}
@@ -54,6 +59,7 @@
                       {{ tutor_form.salary_max }}
                     </div>
                   </div>
+
                   <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
               </form>
           </div>

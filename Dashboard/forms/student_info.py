@@ -64,6 +64,7 @@ class StudentForm(ModelForm):
             "grade",
             "preferred_mode",
             "intro",
+            "image",  # Add the image field
         ]
         labels = {
             "fname": "First Name",
@@ -74,6 +75,7 @@ class StudentForm(ModelForm):
             "grade": "Grade Level",
             "preferred_mode": "Preferred Tutoring Mode",
             "intro": "Introduction",
+            "image": "Profile Image",  # Label for the image field
         }
 
         widgets = {
@@ -90,6 +92,9 @@ class StudentForm(ModelForm):
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
             "intro": forms.Textarea(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+            "image": forms.FileInput(  # Widget for the image field
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
         }
