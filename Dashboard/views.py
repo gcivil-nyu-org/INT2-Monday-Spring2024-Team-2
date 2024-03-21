@@ -108,6 +108,23 @@ def StudentInformation(request):
         if student_form.is_valid():
             user = request.user
             profile = student_form.save(commit=False)
+
+            if "image" in request.FILES:
+                image = Image.open(request.FILES["image"])
+
+                # Resize the image, preserving aspect ratio
+                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+
+                # Save the resized image to a BytesIO object
+                image_io = BytesIO()
+                image.save(image_io, format="JPEG")
+
+                # Create a new Django file-like object to save to the model
+                image_name = request.FILES["image"].name
+                profile.image.save(
+                    image_name, ContentFile(image_io.getvalue()), save=False
+                )
+            
             profile.user = user
             profile.save()
             user.usertype.has_profile_complete = True
