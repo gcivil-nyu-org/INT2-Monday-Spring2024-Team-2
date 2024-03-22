@@ -19,7 +19,7 @@
                   </div>
                   <div class="col-md-4">
                     <p><strong>Student Name:</strong> {{ student_profile.fname }} {{ student_profile.lname }}</p>
-                    <p><strong>Subject:</strong> {{ tutorRequest.subject | title }}</p>
+                    <p><strong>Subject:</strong> {{ tutorRequest.human_readable_subject | title }}</p>
                     <p><strong>Tutoring Mode: </strong>
                       {% if tutorRequest.tutoring_mode == "inperson"  %} 
                       In Person
