@@ -18,6 +18,10 @@ from django.db.models import Q
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 
 
 @login_required
@@ -194,8 +198,42 @@ def TutorDashboard(request):
 
 def CancelSession(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
+    student = session.student_id
+    student_email = student.username
+    print("Student Email:", student_email)
+    studentFname = student.first_name
+    studentLname = student.last_name
+
+    tutor = session.tutor_id
+    tutorFname = tutor.first_name
+    tutorLname = tutor.last_name
+
+    sessionDate = session.date
+    sessionTime = session.start_time
     session.status = "Cancelled"
     session.save()
+
+    # send email notification to the students about session cancellation
+    html_content = render_to_string(
+        "Email/cancellation_template.html",
+        {
+            "studentFname": studentFname,
+            "studentLname": studentLname,
+            "tutorFname": tutorFname,
+            "tutorLname": tutorLname,
+            "sessionDate": sessionDate,
+            "sessionTime": sessionTime,
+        },
+    )
+
+    email = EmailMessage(
+        "Tutoring Session Cancelled",
+        html_content,
+        "tutornyuengineeringverify@gmail.com",
+        [student_email],
+    )
+    email.content_subtype = "html"
+    email.send()
     return redirect("Dashboard:tutor_dashboard")
 
 
