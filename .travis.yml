@@ -16,7 +16,7 @@ before_script:
 
 script:
   - black --check .
-  - flake8 . --ignore=E503
+  - flake8
   - coverage run manage.py test --noinput
 
 after_script:
