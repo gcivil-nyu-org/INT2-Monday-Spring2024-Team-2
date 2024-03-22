@@ -72,9 +72,9 @@ class TutoringSession(models.Model):
     offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
     message = models.TextField()
     status = models.TextField(default="Pending")
-    
+
     def human_readable_subject(self):
-        return self.subject.replace('_', ' ')
+        return self.subject.replace("_", " ")
 
 
 # Two blank lines before the new function definition
