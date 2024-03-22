@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
 from django.db.models import Q
-from PIL import Image
+from PIL import Image, ImageDraw, ImageOps
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.mail import send_mail
@@ -28,7 +28,12 @@ from django.contrib.auth.models import User
 def TutorInformation(request):
     initial_availabilities_json = "[]"
     tutor_form = TutorForm()
-    tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
+    try:
+        tutor_image_form = TutorImageForm(
+            instance=ProfileT.objects.get(user=request.user)
+        )
+    except ProfileT.DoesNotExist:
+        tutor_image_form = TutorImageForm()
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
@@ -49,13 +54,24 @@ def TutorInformation(request):
             # Handle the image field separately using tutor_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
+                image = image.resize((300, 300), Image.Resampling.LANCZOS)
+                # Resize and fill with white background
+                new_image = Image.new("RGB", (300, 300), (255, 255, 255))
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                if image.mode == "RGBA":
-                    background = Image.new("RGB", image.size, (255, 255, 255))
-                    background.paste(image, (0, 0), image)
-                    image = background
+                new_image.paste(
+                    image, ((300 - image.width) // 2, (300 - image.height) // 2)
+                )
+
+                # Crop as a circle
+                mask = Image.new("L", (300, 300), 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, 300, 300), fill=255)
+                circle_image = ImageOps.fit(new_image, (300, 300), centering=(0.5, 0.5))
+                circle_image.putalpha(mask)
+
+                # Save the image
                 image_io = BytesIO()
-                image.save(image_io, format="JPEG")
+                circle_image.save(image_io, format="PNG")
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
@@ -123,15 +139,23 @@ def StudentInformation(request):
             profile = student_form.save(commit=False)
 
             # Handle the image field separately using student_image_form
+            # Handle the image field separately using student_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
-                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                if image.mode == "RGBA":
-                    background = Image.new("RGB", image.size, (255, 255, 255))
-                    background.paste(image, (0, 0), image)
-                    image = background
+                # Resize to 300x300, enlarging if necessary
+                image = image.resize((300, 300), Image.Resampling.LANCZOS)
+                # Fill with white background and crop as a circle
+                new_image = Image.new("RGB", (300, 300), (255, 255, 255))
+                new_image.paste(
+                    image, ((300 - image.width) // 2, (300 - image.height) // 2)
+                )
+                mask = Image.new("L", (300, 300), 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, 300, 300), fill=255)
+                new_image.putalpha(mask)
+                # Save the image
                 image_io = BytesIO()
-                image.save(image_io, format="JPEG")
+                new_image.save(image_io, format="PNG")
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
