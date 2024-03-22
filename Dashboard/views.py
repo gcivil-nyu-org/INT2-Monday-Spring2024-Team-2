@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms.tutor_info import TutorForm, AvailabilityForm
+from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
 from .forms.student_info import StudentForm, StudentImageForm
 from TutorRegister.models import (
     Expertise,
@@ -28,35 +28,34 @@ from django.contrib.auth.models import User
 def TutorInformation(request):
     initial_availabilities_json = "[]"
     tutor_form = TutorForm()
+    tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
 
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
-        tutor_form = TutorForm(request.POST, request.FILES, instance=profile)
+        tutor_form = TutorForm(request.POST, instance=profile)
+        tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
         availability_form = AvailabilityForm(request.POST)
-        if tutor_form.is_valid() and availability_form.is_valid():
-            # save tutor profile data
+        if (
+            tutor_form.is_valid()
+            and tutor_image_form.is_valid()
+            and availability_form.is_valid()
+        ):
             user = request.user
             profile = tutor_form.save(commit=False)
 
+            # Handle the image field separately using tutor_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
-
-                # Resize the image, preserving aspect ratio
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-
                 if image.mode == "RGBA":
                     background = Image.new("RGB", image.size, (255, 255, 255))
                     background.paste(image, (0, 0), image)
                     image = background
-
-                # Save the resized image to a BytesIO object
                 image_io = BytesIO()
                 image.save(image_io, format="JPEG")
-
-                # Create a new Django file-like object to save to the model
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
@@ -73,7 +72,7 @@ def TutorInformation(request):
                 availability_data["user"] = user
                 Availability.objects.create(**availability_data)
 
-            # save expertise data to database
+            # Save expertise data to database
             Expertise.objects.filter(user=request.user).delete()
             selected_expertise = request.POST.getlist("expertise")
             if selected_expertise:
@@ -103,6 +102,7 @@ def TutorInformation(request):
         tutor_form.initial["expertise"] = existing_expertise
     context = {
         "tutor_form": tutor_form,
+        "tutor_image_form": tutor_image_form,
         "availability_form": availability_form,
         "initial_availabilities_json": initial_availabilities_json,
     }

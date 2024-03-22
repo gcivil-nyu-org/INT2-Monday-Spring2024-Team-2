@@ -17,6 +17,7 @@
                     {% if tutor_form.instance.image %}
                         <img src="{{ tutor_form.instance.image.url }}" alt="Profile Image" class="img-thumbnail mb-3">
                     {% endif %}
+                    {{ tutor_image_form.image }}
                   </div>
                   <div class="mb-3">
                     {% for field in tutor_form %}
@@ -62,6 +63,24 @@
 
                   <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
               </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body d-flex justify-content-center align-items-center">
+              <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid" style="display: none;"/>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
       </div>
   </div>
@@ -141,6 +160,57 @@ $(document).ready(function() {
       $("#chosenAvailabilities").children().each(function (index) {
           $(this).find(".btn-danger").attr("onclick", `removeAvailability(this, ${index})`);
       });
+  }
+
+  function updateImagePreview() {
+    var input = document.getElementById('id_image');
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function() {
+          // Create a canvas with the desired dimensions
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          canvas.width = 300;
+          canvas.height = 300;
+  
+          // Calculate the scaling factor and dimensions to maintain aspect ratio
+          var scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+          var scaledWidth = img.width * scale;
+          var scaledHeight = img.height * scale;
+  
+          // Calculate the position to center the image on the canvas
+          var x = (canvas.width - scaledWidth) / 2;
+          var y = (canvas.height - scaledHeight) / 2;
+  
+          // Fill the canvas with a white background
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+          // Draw the resized and centered image
+          ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+  
+          // Update the image preview with the canvas data
+          var imagePreview = document.getElementById('imagePreview');
+          imagePreview.src = canvas.toDataURL();
+          imagePreview.style.display = 'block';
+          $('#imagePreviewModal').modal('show');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  
+  if (window.jQuery) {
+    $(document).ready(function() {
+      $('#id_image').change(updateImagePreview);
+    });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('id_image').addEventListener('change', updateImagePreview);
+    });
   }
   </script>
 {% endblock %}
