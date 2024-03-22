@@ -45,10 +45,11 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        }
-        form label {
-    font-weight: bold; 
-}
+    }
+
+    form label {
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -82,6 +83,9 @@
                 {{ form.date }}
             </div>
             <div id="times-container"></div>
+            <div id="timeslot-error-message" style="display: none; color: red;">
+                You must select at least one timeslot.
+            </div>
             <div class="form-group">
                 {{ form.offering_rate.label_tag }}
                 {{ form.offering_rate }}
@@ -104,9 +108,18 @@
         selectedTimeslotsField.value = JSON.stringify(selectedSlots.map(slot => {
             return { start: slot.start, end: slot.end };
         }));
+        if (selectedSlots.length === 0) {
+            event.preventDefault(); // Prevent form from submitting
+            // Display an error message to the user
+            const errorMessageDiv = document.getElementById('timeslot-error-message');
+            errorMessageDiv.style.display = 'block'; // Show the error message
+        } else {
+            const errorMessageDiv = document.getElementById('timeslot-error-message');
+            errorMessageDiv.style.display = 'none'; // Hide the error message if timeslots are selected
+        }
     });
     document.addEventListener('DOMContentLoaded', function () {
-        const dateField = document.getElementById('date_selector'); 
+        const dateField = document.getElementById('date_selector');
         if (!dateField) {
             console.error('Date field not found');
             return;
@@ -114,7 +127,7 @@
 
         dateField.addEventListener('change', function (e) {
             const selectedDate = e.target.value;
-            const tutorId = '{{ tutor.user.id }}'; 
+            const tutorId = '{{ tutor.user.id }}';
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(`/find/get-available-times/${tutorId}/${selectedDate}/`, {
@@ -158,7 +171,7 @@
             const timeButton = document.createElement('button');
             timeButton.className = 'time-slot-btn';
             timeButton.textContent = `${startTime} - ${endTime}`;
-            timeButton.type = 'button'; 
+            timeButton.type = 'button';
             timeButton.addEventListener('click', function () {
                 selectTimeSlot(startTime, endTime, day);
             });
@@ -205,6 +218,8 @@
 
             if (isSelected) {
                 button.classList.add('selected');
+                const errorMessageDiv = document.getElementById('timeslot-error-message');
+                errorMessageDiv.style.display = 'none';
             } else {
                 button.classList.remove('selected');
             }
