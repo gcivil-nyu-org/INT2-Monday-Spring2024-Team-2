@@ -2,38 +2,49 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <title>{% block title %}{% endblock %}</title>
-    </head>
-        <div class="container">
-            <!-- Navigation Bar -->
-            <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-                <div class="col-md-3 mb-2 mb-md-0">
-                    <a href="{% url 'home' %}" class="d-inline-flex link-body-emphasis text-decoration-none">
-                        <img src="{% static 'images/logo.png' %}" alt="Logo" width = "120">          
-                    </a>
-                </div>
-          
-                <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-                  <li><a href="{% url 'Dashboard:student_dashboard' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Sessions</a></li>
-                  <li><a href="{% url 'TutorFilter:filter_tutors' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">Find A Tutor</a></li>
-                  <li><a href="#" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Requests</a></li>
-                  <li><a href="{% url 'Dashboard:student_profile' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Profile</a></li>
-                </ul>
-          
-                <div class="col-md-3 text-end">
-                  <form method="post" action="{% url 'Dashboard:logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Log Out</button>
-                  </form>
-                </div>
-            </header>
-        <body>
-        {% block content %}
-        {% endblock %}
-        </body>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<div class="container">
+    <!-- Navigation Bar -->
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <div class="col-md-3 mb-2 mb-md-0">
+            <a href="{% url 'home' %}" class="d-inline-flex align-items-center mb-2 mb-lg-0 text-decoration-none">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" width="120">
+            </a>
+        </div>
+
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <!-- Navigation links -->
+            <li><a href="{% url 'Dashboard:student_dashboard' %}" class="nav-link px-2" style="color: #600d91;">My Sessions</a></li>
+            <li><a href="{% url 'TutorFilter:filter_tutors' %}" class="nav-link px-2" style="color: #600d91;">Find A Tutor</a></li>
+            <li><a href="#" class="nav-link px-2" style="color: #600d91;">My Requests</a></li>
+            <li><a href="{% url 'Dashboard:student_profile' %}" class="nav-link px-2" style="color: #600d91;">My Profile</a></li>
+        </ul>
+
+        <div class="col-md-3 text-end">
+            <form method="post" action="{% url 'Dashboard:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" style="background: #600d91; border-color: #600d91;">Log Out</button>
+            </form>
+        </div>
+    </header>
+
+    {% block content %}
+    {% endblock %}
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block footer %}
+{% endblock %}
+</body>
 </html>
