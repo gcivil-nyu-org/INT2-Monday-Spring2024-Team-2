@@ -10,6 +10,7 @@
         <h3 style="color: #600d91">Welcome to Your Tutor Dashboard</h3>
           <br>
             <p class="col-md-8 fs-4">Upcoming Sessions:</p>
+            {% if upcomingSessions %}
             {% for session, student_profile in upcomingSessions%} 
             <div class="modal-content rounded-4 shadow">
               <div class="modal-body p-5 pt-10">
@@ -68,10 +69,14 @@
            </div>
           <br>
           {%endfor%}
+          {%else%}
+          <p style="color:#AC658F; margin-left: 20px"> You currently have no upcoming sessions. <p>
+          {%endif%}
         </div>    
         
             <br>
             <p class="col-md-8 fs-4">Completed Sessions:</p>
+            {% if pastSessions %}
             {% for session, student_profile in pastSessions%}
             <div class="modal-content rounded-4 shadow">
               <div class="modal-body p-5 pt-10">
@@ -102,6 +107,9 @@
            </div>
           <br>
           {%endfor%}
+          {%else%}        
+          <p style="color:#AC658F; margin-left: 20px"> You currently have no completed sessions. <p>
+          {%endif%}
         </div>
     </div>
 </div>
