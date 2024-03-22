@@ -1,8 +1,11 @@
-from django.shortcuts import render, get_object_or_404
-from .forms import TutorFilterForm
-from TutorRegister.models import ProfileT, Availability, Expertise, UserType, ProfileS
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import TutorFilterForm, TutoringSessionRequestForm
+from TutorRegister.models import ProfileT, Availability, Expertise, UserType, ProfileS, TutoringSession
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.http import JsonResponse
+from datetime import datetime, timedelta
+import json
 
 
 def filter_tutors(request):
@@ -95,3 +98,58 @@ def get_display_expertise(expertise):
     expertise_dict = dict(TutorFilterForm.EXPERTISE_CHOICES)
 
     return expertise_dict.get(expertise, expertise)
+
+def request_tutoring_session(request, tutor_id):
+    tutor_user = get_object_or_404(User, pk=tutor_id)
+    tutor_profile = get_object_or_404(ProfileT, user=tutor_user)
+    if request.method == 'POST':
+        form = TutoringSessionRequestForm(request.POST, tutor_user=tutor_user)
+        if form.is_valid():
+            selected_timeslots = json.loads(request.POST.get('selected_timeslots', '[]'))
+            print(selected_timeslots)
+            for timeslot in selected_timeslots:
+                print(timeslot)
+                tutoring_session = TutoringSession(
+                    student_id=request.user,
+                    tutor_id=tutor_user,
+                    tutoring_mode=form.cleaned_data['tutoring_mode'],
+                    subject=form.cleaned_data['subject'],
+                    date=form.cleaned_data['date'],
+                    start_time=datetime.strptime(timeslot['start'], '%H:%M').time(),
+                    end_time=datetime.strptime(timeslot['end'], '%H:%M').time(),
+                    offering_rate=form.cleaned_data['offering_rate'],
+                    message=form.cleaned_data['message'],
+                    status="Pending"
+                )
+                tutoring_session.save()
+            
+            return redirect ("Dashboard:student_dashboard",)
+        else:
+            print(form.errors.as_json())
+    else:
+        form = TutoringSessionRequestForm(tutor_user=tutor_user)
+    print(tutor_profile.intro)
+    return render(request, 'TutorFilter/request_tutoring_session.html', {'form': form, 'tutor': tutor_profile})
+def get_available_times(request, tutor_id, selected_date):
+    if request.method == "POST":
+        selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
+        day_of_week = selected_date_obj.strftime('%A')
+        day = day_of_week
+        print("Called get_available_times")
+        availabilities = Availability.objects.filter(user_id=tutor_id, day_of_week=day.lower())
+        booked_sessions = TutoringSession.objects.filter(tutor_id=tutor_id, date=selected_date, status="Accepted")
+        print(day_of_week)
+        print(availabilities)
+        available_slots = []
+        for availability in availabilities:
+            start = datetime.combine(selected_date_obj, availability.start_time)
+            end = datetime.combine(selected_date_obj, availability.end_time)
+
+            current = start
+            while current < end:
+                slot_end = current + timedelta(minutes=30)
+                if not booked_sessions.filter(start_time__lt=slot_end.time(), end_time__gt=current.time()).exists():
+                    available_slots.append(current.strftime('%H:%M'))
+                current = slot_end
+        print(available_slots)
+        return JsonResponse({'available_slots': available_slots, 'day': day.lower()})

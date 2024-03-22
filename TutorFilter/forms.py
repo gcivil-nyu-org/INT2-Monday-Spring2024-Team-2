@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from TutorRegister.models import ProfileT, Expertise
-
+from TutorRegister.models import ProfileT, Expertise, TutoringSession
+from Dashboard.choices import EXPERTISE_CHOICES
 
 class TutorFilterForm(forms.Form):
     # username = forms.CharField(required=False)
@@ -98,3 +98,45 @@ class TutorFilterForm(forms.Form):
         ),
         required=False,
     )
+
+
+
+class TutoringSessionRequestForm(forms.ModelForm):
+    subject = forms.ChoiceField(choices=[])
+    tutoring_mode = forms.ChoiceField(choices=[])
+    # subject = forms.ModelChoiceField(queryset=Expertise.objects.none(), empty_label="Select Subject")
+    def __init__(self, *args, tutor_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Initialize with empty choices; will be set based on the tutor's preferred mode.
+        available_subject_choices = []
+        if tutor_user:
+            tutor_profile = ProfileT.objects.filter(user=tutor_user).first()
+            expert_subjects = Expertise.objects.filter(user=tutor_user).values_list('subject', flat=True)
+            # Map the Expertise subjects to the human-readable names
+            available_subject_choices = [choice for choice in EXPERTISE_CHOICES if choice[0] in expert_subjects]
+
+            # Ensure the subject field uses the available subjects as choices
+            self.fields['subject'].choices = available_subject_choices
+            if tutor_profile:
+                # Define choices based on the tutor's preferred mode
+                if tutor_profile.preferred_mode == 'both':
+                    mode_choices = [
+                        ('inperson', 'In Person'),
+                        ('remote', 'Remote'),
+                        ('both', 'Both')
+                    ]
+                else:
+                    # If the tutor prefers either inperson or virtual, limit choices to that mode
+                    mode_choices = [(tutor_profile.preferred_mode, tutor_profile.preferred_mode.capitalize())]
+
+                self.fields['tutoring_mode'].choices = mode_choices
+                
+    class Meta:
+        model = TutoringSession
+        fields = ['tutoring_mode', 'subject', 'date', 'offering_rate', 'message']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', 'id': 'date_selector'}),
+            'offering_rate': forms.NumberInput(),
+            'message': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Message'}),
+        }
