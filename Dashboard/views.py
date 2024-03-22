@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm
-from .forms.student_info import StudentForm
+from .forms.student_info import StudentForm, StudentImageForm
 from TutorRegister.models import (
     Expertise,
     Availability,
@@ -46,6 +46,11 @@ def TutorInformation(request):
 
                 # Resize the image, preserving aspect ratio
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
 
                 # Save the resized image to a BytesIO object
                 image_io = BytesIO()
@@ -108,22 +113,25 @@ def TutorInformation(request):
 def StudentInformation(request):
     if request.method == "POST":
         profile, created = ProfileS.objects.get_or_create(user=request.user)
-        student_form = StudentForm(request.POST, request.FILES, instance=profile)
-        if student_form.is_valid():
+        student_form = StudentForm(request.POST, instance=profile)
+        student_image_form = StudentImageForm(
+            request.POST, request.FILES, instance=profile
+        )
+
+        if student_form.is_valid() and student_image_form.is_valid():
             user = request.user
             profile = student_form.save(commit=False)
 
+            # Handle the image field separately using student_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
-
-                # Resize the image, preserving aspect ratio
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-
-                # Save the resized image to a BytesIO object
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
                 image_io = BytesIO()
                 image.save(image_io, format="JPEG")
-
-                # Create a new Django file-like object to save to the model
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
@@ -136,13 +144,19 @@ def StudentInformation(request):
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         profile = None
-        student_form = StudentForm()
         try:
             profile = ProfileS.objects.get(user=request.user)
-            student_form = StudentForm(instance=profile)
         except Exception as e:
             print("Error " + str(e))
-    context = {"student_form": student_form, "profile": profile}
+
+        student_form = StudentForm(instance=profile)
+        student_image_form = StudentImageForm(instance=profile)
+
+    context = {
+        "student_form": student_form,
+        "student_image_form": student_image_form,
+        "profile": profile,
+    }
     return render(request, "Dashboard/student_info.html", context)
 
 
