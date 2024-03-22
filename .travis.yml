@@ -9,6 +9,8 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install pillow
+  - pip install django-storages
+  - pip install boto3
 
 before_script:
   - python manage.py migrate
