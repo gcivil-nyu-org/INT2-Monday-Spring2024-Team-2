@@ -3,6 +3,16 @@
 {% block title %} Create Student Profile {% endblock %}
 
 {% block content %}
+<style>
+  .profile-image {
+    border-radius: 50%; /* Makes the image circular */
+    border: none;       /* Removes the border */
+    width: 300px;       /* Set the width */
+    height: 300px;      /* Set the height */
+    object-fit: cover;  /* Ensures the image covers the area without stretching */
+  }
+</style>
+
 <div class="container mt-5 d-flex flex-column align-items-center justify-content-center">
   <div class="modal-dialog" role="document">
     <div class="modal-content rounded-4 shadow">
@@ -17,7 +27,7 @@
           <div class="mb-3 text-center">
             <!-- Profile Image Field -->
             {% if student_image_form.instance.image %}
-              <img src="{{ student_image_form.instance.image.url }}" alt="Profile Image" class="img-thumbnail mb-3"/>
+              <img src="{{ student_image_form.instance.image.url }}" alt="Profile Image" class="profile-image mb-3"/>
             {% endif %}
             {{ student_image_form.image }}
           </div>
@@ -29,6 +39,9 @@
       </div>
     </div>
   </div>
+</div>
+
+
 
   <!-- Image Preview Modal -->
   <div class="modal" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
@@ -53,56 +66,64 @@
 
 <script>
   function updateImagePreview() {
-    var input = document.getElementById('id_image');
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var img = new Image();
-        img.onload = function() {
-          // Create a canvas with the desired dimensions
-          var canvas = document.createElement('canvas');
-          var ctx = canvas.getContext('2d');
-          canvas.width = 300;
-          canvas.height = 300;
+      var input = document.getElementById('id_image');
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+              var img = new Image();
+              img.onload = function() {
+                  // Create a canvas with the desired dimensions
+                  var canvas = document.createElement('canvas');
+                  var ctx = canvas.getContext('2d');
+                  canvas.width = 300;
+                  canvas.height = 300;
   
-          // Calculate the scaling factor and dimensions to maintain aspect ratio
-          var scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-          var scaledWidth = img.width * scale;
-          var scaledHeight = img.height * scale;
+                  // Calculate the scaling factor and dimensions to maintain aspect ratio
+                  var scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                  var scaledWidth = img.width * scale;
+                  var scaledHeight = img.height * scale;
   
-          // Calculate the position to center the image on the canvas
-          var x = (canvas.width - scaledWidth) / 2;
-          var y = (canvas.height - scaledHeight) / 2;
+                  // Calculate the position to center the image on the canvas
+                  var x = (canvas.width - scaledWidth) / 2;
+                  var y = (canvas.height - scaledHeight) / 2;
   
-          // Fill the canvas with a white background
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+                  // Fill the canvas with a white background
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-          // Draw the resized and centered image
-          ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+                  // Draw the resized and centered image
+                  ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
   
-          // Update the image preview with the canvas data
-          var imagePreview = document.getElementById('imagePreview');
-          imagePreview.src = canvas.toDataURL();
-          imagePreview.style.display = 'block';
-          $('#imagePreviewModal').modal('show');
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+                  // Create a circular mask
+                  ctx.globalCompositeOperation = 'destination-in';
+                  ctx.beginPath();
+                  ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, 2 * Math.PI);
+                  ctx.closePath();
+                  ctx.fill();
+  
+                  // Update the image preview with the canvas data
+                  var imagePreview = document.getElementById('imagePreview');
+                  imagePreview.src = canvas.toDataURL();
+                  imagePreview.style.display = 'block';
+                  $('#imagePreviewModal').modal('show');
+              };
+              img.src = e.target.result;
+          };
+          reader.readAsDataURL(input.files[0]);
+      }
   }
   
   if (window.jQuery) {
-    $(document).ready(function() {
-      $('#id_image').change(updateImagePreview);
-    });
+      $(document).ready(function() {
+          $('#id_image').change(updateImagePreview);
+      });
   } else {
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('id_image').addEventListener('change', updateImagePreview);
-    });
+      document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('id_image').addEventListener('change', updateImagePreview);
+      });
   }
   </script>
+  
   
   
 

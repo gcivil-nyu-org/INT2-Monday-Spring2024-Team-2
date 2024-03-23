@@ -70,7 +70,7 @@
         {% for user in users %}
         <div class="col">
             <div class="card h-80">
-                <img src="/media/{{user.image}}" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
+                <img src="{{ user.image.url }}" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
                 <div style="padding-top:10px">
                     <div style="text-align:center; margin-bottom:10px">
                         <h5>{{ user.fname }} {{user.lname}}</h5>
