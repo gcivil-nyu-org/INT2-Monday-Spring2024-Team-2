@@ -19,6 +19,7 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 @login_required
@@ -111,7 +112,27 @@ def StudentInformation(request):
 
 @login_required
 def StudentDashboard(request):
-    return render(request, "Dashboard/student_dashboard.html")
+    sessions = TutoringSession.objects.filter(
+        student_id=request.user.id,
+        status="Accepted"
+    ).select_related("tutor_id__profilet")
+    
+    now = datetime.now()
+    
+    upcomingSessions = sessions.filter(
+        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
+    )
+    
+    pastSessions = sessions.filter(
+        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
+    )
+    
+    context = {
+        "upcomingSessions": upcomingSessions,
+        "pastSessions": pastSessions
+    }
+    
+    return render(request, "Dashboard/student_dashboard.html", context)
 
 
 @login_required
@@ -119,7 +140,7 @@ def TutorDashboard(request):
     sessions = TutoringSession.objects.filter(
         tutor_id=request.user.id, status="Accepted"
     )
-    now = datetime.now()
+    now = timezone.now()
     upcomingSessions = sessions.filter(
         Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
     )
