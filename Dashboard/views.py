@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms.tutor_info import TutorForm, AvailabilityForm
-from .forms.student_info import StudentForm
+from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
+from .forms.student_info import StudentForm, StudentImageForm
 from TutorRegister.models import (
     Expertise,
     Availability,
@@ -15,39 +15,63 @@ from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
 from django.db.models import Q
-from PIL import Image
+from PIL import Image, ImageDraw, ImageOps
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 
 
 @login_required
 def TutorInformation(request):
     initial_availabilities_json = "[]"
     tutor_form = TutorForm()
+    try:
+        tutor_image_form = TutorImageForm(
+            instance=ProfileT.objects.get(user=request.user)
+        )
+    except ProfileT.DoesNotExist:
+        tutor_image_form = TutorImageForm()
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
 
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
-        tutor_form = TutorForm(request.POST, request.FILES, instance=profile)
+        tutor_form = TutorForm(request.POST, instance=profile)
+        tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
         availability_form = AvailabilityForm(request.POST)
-        if tutor_form.is_valid() and availability_form.is_valid():
-            # save tutor profile data
+        if (
+            tutor_form.is_valid()
+            and tutor_image_form.is_valid()
+            and availability_form.is_valid()
+        ):
             user = request.user
             profile = tutor_form.save(commit=False)
 
+            # Handle the image field separately using tutor_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
-
-                # Resize the image, preserving aspect ratio
+                image = image.resize((300, 300), Image.Resampling.LANCZOS)
+                # Resize and fill with white background
+                new_image = Image.new("RGB", (300, 300), (255, 255, 255))
                 image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                new_image.paste(
+                    image, ((300 - image.width) // 2, (300 - image.height) // 2)
+                )
 
-                # Save the resized image to a BytesIO object
+                # Crop as a circle
+                mask = Image.new("L", (300, 300), 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, 300, 300), fill=255)
+                circle_image = ImageOps.fit(new_image, (300, 300), centering=(0.5, 0.5))
+                circle_image.putalpha(mask)
+
+                # Save the image
                 image_io = BytesIO()
-                image.save(image_io, format="JPEG")
-
-                # Create a new Django file-like object to save to the model
+                circle_image.save(image_io, format="PNG")
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
@@ -64,7 +88,7 @@ def TutorInformation(request):
                 availability_data["user"] = user
                 Availability.objects.create(**availability_data)
 
-            # save expertise data to database
+            # Save expertise data to database
             Expertise.objects.filter(user=request.user).delete()
             selected_expertise = request.POST.getlist("expertise")
             if selected_expertise:
@@ -94,6 +118,7 @@ def TutorInformation(request):
         tutor_form.initial["expertise"] = existing_expertise
     context = {
         "tutor_form": tutor_form,
+        "tutor_image_form": tutor_image_form,
         "availability_form": availability_form,
         "initial_availabilities_json": initial_availabilities_json,
     }
@@ -104,22 +129,33 @@ def TutorInformation(request):
 def StudentInformation(request):
     if request.method == "POST":
         profile, created = ProfileS.objects.get_or_create(user=request.user)
-        student_form = StudentForm(request.POST, request.FILES, instance=profile)
-        if student_form.is_valid():
+        student_form = StudentForm(request.POST, instance=profile)
+        student_image_form = StudentImageForm(
+            request.POST, request.FILES, instance=profile
+        )
+
+        if student_form.is_valid() and student_image_form.is_valid():
             user = request.user
             profile = student_form.save(commit=False)
 
+            # Handle the image field separately using student_image_form
+            # Handle the image field separately using student_image_form
             if "image" in request.FILES:
                 image = Image.open(request.FILES["image"])
-
-                # Resize the image, preserving aspect ratio
-                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-
-                # Save the resized image to a BytesIO object
+                # Resize to 300x300, enlarging if necessary
+                image = image.resize((300, 300), Image.Resampling.LANCZOS)
+                # Fill with white background and crop as a circle
+                new_image = Image.new("RGB", (300, 300), (255, 255, 255))
+                new_image.paste(
+                    image, ((300 - image.width) // 2, (300 - image.height) // 2)
+                )
+                mask = Image.new("L", (300, 300), 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, 300, 300), fill=255)
+                new_image.putalpha(mask)
+                # Save the image
                 image_io = BytesIO()
-                image.save(image_io, format="JPEG")
-
-                # Create a new Django file-like object to save to the model
+                new_image.save(image_io, format="PNG")
                 image_name = request.FILES["image"].name
                 profile.image.save(
                     image_name, ContentFile(image_io.getvalue()), save=False
@@ -132,13 +168,19 @@ def StudentInformation(request):
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         profile = None
-        student_form = StudentForm()
         try:
             profile = ProfileS.objects.get(user=request.user)
-            student_form = StudentForm(instance=profile)
         except Exception as e:
             print("Error " + str(e))
-    context = {"student_form": student_form, "profile": profile}
+
+        student_form = StudentForm(instance=profile)
+        student_image_form = StudentImageForm(instance=profile)
+
+    context = {
+        "student_form": student_form,
+        "student_image_form": student_image_form,
+        "profile": profile,
+    }
     return render(request, "Dashboard/student_info.html", context)
 
 
@@ -180,8 +222,42 @@ def TutorDashboard(request):
 
 def CancelSession(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
+    student = session.student_id
+    student_email = student.username
+    print("Student Email:", student_email)
+    studentFname = student.first_name
+    studentLname = student.last_name
+
+    tutor = session.tutor_id
+    tutorFname = tutor.first_name
+    tutorLname = tutor.last_name
+
+    sessionDate = session.date
+    sessionTime = session.start_time
     session.status = "Cancelled"
     session.save()
+
+    # send email notification to the students about session cancellation
+    html_content = render_to_string(
+        "Email/cancellation_template.html",
+        {
+            "studentFname": studentFname,
+            "studentLname": studentLname,
+            "tutorFname": tutorFname,
+            "tutorLname": tutorLname,
+            "sessionDate": sessionDate,
+            "sessionTime": sessionTime,
+        },
+    )
+
+    email = EmailMessage(
+        "Tutoring Session Cancelled",
+        html_content,
+        "tutornyuengineeringverify@gmail.com",
+        [student_email],
+    )
+    email.content_subtype = "html"
+    email.send()
     return redirect("Dashboard:tutor_dashboard")
 
 
