@@ -82,7 +82,7 @@ def TutorInformation(request):
                         Expertise.objects.create(user=user, subject=expertise)
                 user.usertype.has_profile_complete = True
                 user.usertype.save()
-                return HttpResponseRedirect(reverse("Dashboard:tutor_dashboard"))
+                return HttpResponseRedirect(reverse("Dashboard:dashboard"))
         else:
             profile = None
             existing_availabilities = None
@@ -148,7 +148,7 @@ def StudentInformation(request):
                 profile.save()
                 user.usertype.has_profile_complete = True
                 user.usertype.save()
-                return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
+                return HttpResponseRedirect(reverse("Dashboard:dashboard"))
         else:
             profile = None
             try:
