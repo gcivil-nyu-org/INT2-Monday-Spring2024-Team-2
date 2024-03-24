@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms.tutor_info import TutorForm, AvailabilityForm
-from .forms.student_info import StudentForm
+from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
+from .forms.student_info import StudentForm, StudentImageForm
 from TutorRegister.models import (
     Expertise,
     Availability,
@@ -15,6 +15,9 @@ from django.http import HttpResponseRedirect
 import json
 from datetime import datetime, time
 from django.db.models import Q
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -26,6 +29,7 @@ from django.utils import timezone
 def TutorInformation(request):
     initial_availabilities_json = "[]"
     tutor_form = TutorForm()
+    tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
     existing_expertise = list(
         Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
     )
@@ -33,11 +37,31 @@ def TutorInformation(request):
     if request.method == "POST":
         profile, created = ProfileT.objects.get_or_create(user=request.user)
         tutor_form = TutorForm(request.POST, instance=profile)
+        tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
         availability_form = AvailabilityForm(request.POST)
-        if tutor_form.is_valid() and availability_form.is_valid():
-            # save tutor profile data
+        if (
+            tutor_form.is_valid()
+            and tutor_image_form.is_valid()
+            and availability_form.is_valid()
+        ):
             user = request.user
             profile = tutor_form.save(commit=False)
+
+            # Handle the image field separately using tutor_image_form
+            if "image" in request.FILES:
+                image = Image.open(request.FILES["image"])
+                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
+                image_io = BytesIO()
+                image.save(image_io, format="JPEG")
+                image_name = request.FILES["image"].name
+                profile.image.save(
+                    image_name, ContentFile(image_io.getvalue()), save=False
+                )
+
             profile.user = user
             profile.save()
 
@@ -49,7 +73,7 @@ def TutorInformation(request):
                 availability_data["user"] = user
                 Availability.objects.create(**availability_data)
 
-            # save expertise data to database
+            # Save expertise data to database
             Expertise.objects.filter(user=request.user).delete()
             selected_expertise = request.POST.getlist("expertise")
             if selected_expertise:
@@ -79,6 +103,7 @@ def TutorInformation(request):
         tutor_form.initial["expertise"] = existing_expertise
     context = {
         "tutor_form": tutor_form,
+        "tutor_image_form": tutor_image_form,
         "availability_form": availability_form,
         "initial_availabilities_json": initial_availabilities_json,
     }
@@ -90,9 +115,29 @@ def StudentInformation(request):
     if request.method == "POST":
         profile, created = ProfileS.objects.get_or_create(user=request.user)
         student_form = StudentForm(request.POST, instance=profile)
-        if student_form.is_valid():
+        student_image_form = StudentImageForm(
+            request.POST, request.FILES, instance=profile
+        )
+
+        if student_form.is_valid() and student_image_form.is_valid():
             user = request.user
             profile = student_form.save(commit=False)
+
+            # Handle the image field separately using student_image_form
+            if "image" in request.FILES:
+                image = Image.open(request.FILES["image"])
+                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                if image.mode == "RGBA":
+                    background = Image.new("RGB", image.size, (255, 255, 255))
+                    background.paste(image, (0, 0), image)
+                    image = background
+                image_io = BytesIO()
+                image.save(image_io, format="JPEG")
+                image_name = request.FILES["image"].name
+                profile.image.save(
+                    image_name, ContentFile(image_io.getvalue()), save=False
+                )
+
             profile.user = user
             profile.save()
             user.usertype.has_profile_complete = True
@@ -100,13 +145,19 @@ def StudentInformation(request):
             return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
     else:
         profile = None
-        student_form = StudentForm()
         try:
             profile = ProfileS.objects.get(user=request.user)
-            student_form = StudentForm(instance=profile)
         except Exception as e:
             print("Error " + str(e))
-    context = {"student_form": student_form}
+
+        student_form = StudentForm(instance=profile)
+        student_image_form = StudentImageForm(instance=profile)
+
+    context = {
+        "student_form": student_form,
+        "student_image_form": student_image_form,
+        "profile": profile,
+    }
     return render(request, "Dashboard/student_info.html", context)
 
 

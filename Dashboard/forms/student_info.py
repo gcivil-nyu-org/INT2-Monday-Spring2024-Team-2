@@ -93,3 +93,17 @@ class StudentForm(ModelForm):
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
         }
+
+
+class StudentImageForm(forms.ModelForm):
+    class Meta:
+        model = ProfileS
+        fields = ["image"]
+        labels = {
+            "image": "Profile Image",
+        }
+        widgets = {
+            "image": forms.FileInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+        }

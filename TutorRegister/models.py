@@ -73,6 +73,9 @@ class TutoringSession(models.Model):
     message = models.TextField()
     status = models.TextField(default="Pending")
 
+    def human_readable_subject(self):
+        return self.subject.replace("_", " ")
+
 
 # Two blank lines before the new function definition
 # Signal to automatically create or update UserType when a User instance is saved

@@ -9,6 +9,7 @@
     <div class="mt-4">
         <h3 style="color: #600d91">Your Tutoring Requests: </h3>
             <br>
+            {% if tutorRequests%}
             {% for tutorRequest, student_profile in tutorRequests%} 
             <div class="modal-content rounded-4 shadow">
               <div class="modal-body p-5 pt-10">
@@ -18,7 +19,7 @@
                   </div>
                   <div class="col-md-4">
                     <p><strong>Student Name:</strong> {{ student_profile.fname }} {{ student_profile.lname }}</p>
-                    <p><strong>Subject:</strong> {{ tutorRequest.subject | title }}</p>
+                    <p><strong>Subject:</strong> {{ tutorRequest.human_readable_subject | title }}</p>
                     <p><strong>Tutoring Mode: </strong>
                       {% if tutorRequest.tutoring_mode == "inperson"  %} 
                       In Person
@@ -89,6 +90,9 @@
            </div>
           <br>
           {%endfor%}
+          {%else%}
+          <p style="color:#AC658F; margin-left: 20px"> You currently have no tutoring requests. <p>
+          {%endif%}
         </div>    
         </div>
     </div>
