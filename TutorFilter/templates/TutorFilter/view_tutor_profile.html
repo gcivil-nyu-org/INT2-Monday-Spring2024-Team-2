@@ -24,13 +24,12 @@
                             <p>Zipcode: {{ profilet.zip }}</p>
                             <p>Grade: {{ profilet.grade|capfirst  }}</p>
                             <p>Preferred Mode: {{ profilet.preferred_mode|capfirst  }}</p>
-                            <p>Salaray Range: {{ profilet.salary_min }} - {{ profilet.salary_max }}</p>
+                            <p>Salaray Range: ${{ profilet.salary_min }} - {{ profilet.salary_max }}/Hour</p>
                         </div>
                         <div class="col-md-6">
-                            <p>Expertise: 
+                            <p>Expertise:
                                 {% for e in expertise %}
-                                    {% if not forloop.first %}, {% endif %}
-                                    {{ e|capfirst  }}
+                                    {{ e|capfirst }}{% if not forloop.last %},{% endif %}
                                 {% endfor %}
                             </p>
                             <p>Availability:</p>
