@@ -37,19 +37,21 @@
                                 {% endif %}
                                 </p>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <p><strong>Date: </strong>{{ request.date }}</p>
                                 <p><strong>Time: </strong>{{ request.start_time }} - {{ request.end_time }}</p>
                                 <P><strong>Offering Rate: </strong>  ${{ request.offering_rate}} / hour </p>
                             </div>
                             <div class="col-md-2">
                                 {% if userType == "student" %}
-                                    {% if request.status == "Pending"}
+                                    {% if request.status == "Pending" %}
                                     <p style="color: #359AF7;">PENDING</p>
                                     {% else %}
                                     <p style="color: #F92121;">DECLINED</p>
+                                    {% endif %}
                                 {% endif %}
                             </div>
+                            <div class="col-md-2"></div>
                             <div class="col-md-7">
                                 {% if userType == "tutor" %}
                                 <p><strong>Message: </strong>{{ request.message }}</p>
@@ -63,27 +65,84 @@
                                 </form>
                                 <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#declineModal{{ request.id }}">Decline</button>
                                 {% else %}
-                                    {% if request.status == "Pending"}
-                                    <form action="{% url 'Dashboard:cancel_request' request.id %}" method="post">
-                                        <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ request.id }}">Cancel</button>
-                                    </form>
+                                    {% if request.status == "Pending" %}
+                                    <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ request.id }}">Cancel</button>
                                     {% else %}
-                                    <button type="submit" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal{{ request.id }}">Delete</button>
+                                    <form action="{% url 'Dashboard:delete_request' request.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-secondary" >Delete</button>
+                                    </form>
                                     {% endif %}
                                 {% endif %}
                             </div>
 
                             <!-- Success Modal -->
-
+                            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="successModalLabel">Success</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            You have successfully accepted this tutoring request.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Decline confirmation Modal -->
+                            <div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1" aria-labelledby="declineModal{{ request.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Decline Confirmation</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to decline this request?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                            <form action="{% url 'Dashboard:decline_request' request.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Yes</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Cancel confirmation Modal -->
+                            <div class="modal fade" id="cancelModal{{ request.id }}" tabindex="-1" aria-labelledby="cancelModal{{ request.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Cancel Confirmation</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to cancel this request?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                                            <form action="{% url 'Dashboard:cancel_request' request.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Yes</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Delete Modal -->
+
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
+            <p style="color:#AC658F; margin-left: 20px"> You currently have no tutoring requests. <p></p>
         {% endif %}
     </div>
 

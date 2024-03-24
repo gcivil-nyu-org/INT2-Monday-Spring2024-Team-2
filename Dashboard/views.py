@@ -346,7 +346,7 @@ def AcceptRequest(request, session_id):
 
 def DeclineRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
-    session.status = "Rejected"
+    session.status = "Declined"
     session.save()
     return redirect("Dashboard:tutor_request")
 
