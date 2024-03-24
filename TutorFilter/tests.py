@@ -15,15 +15,15 @@ class TutorFilterTest(TestCase):
             username="testuser@example.com",
             password="testpassword",
         )
-        Expertise.objects.create(user=self.testuser, subject="math")
+        Expertise.objects.create(user=self.user, subject="math")
         ProfileT.objects.create(
-            user=self.testuser,
+            user=self.user,
             preferred_mode="remote",
             grade="freshman",
             zip="12345",
             salary_min=50,
         )
-        UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
+        UserType.objects.filter(user=self.user).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
 
     def test_filter_tutors(self):
@@ -47,7 +47,7 @@ class TutorFilterTest(TestCase):
 
         # Check if the response context contains the expected user
         users_in_context = response.context["users"]
-        self.assertTrue(any(user.user == self.testuser for user in users_in_context))
+        self.assertTrue(any(user.user == self.user for user in users_in_context))
 
     def test_filter_tutors2(self):
         c = Client()
