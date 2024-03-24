@@ -1,0 +1,93 @@
+{% extends baseTemplate %}
+{% load static %}
+
+{% block title %}Tutoring Requests{% endblock %}
+
+{% block content %}
+    <!-- Tutoring Requests Content -->
+    <div class="mt-4">
+        <h3 style="color: #600d91">Your Tutoring Requests: </h3>
+        <br>
+        {% if tutorRequests %}
+            {% for request in tutorRequests %}
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-body p-5 pt-10">
+                        <div class="row">
+                            <div class="col-md-2">
+                                {% if userType == "student" %}
+                                    <img src="/media/{{ session.tutor_id.profileT.image }}" alt="Tutor" class="card-img-top" style="max-height: 100px; width: auto">
+                                {% else %}
+                                    <img src="/media/{{ session.student_id.profileS.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <p>
+                                {% if userType == "student" %}
+                                <strong>Tutor Name:</strong> {{ request.tutor_id.profilet.fname }} {{ request.tutor_id.profilet.lname }}
+                                {% else %}
+                                <strong>Student Name:</strong> {{ request.student_id.profiles.fname }} {{ request.student_id.profiles.lname }}
+                                {% endif %}
+                                </p>
+                                <p><strong>Subject:</strong> {{ request.human_readable_subject | title }}</p>
+                                <p><strong>Tutoring Mode: </strong>
+                                {% if request.tutoring_mode == "inperson"  %} 
+                                In Person
+                                {% else %}
+                                Remote
+                                {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Date: </strong>{{ request.date }}</p>
+                                <p><strong>Time: </strong>{{ request.start_time }} - {{ request.end_time }}</p>
+                                <P><strong>Offering Rate: </strong>  ${{ request.offering_rate}} / hour </p>
+                            </div>
+                            <div class="col-md-2">
+                                {% if userType == "student" %}
+                                    {% if request.status == "Pending"}
+                                    <p style="color: #359AF7;">PENDING</p>
+                                    {% else %}
+                                    <p style="color: #F92121;">DECLINED</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-7">
+                                {% if userType == "tutor" %}
+                                <p><strong>Message: </strong>{{ request.message }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                {% if userType == "tutor" %}
+                                <form action="{% url 'Dashboard:accept_request' request.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success" style="margin-right:10px;" data-bs-toggle="modal" data-bs-target="#successModal">Accept</button>
+                                </form>
+                                <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#declineModal{{ request.id }}">Decline</button>
+                                {% else %}
+                                    {% if request.status == "Pending"}
+                                    <form action="{% url 'Dashboard:cancel_request' request.id %}" method="post">
+                                        <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ request.id }}">Cancel</button>
+                                    </form>
+                                    {% else %}
+                                    <button type="submit" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal{{ request.id }}">Delete</button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Success Modal -->
+
+
+                            <!-- Decline confirmation Modal -->
+                            <!-- Cancel confirmation Modal -->
+                            <!-- Delete Modal -->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+{% endblock %}

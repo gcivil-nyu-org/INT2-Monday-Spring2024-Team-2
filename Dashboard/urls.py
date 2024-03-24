@@ -13,4 +13,8 @@ urlpatterns = [
     path("accept/<int:session_id>/", views.AcceptRequest, name="accept_request"),
     path("decline/<int:session_id>/", views.DeclineRequest, name="decline_request"),
     path("logout/", views.logout_view, name="logout"),
+    path("", views.UserDashboard, name="dashboard"),
+    path("requests", views.Requests, name="requests"),
+    path("delete/<int:session_id>/", views.DeleteRequest, name="delete_request"),
+    path("cancel-request/<int:session_id>/", views.CancelRequest, name="cancel_request")
 ]
