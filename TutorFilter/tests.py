@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import ProfileT, Expertise, UserType
+from TutorRegister.models import ProfileT, Expertise, UserType, ProfileS
+from .views import view_profile, view_student_profile, view_tutor_profile
 from django.test import Client
 
 
@@ -24,6 +25,16 @@ class TutorFilterTest(TestCase):
         )
         UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
+
+        self.user_type = UserType.objects.create(user=self.user, user_type="tutor")
+        # Create a test tutor profile
+        self.tutor_profile = ProfileT.objects.create(
+            user=self.user, fname="Test", lname="Tutor"
+        )
+        # Create a test student profile
+        self.student_profile = ProfileS.objects.create(
+            user=self.user, fname="Test", lname="Student"
+        )
 
     def test_filter_tutors(self):
         # Simulate a GET request with query parameters
@@ -71,3 +82,23 @@ class TutorFilterTest(TestCase):
         )
         # Check if the response context contains the expected user
         self.assertEqual(len(response2.context["users"]), 0)
+
+    def test_view_tutor_profile(self):
+        url = reverse("view_tutor_profile", kwargs={"user_id": self.user.id})
+        request = self.factory.get(url)
+        request.user = self.user
+        response = view_tutor_profile(request, self.user.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Test Tutor"
+        )  # Assuming 'Test Tutor' is part of the rendered template
+
+    def test_view_student_profile(self):
+        url = reverse("view_student_profile", kwargs={"user_id": self.user.id})
+        request = self.factory.get(url)
+        request.user = self.user
+        response = view_student_profile(request, self.user.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Test Student"
+        )  # Assuming 'Test Student' is part of the rendered template
