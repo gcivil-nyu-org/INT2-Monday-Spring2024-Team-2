@@ -27,138 +27,148 @@ from django.utils import timezone
 
 @login_required
 def TutorInformation(request):
-    initial_availabilities_json = "[]"
-    tutor_form = TutorForm()
-    tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
-    existing_expertise = list(
-        Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
-    )
+    if request.user.usertype.user_type == "tutor":
+        initial_availabilities_json = "[]"
+        tutor_form = TutorForm()
+        tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
+        existing_expertise = list(
+            Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
+        )
 
-    if request.method == "POST":
-        profile, created = ProfileT.objects.get_or_create(user=request.user)
-        tutor_form = TutorForm(request.POST, instance=profile)
-        tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
-        availability_form = AvailabilityForm(request.POST)
-        if (
-            tutor_form.is_valid()
-            and tutor_image_form.is_valid()
-            and availability_form.is_valid()
-        ):
-            user = request.user
-            profile = tutor_form.save(commit=False)
+        if request.method == "POST":
+            profile, created = ProfileT.objects.get_or_create(user=request.user)
+            tutor_form = TutorForm(request.POST, instance=profile)
+            tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
+            availability_form = AvailabilityForm(request.POST)
+            if (
+                tutor_form.is_valid()
+                and tutor_image_form.is_valid()
+                and availability_form.is_valid()
+            ):
+                user = request.user
+                profile = tutor_form.save(commit=False)
 
-            # Handle the image field separately using tutor_image_form
-            if "image" in request.FILES:
-                image = Image.open(request.FILES["image"])
-                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                if image.mode == "RGBA":
-                    background = Image.new("RGB", image.size, (255, 255, 255))
-                    background.paste(image, (0, 0), image)
-                    image = background
-                image_io = BytesIO()
-                image.save(image_io, format="JPEG")
-                image_name = request.FILES["image"].name
-                profile.image.save(
-                    image_name, ContentFile(image_io.getvalue()), save=False
-                )
-
-            profile.user = user
-            profile.save()
-
-            Availability.objects.filter(user=request.user).delete()
-            serialized_availabilities = request.POST.get("availabilities")
-            availabilities = json.loads(serialized_availabilities)
-
-            for availability_data in availabilities:
-                availability_data["user"] = user
-                Availability.objects.create(**availability_data)
-
-            # Save expertise data to database
-            Expertise.objects.filter(user=request.user).delete()
-            selected_expertise = request.POST.getlist("expertise")
-            if selected_expertise:
-                for expertise in selected_expertise:
-                    Expertise.objects.create(user=user, subject=expertise)
-            user.usertype.has_profile_complete = True
-            user.usertype.save()
-            return HttpResponseRedirect(reverse("Dashboard:tutor_dashboard"))
-    else:
-        profile = None
-        existing_availabilities = None
-        try:
-            profile = ProfileT.objects.get(user=request.user)
-            existing_availabilities = Availability.objects.filter(user=request.user)
-            initial_availabilities_json = json.dumps(
-                list(
-                    existing_availabilities.values(
-                        "day_of_week", "start_time", "end_time"
+                # Handle the image field separately using tutor_image_form
+                if "image" in request.FILES:
+                    image = Image.open(request.FILES["image"])
+                    image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                    if image.mode == "RGBA":
+                        background = Image.new("RGB", image.size, (255, 255, 255))
+                        background.paste(image, (0, 0), image)
+                        image = background
+                    image_io = BytesIO()
+                    image.save(image_io, format="JPEG")
+                    image_name = request.FILES["image"].name
+                    profile.image.save(
+                        image_name, ContentFile(image_io.getvalue()), save=False
                     )
-                ),
-                cls=DateTimeEncoder,
-            )
-            tutor_form = TutorForm(instance=profile)
-        except Exception as e:
-            print("Error " + str(e))
-        availability_form = AvailabilityForm()
-        tutor_form.initial["expertise"] = existing_expertise
-    context = {
-        "tutor_form": tutor_form,
-        "tutor_image_form": tutor_image_form,
-        "availability_form": availability_form,
-        "initial_availabilities_json": initial_availabilities_json,
-    }
-    return render(request, "Dashboard/tutor_info.html", context)
+
+                profile.user = user
+                profile.save()
+
+                Availability.objects.filter(user=request.user).delete()
+                serialized_availabilities = request.POST.get("availabilities")
+                availabilities = json.loads(serialized_availabilities)
+
+                for availability_data in availabilities:
+                    availability_data["user"] = user
+                    Availability.objects.create(**availability_data)
+
+                # Save expertise data to database
+                Expertise.objects.filter(user=request.user).delete()
+                selected_expertise = request.POST.getlist("expertise")
+                if selected_expertise:
+                    for expertise in selected_expertise:
+                        Expertise.objects.create(user=user, subject=expertise)
+                user.usertype.has_profile_complete = True
+                user.usertype.save()
+                return HttpResponseRedirect(reverse("Dashboard:tutor_dashboard"))
+        else:
+            profile = None
+            existing_availabilities = None
+            try:
+                profile = ProfileT.objects.get(user=request.user)
+                existing_availabilities = Availability.objects.filter(user=request.user)
+                initial_availabilities_json = json.dumps(
+                    list(
+                        existing_availabilities.values(
+                            "day_of_week", "start_time", "end_time"
+                        )
+                    ),
+                    cls=DateTimeEncoder,
+                )
+                tutor_form = TutorForm(instance=profile)
+            except Exception as e:
+                print("Error " + str(e))
+            availability_form = AvailabilityForm()
+            tutor_form.initial["expertise"] = existing_expertise
+        context = {
+            "tutor_form": tutor_form,
+            "tutor_image_form": tutor_image_form,
+            "availability_form": availability_form,
+            "initial_availabilities_json": initial_availabilities_json,
+        }
+        
+        return render(request, "Dashboard/tutor_info.html", context)
+    
+    else:
+        return redirect("Dashboard:student_profile")
 
 
 @login_required
 def StudentInformation(request):
-    if request.method == "POST":
-        profile, created = ProfileS.objects.get_or_create(user=request.user)
-        student_form = StudentForm(request.POST, instance=profile)
-        student_image_form = StudentImageForm(
-            request.POST, request.FILES, instance=profile
-        )
+    if request.user.usertype.user_type == "student":
+        if request.method == "POST":
+            profile, created = ProfileS.objects.get_or_create(user=request.user)
+            student_form = StudentForm(request.POST, instance=profile)
+            student_image_form = StudentImageForm(
+                request.POST, request.FILES, instance=profile
+            )
 
-        if student_form.is_valid() and student_image_form.is_valid():
-            user = request.user
-            profile = student_form.save(commit=False)
+            if student_form.is_valid() and student_image_form.is_valid():
+                user = request.user
+                profile = student_form.save(commit=False)
 
-            # Handle the image field separately using student_image_form
-            if "image" in request.FILES:
-                image = Image.open(request.FILES["image"])
-                image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                if image.mode == "RGBA":
-                    background = Image.new("RGB", image.size, (255, 255, 255))
-                    background.paste(image, (0, 0), image)
-                    image = background
-                image_io = BytesIO()
-                image.save(image_io, format="JPEG")
-                image_name = request.FILES["image"].name
-                profile.image.save(
-                    image_name, ContentFile(image_io.getvalue()), save=False
-                )
+                # Handle the image field separately using student_image_form
+                if "image" in request.FILES:
+                    image = Image.open(request.FILES["image"])
+                    image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                    if image.mode == "RGBA":
+                        background = Image.new("RGB", image.size, (255, 255, 255))
+                        background.paste(image, (0, 0), image)
+                        image = background
+                    image_io = BytesIO()
+                    image.save(image_io, format="JPEG")
+                    image_name = request.FILES["image"].name
+                    profile.image.save(
+                        image_name, ContentFile(image_io.getvalue()), save=False
+                    )
 
-            profile.user = user
-            profile.save()
-            user.usertype.has_profile_complete = True
-            user.usertype.save()
-            return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
+                profile.user = user
+                profile.save()
+                user.usertype.has_profile_complete = True
+                user.usertype.save()
+                return HttpResponseRedirect(reverse("Dashboard:student_dashboard"))
+        else:
+            profile = None
+            try:
+                profile = ProfileS.objects.get(user=request.user)
+            except Exception as e:
+                print("Error " + str(e))
+
+            student_form = StudentForm(instance=profile)
+            student_image_form = StudentImageForm(instance=profile)
+
+        context = {
+            "student_form": student_form,
+            "student_image_form": student_image_form,
+            "profile": profile,
+        }
+        
+        return render(request, "Dashboard/student_info.html", context)
+    
     else:
-        profile = None
-        try:
-            profile = ProfileS.objects.get(user=request.user)
-        except Exception as e:
-            print("Error " + str(e))
-
-        student_form = StudentForm(instance=profile)
-        student_image_form = StudentImageForm(instance=profile)
-
-    context = {
-        "student_form": student_form,
-        "student_image_form": student_image_form,
-        "profile": profile,
-    }
-    return render(request, "Dashboard/student_info.html", context)
+        return redirect("Dashboard:tutor_profile")
 
 
 @login_required
