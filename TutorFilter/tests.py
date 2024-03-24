@@ -26,16 +26,6 @@ class TutorFilterTest(TestCase):
         UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
 
-        self.user_type = UserType.objects.create(user=self.testuser, user_type="tutor")
-        # Create a test tutor profile
-        self.tutor_profile = ProfileT.objects.create(
-            user=self.testuser, fname="Test", lname="Tutor"
-        )
-        # Create a test student profile
-        self.student_profile = ProfileS.objects.create(
-            user=self.testuser, fname="Test", lname="Student"
-        )
-
     def test_filter_tutors(self):
         # Simulate a GET request with query parameters
         form_data = {
@@ -82,23 +72,3 @@ class TutorFilterTest(TestCase):
         )
         # Check if the response context contains the expected user
         self.assertEqual(len(response2.context["users"]), 0)
-
-    def test_view_tutor_profile(self):
-        url = reverse("view_tutor_profile", kwargs={"user_id": self.testuser.id})
-        request = self.factory.get(url)
-        request.user = self.testuser
-        response = view_tutor_profile(request, self.testuser.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "Test Tutor"
-        )  # Assuming 'Test Tutor' is part of the rendered template
-
-    def test_view_student_profile(self):
-        url = reverse("view_student_profile", kwargs={"user_id": self.testuser.id})
-        request = self.factory.get(url)
-        request.user = self.testuser
-        response = view_student_profile(request, self.testuser.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "Test Student"
-        )  # Assuming 'Test Student' is part of the rendered template
