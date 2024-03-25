@@ -1,26 +1,33 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import ProfileT, Expertise
+from TutorRegister.models import ProfileT, ProfileS, Expertise
 from django.test import Client
-
 
 class TutorFilterTest(TestCase):
     @classmethod
-    def setUpTestData(self):
+    def setUpTestData(cls):
         # Set up data for the whole TestCase
         # Create expertise, profile, and other necessary objects here
-        self.testuser = User.objects.create_user(
+        cls.testuser = User.objects.create_user(
             username="testuser@example.com",
             password="testpassword",
         )
-        Expertise.objects.create(user=self.testuser, subject="math")
+        cls.testuser2 = User.objects.create_user(
+            username="testuser2@example.com",
+            password="testpassword",
+        )
+        Expertise.objects.create(user=cls.testuser, subject="math")
         ProfileT.objects.create(
-            user=self.testuser,
+            user=cls.testuser,
             preferred_mode="remote",
             grade="freshman",
             zip="12345",
             salary_min=50,
+        )
+        ProfileS.objects.create(
+            user=cls.testuser2,
+            student_field="Some field",
         )
         # Assign the expertise to the user somehow, according to your model structure
 
@@ -70,3 +77,27 @@ class TutorFilterTest(TestCase):
         )
         # Check if the response context contains the expected user
         self.assertEqual(len(response2.context["users"]), 0)
+
+    def test_view_profile_tutor(self):
+        # Test view_profile for a tutor user
+        response = self.client.get(reverse("TutorFilter:view_profile", args=[self.testuser.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "TutorFilter/view_tutor_profile.html")
+
+    def test_view_profile_student(self):
+        # Test view_profile for a student user
+        response = self.client.get(reverse("TutorFilter:view_profile", args=[self.testuser2.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "TutorFilter/view_student_profile.html")
+
+    def test_view_tutor_profile(self):
+        # Test view_tutor_profile
+        response = self.client.get(reverse("TutorFilter:view_tutor_profile", args=[self.testuser.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "TutorFilter/view_tutor_profile.html")
+
+    def test_view_student_profile(self):
+        # Test view_student_profile
+        response = self.client.get(reverse("TutorFilter:view_student_profile", args=[self.testuser2.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "TutorFilter/view_student_profile.html")
