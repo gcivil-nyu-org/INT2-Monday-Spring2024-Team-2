@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import ModelForm
-from TutorRegister.models import ProfileT, Expertise
+from TutorRegister.models import ProfileT, Expertise, TutoringSession
+from Dashboard.choices import EXPERTISE_CHOICES
+from django.utils import timezone
 
 
 class TutorFilterForm(forms.Form):
@@ -98,3 +100,61 @@ class TutorFilterForm(forms.Form):
         ),
         required=False,
     )
+
+
+class TutoringSessionRequestForm(forms.ModelForm):
+    subject = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": "form-select"})
+    )
+    tutoring_mode = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": "form-select"})
+    )
+
+    def __init__(self, *args, tutor_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        available_subject_choices = []
+        if tutor_user:
+            tutor_profile = ProfileT.objects.filter(user=tutor_user).first()
+            expert_subjects = Expertise.objects.filter(user=tutor_user).values_list(
+                "subject", flat=True
+            )
+            available_subject_choices = [
+                choice for choice in EXPERTISE_CHOICES if choice[0] in expert_subjects
+            ]
+
+            self.fields["subject"].choices = available_subject_choices
+            if tutor_profile:
+                if tutor_profile.preferred_mode == "both":
+                    mode_choices = [
+                        ("inperson", "In Person"),
+                        ("remote", "Remote"),
+                        ("both", "Both"),
+                    ]
+                else:
+                    mode_choices = [
+                        (
+                            tutor_profile.preferred_mode,
+                            tutor_profile.preferred_mode.capitalize(),
+                        ),
+                    ]
+
+                self.fields["tutoring_mode"].choices = mode_choices
+
+    class Meta:
+        model = TutoringSession
+        fields = ["tutoring_mode", "subject", "date", "offering_rate", "message"]
+        widgets = {
+            "date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "min": timezone.localdate(),
+                    "class": "form-control",
+                    "id": "date_selector",
+                }
+            ),
+            "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
+            "message": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3, "placeholder": "Message"}
+            ),
+        }

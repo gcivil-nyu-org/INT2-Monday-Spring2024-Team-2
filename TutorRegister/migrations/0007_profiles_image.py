@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0006_alter_profilet_salary_max_alter_profilet_salary_min"),
     ]

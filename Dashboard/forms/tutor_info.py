@@ -186,3 +186,17 @@ class AvailabilityForm(forms.ModelForm):
                 }
             ),
         }
+
+
+class TutorImageForm(forms.ModelForm):
+    class Meta:
+        model = ProfileT
+        fields = ["image"]
+        labels = {
+            "image": "Profile Image",
+        }
+        widgets = {
+            "image": forms.FileInput(
+                attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            ),
+        }
