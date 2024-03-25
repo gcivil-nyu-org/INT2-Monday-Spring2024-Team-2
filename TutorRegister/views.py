@@ -52,7 +52,7 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                
+
                 if user.usertype.has_profile_complete:
                     return HttpResponseRedirect(reverse("Dashboard:dashboard"))
                 else:

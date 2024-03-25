@@ -186,17 +186,17 @@ class CancelSessionTestCase(TestCase):
             username="testuser@example.com",
             password="testpassword",
         )
-        
+
         self.student.usertype.user_type = "student"
         self.student.usertype.save()
-        
+
         self.tutor = User.objects.create_user(
             username="testuser@nyu.edu",
             password="testpassword",
         )
         self.tutor.usertype.user_type = "tutor"
         self.tutor.usertype.save()
-        
+
         self.session = TutoringSession.objects.create(
             student_id=self.student,
             tutor_id=self.tutor,

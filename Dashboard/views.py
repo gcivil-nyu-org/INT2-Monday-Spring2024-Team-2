@@ -30,15 +30,21 @@ def TutorInformation(request):
     if request.user.usertype.user_type == "tutor":
         initial_availabilities_json = "[]"
         tutor_form = TutorForm()
-        tutor_image_form = TutorImageForm(instance=ProfileT.objects.get(user=request.user))
+        tutor_image_form = TutorImageForm(
+            instance=ProfileT.objects.get(user=request.user)
+        )
         existing_expertise = list(
-            Expertise.objects.filter(user=request.user).values_list("subject", flat=True)
+            Expertise.objects.filter(user=request.user).values_list(
+                "subject", flat=True
+            )
         )
 
         if request.method == "POST":
             profile, created = ProfileT.objects.get_or_create(user=request.user)
             tutor_form = TutorForm(request.POST, instance=profile)
-            tutor_image_form = TutorImageForm(request.POST, request.FILES, instance=profile)
+            tutor_image_form = TutorImageForm(
+                request.POST, request.FILES, instance=profile
+            )
             availability_form = AvailabilityForm(request.POST)
             if (
                 tutor_form.is_valid()
@@ -108,9 +114,9 @@ def TutorInformation(request):
             "availability_form": availability_form,
             "initial_availabilities_json": initial_availabilities_json,
         }
-        
+
         return render(request, "Dashboard/tutor_info.html", context)
-    
+
     else:
         return redirect("Dashboard:student_profile")
 
@@ -164,9 +170,9 @@ def StudentInformation(request):
             "student_image_form": student_image_form,
             "profile": profile,
         }
-        
+
         return render(request, "Dashboard/student_info.html", context)
-    
+
     else:
         return redirect("Dashboard:tutor_profile")
 
@@ -174,35 +180,37 @@ def StudentInformation(request):
 @login_required
 def UserDashboard(request):
     userType = request.user.usertype.user_type
-    
+
     if userType == "student":
         sessions = TutoringSession.objects.filter(
-            student_id=request.user.id,
-            status="Accepted"
+            student_id=request.user.id, status="Accepted"
         ).select_related("tutor_id__profilet")
     else:
         sessions = TutoringSession.objects.filter(
-            tutor_id=request.user.id, 
-            status="Accepted"
+            tutor_id=request.user.id, status="Accepted"
         ).select_related("student_id__profiles")
-        
+
     now = datetime.now()
-    
+
     upcomingSessions = sessions.filter(
         Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
     )
-    
+
     pastSessions = sessions.filter(
         Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
     )
-    
+
     context = {
-        "baseTemplate": "Dashboard/base_student.html" if userType == "student" else "Dashboard/base_tutor.html",
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
         "userType": userType,
         "upcomingSessions": upcomingSessions,
-        "pastSessions": pastSessions
+        "pastSessions": pastSessions,
     }
-    
+
     return render(request, "Dashboard/dashboard.html", context)
 
 
@@ -211,7 +219,7 @@ def CancelSession(request, session_id):
     userType = request.user.usertype.user_type
 
     session = TutoringSession.objects.get(pk=session_id)
-    
+
     student = session.student_id
     student_email = student.username
     studentFname = student.first_name
@@ -226,7 +234,7 @@ def CancelSession(request, session_id):
     sessionTime = session.start_time
     session.status = "Cancelled"
     session.save()
-    
+
     # send email notification to the students about session cancellation
     html_content = render_to_string(
         "Email/cancellation_template.html",
@@ -248,31 +256,33 @@ def CancelSession(request, session_id):
     )
     email.content_subtype = "html"
     email.send()
-    
+
     return redirect("Dashboard:dashboard")
 
 
 @login_required
 def Requests(request):
     userType = request.user.usertype.user_type
-    
+
     if userType == "tutor":
         tutorRequests = TutoringSession.objects.filter(
-            tutor_id=request.user.id,
-            status="Pending"
+            tutor_id=request.user.id, status="Pending"
         ).select_related("student_id__profiles")
     else:
         tutorRequests = TutoringSession.objects.filter(
-            student_id=request.user.id,
-            status__in=["Pending", "Declined"]
+            student_id=request.user.id, status__in=["Pending", "Declined"]
         ).select_related("tutor_id__profilet")
-        
+
     context = {
-        "baseTemplate": "Dashboard/base_student.html" if userType == "student" else "Dashboard/base_tutor.html",
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
         "userType": userType,
-        "tutorRequests": tutorRequests
+        "tutorRequests": tutorRequests,
     }
-    
+
     return render(request, "Dashboard/requests.html", context)
 
 
@@ -295,7 +305,7 @@ def DeleteRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
     if session.status == "Declined":
         session.delete()
-        
+
     return redirect("Dashboard:requests")
 
 
@@ -305,7 +315,7 @@ def CancelRequest(request, session_id):
     if session.status == "Pending":
         session.status = "Cancelled"
         session.save()
-        
+
     return redirect("Dashboard:requests")
 
 
