@@ -68,6 +68,8 @@ class TutorInformationTest(TestCase):
         cls.user = User.objects.create_user(
             username="tutor@test.com", password="password123"
         )
+        cls.user.usertype.user_type = "tutor"
+        cls.user.usertype.save()
         cls.url = reverse("Dashboard:tutor_profile")
         ProfileT.objects.create(
             user=cls.user,
@@ -147,6 +149,8 @@ class StudentInformationTestCase(TestCase):
         self.user = User.objects.create_user(
             username="test@example.com", password="12345"
         )
+        self.user.usertype.user_type = "student"
+        self.user.usertype.save()
         self.client = Client(username="test@example.com", password="12345")
         self.factory = RequestFactory()
 
@@ -178,17 +182,24 @@ class StudentInformationTestCase(TestCase):
 
 class CancelSessionTestCase(TestCase):
     def setUp(self):
-        student = User.objects.create_user(
+        self.student = User.objects.create_user(
             username="testuser@example.com",
             password="testpassword",
         )
-        tutor = User.objects.create_user(
-            username="testuser@nyu.com",
+        
+        self.student.usertype.user_type = "student"
+        self.student.usertype.save()
+        
+        self.tutor = User.objects.create_user(
+            username="testuser@nyu.edu",
             password="testpassword",
         )
+        self.tutor.usertype.user_type = "tutor"
+        self.tutor.usertype.save()
+        
         self.session = TutoringSession.objects.create(
-            student_id=student,
-            tutor_id=tutor,
+            student_id=self.student,
+            tutor_id=self.tutor,
             date="2024-03-20",
             start_time="10:00:00",
             end_time="11:00:00",
@@ -201,6 +212,7 @@ class CancelSessionTestCase(TestCase):
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_cancel_session(self):
+        self.client.login(username="testuser@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:cancel_session", args=(self.session.pk,))
         )

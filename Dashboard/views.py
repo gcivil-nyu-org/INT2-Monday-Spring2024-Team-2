@@ -206,10 +206,10 @@ def UserDashboard(request):
     return render(request, "Dashboard/dashboard.html", context)
 
 
-# @login_required
+@login_required
 def CancelSession(request, session_id):
     userType = request.user.usertype.user_type
-    
+
     session = TutoringSession.objects.get(pk=session_id)
     
     student = session.student_id
@@ -226,7 +226,7 @@ def CancelSession(request, session_id):
     sessionTime = session.start_time
     session.status = "Cancelled"
     session.save()
-
+    
     # send email notification to the students about session cancellation
     html_content = render_to_string(
         "Email/cancellation_template.html",
