@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from TutorRegister.models import ProfileT, ProfileS, Expertise
 from django.test import Client
 
+
 class TutorFilterTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -83,24 +84,32 @@ class TutorFilterTest(TestCase):
 
     def test_view_profile_tutor(self):
         # Test view_profile for a tutor user
-        response = self.client.get(reverse("TutorFilter:view_profile", args=[self.testuser.id]))
+        response = self.client.get(
+            reverse("TutorFilter:view_profile", args=[self.testuser.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "TutorFilter/view_tutor_profile.html")
 
     def test_view_profile_student(self):
         # Test view_profile for a student user
-        response = self.client.get(reverse("TutorFilter:view_profile", args=[self.testuser2.id]))
+        response = self.client.get(
+            reverse("TutorFilter:view_profile", args=[self.testuser2.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "TutorFilter/view_student_profile.html")
 
     def test_view_tutor_profile(self):
         # Test view_tutor_profile
-        response = self.client.get(reverse("TutorFilter:view_tutor_profile", args=[self.testuser.id]))
+        response = self.client.get(
+            reverse("TutorFilter:view_tutor_profile", args=[self.testuser.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "TutorFilter/view_tutor_profile.html")
 
     def test_view_student_profile(self):
         # Test view_student_profile
-        response = self.client.get(reverse("TutorFilter:view_student_profile", args=[self.testuser2.id]))
+        response = self.client.get(
+            reverse("TutorFilter:view_student_profile", args=[self.testuser2.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "TutorFilter/view_student_profile.html")
