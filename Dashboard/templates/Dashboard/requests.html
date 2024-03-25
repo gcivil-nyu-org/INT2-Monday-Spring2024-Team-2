@@ -15,9 +15,9 @@
                         <div class="row">
                             <div class="col-md-2">
                                 {% if userType == "student" %}
-                                    <img src="/media/{{ request.tutor_id.profilet.image }}" alt="Tutor" class="card-img-top" style="max-height: 100px; width: auto">
+                                    <img src="{{ request.tutor_id.profilet.image.url }}" alt="Tutor" class="card-img-top" style="max-height: 100px; width: auto">
                                 {% else %}
-                                    <img src="/media/{{ request.student_id.profiles.image }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
+                                    <img src="{{ request.student_id.profiles.image.url }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
                                 {% endif %}
                             </div>
                             <div class="col-md-4">
