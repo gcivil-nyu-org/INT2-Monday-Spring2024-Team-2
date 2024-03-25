@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import ProfileT, Expertise
+from TutorRegister.models import ProfileT, Expertise, UserType
 from django.test import Client
 
 
@@ -22,6 +22,7 @@ class TutorFilterTest(TestCase):
             zip="12345",
             salary_min=50,
         )
+        UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
 
     def test_filter_tutors(self):
@@ -34,15 +35,12 @@ class TutorFilterTest(TestCase):
             "salary_max": 60,
         }
         # form = TutorFilterForm(data=form_data)
-
         response = self.client.get(
             reverse("TutorFilter:filter_tutors"),
             form_data,
         )
-
         # Check if the response is 200 OK
         self.assertEqual(response.status_code, 200)
-
         # Check if the response context contains the expected user
         users_in_context = response.context["users"]
         self.assertTrue(any(user.user == self.testuser for user in users_in_context))
@@ -58,12 +56,9 @@ class TutorFilterTest(TestCase):
             "salary_max": 20,
         }
         # form = TutorFilterForm(data=form_data)
-
         response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
-
         # Check if the response is 200 OK
         self.assertEqual(response2.status_code, 200)
-
         response2 = c.get(
             reverse("TutorFilter:filter_tutors"),
             form_data2,
