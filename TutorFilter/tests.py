@@ -35,15 +35,12 @@ class TutorFilterTest(TestCase):
             "salary_max": 60,
         }
         # form = TutorFilterForm(data=form_data)
-
         response = self.client.get(
             reverse("TutorFilter:filter_tutors"),
             form_data,
         )
-
         # Check if the response is 200 OK
         self.assertEqual(response.status_code, 200)
-
         # Check if the response context contains the expected user
         users_in_context = response.context["users"]
         self.assertTrue(any(user.user == self.testuser for user in users_in_context))
@@ -59,12 +56,9 @@ class TutorFilterTest(TestCase):
             "salary_max": 20,
         }
         # form = TutorFilterForm(data=form_data)
-
         response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
-
         # Check if the response is 200 OK
         self.assertEqual(response2.status_code, 200)
-
         response2 = c.get(
             reverse("TutorFilter:filter_tutors"),
             form_data2,
