@@ -27,7 +27,10 @@ class TutorFilterTest(TestCase):
         )
         ProfileS.objects.create(
             user=cls.testuser2,
-            student_field="Some field",
+            school="CUNY",
+            preferred_mode="remote",
+            grade="undergrad",
+            zip="12345",
         )
         # Assign the expertise to the user somehow, according to your model structure
 
