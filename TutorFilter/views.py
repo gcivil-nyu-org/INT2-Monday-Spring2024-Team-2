@@ -110,6 +110,7 @@ def get_display_expertise(expertise):
 def request_tutoring_session(request, tutor_id):
     tutor_user = get_object_or_404(User, pk=tutor_id)
     tutor_profile = get_object_or_404(ProfileT, user=tutor_user)
+    availabilities = Availability.objects.filter(user_id=tutor_id)
     if request.method == "POST":
         form = TutoringSessionRequestForm(request.POST, tutor_user=tutor_user)
         if form.is_valid():
@@ -132,13 +133,10 @@ def request_tutoring_session(request, tutor_id):
                 tutoring_session.save()
 
             return redirect(
-                "Dashboard:student_dashboard",
+                "Dashboard:dashboard",
             )
-        else:
-            print(form.errors.as_json())
     else:
         form = TutoringSessionRequestForm(tutor_user=tutor_user)
-        availabilities = Availability.objects.filter(user_id=tutor_id)
     return render(
         request,
         "TutorFilter/request_tutoring_session.html",
