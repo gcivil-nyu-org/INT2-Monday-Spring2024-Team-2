@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import ProfileT, ProfileS, Expertise
+from TutorRegister.models import ProfileT, ProfileS, Expertise, UserType
 from django.test import Client
 
 
@@ -18,6 +18,12 @@ class TutorFilterTest(TestCase):
             username="testuser2@example.com",
             password="testpassword",
         )
+        cls.testuser.usertype.user_type = "tutor"
+        cls.testuser2.usertype.user_type = "student"
+        cls.testuser.usertype.has_profile_complete = True
+        cls.testuser2.usertype.has_profile_complete = True
+        cls.testuser.usertype.save()
+        cls.testuser2.usertype.save()
         Expertise.objects.create(user=cls.testuser, subject="math")
         ProfileT.objects.create(
             user=cls.testuser,
@@ -33,10 +39,8 @@ class TutorFilterTest(TestCase):
             grade="undergrad",
             zip="12345",
         )
-        # Assign the expertise to the user somehow, according to your model structure
 
     def test_filter_tutors(self):
-        # Simulate a GET request with query parameters
         form_data = {
             "preferred_mode": "remote",
             "grade": "freshman",
@@ -44,17 +48,11 @@ class TutorFilterTest(TestCase):
             "zipcode": "12345",
             "salary_max": 60,
         }
-        # form = TutorFilterForm(data=form_data)
-
         response = self.client.get(
             reverse("TutorFilter:filter_tutors"),
             form_data,
         )
-
-        # Check if the response is 200 OK
         self.assertEqual(response.status_code, 200)
-
-        # Check if the response context contains the expected user
         users_in_context = response.context["users"]
         self.assertTrue(any(user.user == self.testuser for user in users_in_context))
 
