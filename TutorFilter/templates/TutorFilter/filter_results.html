@@ -19,9 +19,9 @@
         </div>
   
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="{% url 'Dashboard:student_dashboard' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Sessions</a></li>
+          <li><a href="{% url 'Dashboard:dashboard' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Sessions</a></li>
           <li><a href="{% url 'TutorFilter:filter_tutors' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">Find A Tutor</a></li>
-          <li><a href="#" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Requests</a></li>
+          <li><a href="{% url 'Dashboard:requests' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Requests</a></li>
           <li><a href="{% url 'Dashboard:student_profile' %}" class="nav-link px-2" style="color: #600d91; margin-left:10px">My Profile</a></li>
         </ul>
   
@@ -70,7 +70,7 @@
         {% for user in users %}
         <div class="col">
             <div class="card h-80">
-                <img src="/media/{{user.image}}" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
+                <img src="{{ user.image.url }}" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
                 <div style="padding-top:10px">
                     <div style="text-align:center; margin-bottom:10px">
                         <h5>{{ user.fname }} {{user.lname}}</h5>

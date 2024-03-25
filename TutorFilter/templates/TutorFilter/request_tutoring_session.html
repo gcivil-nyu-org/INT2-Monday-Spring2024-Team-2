@@ -1,0 +1,278 @@
+{% extends 'Dashboard/base_student.html' %}
+{% load static %}
+{% block extra_css %}
+<style>
+    .time-slot-btn {
+        margin: 5px;
+        padding: 10px 15px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .time-slot-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .selected,
+    .selected:hover {
+        background-color: #8e7aff;
+        color: rgb(0, 0, 0);
+    }
+
+    .profile-image {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+    }
+
+    .row .col-auto {
+        padding-right: 0;
+    }
+
+    .btn-custom {
+        background-color: white;
+        color: #600E90;
+        border-color: #600E90;
+    }
+
+    .btn-custom:hover {
+        background-color: #600E90;
+        color: white;
+    }
+
+    label {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container py-0 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 py-3 shadow-lg">
+            <div class="card">
+                <div class="card-header">
+                    <div class="profile-container d-flex align-items-center gap-3">
+                        <img src="{{ tutor.image.url }}" alt="Tutor's Profile Image"
+                            class="profile-image rounded-circle">
+                        <div>
+                            <h2 class="h4 mb-2">{{ tutor.fname }} {{ tutor.lname }}</h2>
+                            <p class="mb-0"><b>Hourly Rate:</b> ${{ tutor.salary_min }} - {{ tutor.salary_max }}</p>
+                            <div class="row align-items-start">
+                                <div class="col-auto">
+                                    <strong>Availability:</strong>
+                                </div>
+                                <div class="col">
+                                    {% for slot in availabilities %}
+                                    <div class="row">
+                                        <div class="col-auto text-nowrap">{{ slot.day_of_week|capfirst }}</div>
+                                        <div class="col">{{ slot.start_time|time:"H:i" }} - {{slot.end_time|time:"H:i"}}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="h5 mb-3">Request a tutoring session with {{ tutor.fname }}: </h3>
+                    <form method="post" id="tutoring-session-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.subject.label_tag }}
+                            {{ form.subject }}
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col">
+                                    {{ form.tutoring_mode.label_tag }}
+                                    {{ form.tutoring_mode }}
+                                </div>
+                                <div class="col">
+                                    {{ form.offering_rate.label_tag }}
+                                    {{ form.offering_rate }}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="mb-3">
+                            {{ form.date.label_tag }}
+                            {{ form.date }}
+                        </div>
+                        <div id="times-container" class="mb-3"></div>
+                        <div id="timeslot-error-message" class="alert alert-danger" style="display: none;">
+                            You must select at least one timeslot.
+                        </div>
+                        <div class="mb-3">
+                            {{ form.message.label_tag }}
+                            {{ form.message }}
+                        </div>
+                        <input type="hidden" name="selected_timeslots" id="selected-timeslots-field">
+                        <button type="submit" class="btn btn-custom">Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    document.getElementById('tutoring-session-form').addEventListener('submit', function (event) {
+        const selectedTimeslotsField = document.getElementById('selected-timeslots-field');
+
+        const mergedSlots = mergeConsecutiveSlots(selectedSlots);
+        selectedTimeslotsField.value = JSON.stringify(mergedSlots.map(slot => {
+            return { start: slot.start, end: slot.end };
+        }));
+
+        if (selectedSlots.length === 0) {
+            event.preventDefault();
+            const errorMessageDiv = document.getElementById('timeslot-error-message');
+            errorMessageDiv.style.display = 'block';
+        } else {
+            const errorMessageDiv = document.getElementById('timeslot-error-message');
+            errorMessageDiv.style.display = 'none';
+        }
+    });
+
+    function mergeConsecutiveSlots(slots) {
+        if (!slots.length) {
+            return [];
+        }
+        slots.sort((a, b) => a.start.localeCompare(b.start));
+        const merged = [];
+        let last = slots[0];
+
+        for (let i = 1; i < slots.length; i++) {
+            const current = slots[i];
+            if (last.end === current.start) {
+                last = { start: last.start, end: current.end };
+            } else {
+                merged.push(last);
+                last = current;
+            }
+        }
+        merged.push(last);
+        return merged;
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateField = document.getElementById('date_selector');
+        if (!dateField) {
+            console.error('Date field not found');
+            return;
+        }
+
+        dateField.addEventListener('change', function (e) {
+            const selectedDate = e.target.value;
+            const tutorId = '{{ tutor.user.id }}';
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/find/get-available-times/${tutorId}/${selectedDate}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    'date': selectedDate
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateTimeSelection(data.available_slots, data.day);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    });
+
+    function updateTimeSelection(times, day) {
+        const timesContainer = document.getElementById('times-container');
+
+        if (!timesContainer) {
+            console.error('Times container not found');
+            return;
+        }
+
+        timesContainer.innerHTML = '';
+
+        times.forEach(time => {
+            const startTime = time;
+            const endTime = addHalfHour(time);
+            const timeButton = document.createElement('button');
+            timeButton.className = 'time-slot-btn';
+            timeButton.textContent = `${startTime} - ${endTime}`;
+            timeButton.type = 'button';
+            timeButton.addEventListener('click', function () {
+                selectTimeSlot(startTime, endTime, day);
+            });
+            timesContainer.appendChild(timeButton);
+        });
+    }
+
+    function addHalfHour(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes + 30);
+
+        let newHours = date.getHours();
+        let newMinutes = date.getMinutes();
+
+        newHours = newHours.toString().padStart(2, '0');
+        newMinutes = newMinutes.toString().padStart(2, '0');
+
+        return `${newHours}:${newMinutes}`;
+    }
+
+    let selectedSlots = [];
+    let mergedSlots = [];
+
+    function selectTimeSlot(start, end, day) {
+        const timeslot = { start, end };
+        const existingSlotIndex = selectedSlots.findIndex(
+            slot => slot.start === start && slot.end === end
+        );
+
+        if (existingSlotIndex > -1) {
+            selectedSlots.splice(existingSlotIndex, 1);
+        } else {
+            selectedSlots.push(timeslot);
+        }
+        updateSlotButtons(day);
+    }
+
+    function updateSlotButtons(day) {
+        document.querySelectorAll('.time-slot-btn').forEach(button => {
+            const [startTime, endTime] = button.textContent.trim().split(' - ');
+            const isSelected = selectedSlots.some(slot =>
+                slot.start === startTime && slot.end === endTime
+            );
+
+            if (isSelected) {
+                button.classList.add('selected');
+                const errorMessageDiv = document.getElementById('timeslot-error-message');
+                errorMessageDiv.style.display = 'none';
+            } else {
+                button.classList.remove('selected');
+            }
+        });
+    }
+</script>
+{% endblock %}

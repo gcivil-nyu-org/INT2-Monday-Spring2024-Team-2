@@ -9,7 +9,7 @@
             <div class="card mt-5">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <img src="/media/{{profilet.image}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
+                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
                         <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-center">
-                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:view_tutor_profile' user_id=profilet.user_id %}'">Request a Session</button>
+                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
                 </div>
             </div>
         </div>
