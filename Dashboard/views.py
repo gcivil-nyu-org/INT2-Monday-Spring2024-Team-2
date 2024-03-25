@@ -172,62 +172,6 @@ def StudentInformation(request):
 
 
 @login_required
-def StudentDashboard(request):
-    sessions = TutoringSession.objects.filter(
-        student_id=request.user.id,
-        status="Accepted"
-    ).select_related("tutor_id__profilet")
-    
-    now = datetime.now()
-    
-    upcomingSessions = sessions.filter(
-        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
-    )
-    
-    pastSessions = sessions.filter(
-        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
-    )
-    
-    context = {
-        "upcomingSessions": upcomingSessions,
-        "pastSessions": pastSessions
-    }
-    
-    return render(request, "Dashboard/student_dashboard.html", context)
-
-
-@login_required
-def TutorDashboard(request):
-    sessions = TutoringSession.objects.filter(
-        tutor_id=request.user.id, status="Accepted"
-    )
-    now = timezone.now()
-    upcomingSessions = sessions.filter(
-        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
-    )
-    pastSessions = sessions.filter(
-        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
-    )
-
-    upcomingSessions_studentInfo = []
-    pastSessions_studentInfo = []
-
-    for session in upcomingSessions:
-        student_profile = ProfileS.objects.get(user=session.student_id)
-        upcomingSessions_studentInfo.append((session, student_profile))
-
-    for session in pastSessions:
-        student_profile = ProfileS.objects.get(user=session.student_id)
-        pastSessions_studentInfo.append((session, student_profile))
-
-    context = {
-        "upcomingSessions": upcomingSessions_studentInfo,
-        "pastSessions": pastSessions_studentInfo,
-    }
-    return render(request, "Dashboard/tutor_dashboard.html", context)
-
-
-@login_required
 def UserDashboard(request):
     userType = request.user.usertype.user_type
     
@@ -262,7 +206,7 @@ def UserDashboard(request):
     return render(request, "Dashboard/dashboard.html", context)
 
 
-@login_required
+# @login_required
 def CancelSession(request, session_id):
     userType = request.user.usertype.user_type
     
@@ -308,21 +252,6 @@ def CancelSession(request, session_id):
     return redirect("Dashboard:dashboard")
 
 
-def TutorRequest(request):
-    tutorRequests = TutoringSession.objects.filter(
-        tutor_id=request.user.id, status="Pending"
-    )
-
-    tutorRequests_studentInfo = []
-
-    for tutorRequest in tutorRequests:
-        student_profile = ProfileS.objects.get(user=tutorRequest.student_id)
-        tutorRequests_studentInfo.append((tutorRequest, student_profile))
-
-    context = {"tutorRequests": tutorRequests_studentInfo}
-    return render(request, "Dashboard/tutor_request.html", context)
-
-
 @login_required
 def Requests(request):
     userType = request.user.usertype.user_type
@@ -351,14 +280,14 @@ def AcceptRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
     session.status = "Accepted"
     session.save()
-    return redirect("Dashboard:tutor_request")
+    return redirect("Dashboard:requests")
 
 
 def DeclineRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
     session.status = "Declined"
     session.save()
-    return redirect("Dashboard:tutor_request")
+    return redirect("Dashboard:requests")
 
 
 @login_required

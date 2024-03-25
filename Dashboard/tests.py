@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import Expertise, Availability, ProfileT, TutoringSession
 import json
-from .views import StudentInformation, TutorRequest
+from .views import StudentInformation, Requests
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
 from django.core import mail
@@ -20,13 +20,13 @@ class StudentDashboardTestCase(TestCase):
 
     def test_student_dashboard_view_with_login(self):
         self.client.login(username="test@example.com", password="12345")
-        url = reverse("Dashboard:student_dashboard")
+        url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Dashboard/student_dashboard.html")
+        self.assertTemplateUsed(response, "Dashboard/dashboard.html")
 
     def test_student_dashboard_view_without_login(self):
-        url = reverse("Dashboard:student_dashboard")
+        url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         # Check if redirect to login page
@@ -41,13 +41,13 @@ class TutorDashboardTestCase(TestCase):
 
     def test_tutor_dashboard_view_with_login(self):
         self.client.login(username="test@nyu.edu", password="12345")
-        url = reverse("Dashboard:tutor_dashboard")
+        url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "Dashboard/tutor_dashboard.html")
+        self.assertTemplateUsed(response, "Dashboard/dashboard.html")
 
     def test_tutor_dashboard_view_without_login(self):
-        url = reverse("Dashboard:tutor_dashboard")
+        url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         # Check if redirect to login page
@@ -129,7 +129,7 @@ class TutorInformationTest(TestCase):
 
         self.assertRedirects(
             response,
-            reverse("Dashboard:tutor_dashboard"),
+            reverse("Dashboard:dashboard"),
             status_code=302,
             target_status_code=200,
         )
@@ -210,7 +210,7 @@ class CancelSessionTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
 
-class TutorRequestTestCase(TestCase):
+class RequestsTestCase(TestCase):
     def setUp(self):
         self.student = User.objects.create_user(
             username="testuser@example.com",
@@ -244,9 +244,9 @@ class TutorRequestTestCase(TestCase):
         )
 
     def test_tutor_request(self):
-        request = RequestFactory().get(reverse("Dashboard:tutor_request"))
+        request = RequestFactory().get(reverse("Dashboard:requests"))
         request.user = self.tutor
-        response = TutorRequest(request)
+        response = Requests(request)
         self.assertEqual(response.status_code, 200)
 
 
@@ -311,7 +311,7 @@ class DeclineRequestTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.session.refresh_from_db()
-        self.assertEqual(self.session.status, "Rejected")
+        self.assertEqual(self.session.status, "Declined")
 
 
 class LogoutTestCase(TestCase):
