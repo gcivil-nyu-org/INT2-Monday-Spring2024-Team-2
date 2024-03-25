@@ -84,7 +84,7 @@
                 <!-- More info as necessary -->
                 </div>
                 <div class="text-center mb-2">
-                    <button class="btn btn-outline-success" style="width: 100px; background-color: #600E90; color: white; border-color: #600E90;margin-bottom: 10px" > Detail </button>
+                    <a href="{% url 'TutorFilter:view_tutor_profile' user_id=user.user_id %}" class="btn btn-outline-success" style="width: 100px; background-color: #600E90; color: white; border-color: #600E90;margin-bottom: 10px" > Detail </a>
                 </div>
             <!-- Add interactive elements like buttons if needed -->
             </div>

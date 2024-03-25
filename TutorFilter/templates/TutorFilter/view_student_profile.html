@@ -1,0 +1,38 @@
+{% extends 'Dashboard/base_tutor.html' %}
+
+{% block title %} View Student Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <img src="{{profiles.image.url}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Student Image">
+                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profiles.fname }} {{profiles.lname}}</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>{{ profiles.intro }}</p>
+                    <hr>
+                    <h3 class="fw-bold mb-3 fs-4">About {{ profiles.fname }}:</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Gender: {{ profiles.gender|capfirst }}</p>
+                            <p>School: {{ profiles.school|capfirst }}</p>
+                            <p>Zipcode: {{ profiles.zip }}</p>
+                            <p>Grade: {{ profiles.grade|capfirst }}</p>
+                            <p>Preferred Mode: {{ profiles.preferred_mode|capfirst }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-center">
+                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:view_student_profile' user_id=profiles.user_id %}'">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

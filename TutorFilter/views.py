@@ -1,16 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .forms import TutorFilterForm
-from TutorRegister.models import ProfileT, Availability, Expertise, UserType
+from TutorRegister.models import ProfileT, Availability, Expertise, UserType, ProfileS
 from django.contrib.auth.models import User
 from django.conf import settings
 
 
 def filter_tutors(request):
-
     form = TutorFilterForm(request.GET)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
-    # user_type = UserType.objects
+    has_profile = (
+        UserType.objects.all()
+        .filter(has_profile_complete=True)
+        .values_list("user", flat=True)
+    )
+    users = users.filter(user__in=has_profile)
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
             users_expertise_id = users_expertise.filter(
@@ -36,3 +40,58 @@ def filter_tutors(request):
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
+
+
+def get_type(user_id):
+    u_t = get_object_or_404(UserType, user=user_id)
+    t = u_t.user_type
+
+    return t
+
+
+def view_profile(request, user_id):
+    type = get_type(user_id)
+
+    if type == "tutor":
+        return view_tutor_profile(request, user_id)
+
+    elif type == "student":
+        return view_student_profile(request, user_id)
+
+
+def view_tutor_profile(request, user_id):
+    profilet = get_object_or_404(ProfileT, user=user_id)
+    expertise = Expertise.objects.all().filter(user=profilet.user)
+
+    expertises = [get_display_expertise(e.subject) for e in expertise]
+
+    availability = Availability.objects.all().filter(user=profilet.user)
+    return render(
+        request,
+        "TutorFilter/view_tutor_profile.html",
+        {
+            "profilet": profilet,
+            "expertise": expertises,
+            "availability": availability,
+            "MEDIA_URL": settings.MEDIA_URL,
+        },
+    )
+
+
+def view_student_profile(request, user_id):
+    profiles = get_object_or_404(ProfileS, user=user_id)
+
+    return render(
+        request,
+        "TutorFilter/view_student_profile.html",
+        {
+            "profiles": profiles,
+            "MEDIA_URL": settings.MEDIA_URL,
+        },
+    )
+
+
+def get_display_expertise(expertise):
+    expertise_dict = dict(TutorFilterForm.EXPERTISE_CHOICES)
+
+    return expertise_dict.get(expertise, expertise)
