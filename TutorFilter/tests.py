@@ -49,7 +49,6 @@ class TutorFilterTest(TestCase):
             grade="undergrad",
             zip="12345",
         )
-        UserType.objects.filter(user=self.testuser).update(has_profile_complete=True)
         # Assign the expertise to the user somehow, according to your model structure
 
     def test_filter_tutors(self):
@@ -123,6 +122,7 @@ class TutorFilterTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "TutorFilter/view_student_profile.html")
+
 
 class TutoringSessionTests(TestCase):
     @classmethod
