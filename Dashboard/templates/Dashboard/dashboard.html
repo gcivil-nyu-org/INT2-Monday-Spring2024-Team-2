@@ -23,9 +23,11 @@
                             </div>
                             <div class="col-md-4">
                                 {% if userType == "student" %}
-                                    <p><strong>Tutor Name:</strong> {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</p>
+                                    <p><strong>Tutor Name:</strong> <a href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
+                                        {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a></p>
                                 {% else %}
-                                    <p><strong>Student Name:</strong> {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</p>
+                                    <p><strong>Student Name:</strong> <a href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
+                                        {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a></p>
                                 {% endif %}
                                 <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
                                 <p><strong>Tutoring Mode: </strong>
@@ -96,9 +98,11 @@
                             <div class="col-md-4">
                                 <p>
                                 {% if userType == "student" %}
-                                    <strong>Tutor Name:</strong> {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}
+                                    <strong>Tutor Name:</strong> <a href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
+                                        {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a>
                                 {% else %}
-                                    <strong>Student Name:</strong> {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}
+                                    <strong>Student Name:</strong> <a href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
+                                        {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a>
                                 {% endif %}
                                 </p>
                                 <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>

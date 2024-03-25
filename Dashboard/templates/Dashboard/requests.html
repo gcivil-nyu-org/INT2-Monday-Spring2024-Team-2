@@ -23,9 +23,11 @@
                             <div class="col-md-4">
                                 <p>
                                 {% if userType == "student" %}
-                                <strong>Tutor Name:</strong> {{ request.tutor_id.profilet.fname }} {{ request.tutor_id.profilet.lname }}
+                                <strong>Tutor Name:</strong>  <a href="{% url 'TutorFilter:view_tutor_profile' user_id=request.tutor_id.profilet.user_id %}">
+                                    {{ request.tutor_id.profilet.fname }} {{ request.tutor_id.profilet.lname }} </a>
                                 {% else %}
-                                <strong>Student Name:</strong> {{ request.student_id.profiles.fname }} {{ request.student_id.profiles.lname }}
+                                <strong>Student Name:</strong> <a href="{% url 'TutorFilter:view_student_profile' user_id=request.student_id.profiles.user_id %}">
+                                {{ request.student_id.profiles.fname }} {{ request.student_id.profiles.lname }} </a>
                                 {% endif %}
                                 </p>
                                 <p><strong>Subject:</strong> {{ request.human_readable_subject | title }}</p>
