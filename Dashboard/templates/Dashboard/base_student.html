@@ -21,9 +21,9 @@
 
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
             <!-- Navigation links -->
-            <li><a href="{% url 'Dashboard:student_dashboard' %}" class="nav-link px-2" style="color: #600d91;">My Sessions</a></li>
+            <li><a href="{% url 'Dashboard:dashboard' %}" class="nav-link px-2" style="color: #600d91;">My Sessions</a></li>
             <li><a href="{% url 'TutorFilter:filter_tutors' %}" class="nav-link px-2" style="color: #600d91;">Find A Tutor</a></li>
-            <li><a href="#" class="nav-link px-2" style="color: #600d91;">My Requests</a></li>
+            <li><a href="{% url 'Dashboard:requests' %}" class="nav-link px-2" style="color: #600d91;">My Requests</a></li>
             <li><a href="{% url 'Dashboard:student_profile' %}" class="nav-link px-2" style="color: #600d91;">My Profile</a></li>
         </ul>
 
@@ -46,5 +46,23 @@
 
 {% block footer %}
 {% endblock %}
+<!--Footer-->
+<div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" width = "80">          
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2023 TutorNYU, Inc</span>
+      </div>
+  
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+        <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+      </ul>
+    </footer>
+  </div>
+  
 </body>
 </html>
