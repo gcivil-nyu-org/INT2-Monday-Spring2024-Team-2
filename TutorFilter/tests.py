@@ -15,7 +15,6 @@ from .forms import TutoringSessionRequestForm
 import json
 
 
-
 class TutorFilterTest(TestCase):
     @classmethod
     def setUpTestData(cls):
