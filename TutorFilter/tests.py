@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import (
     ProfileT,
+    ProfileS,
     Expertise,
     UserType,
     Availability,
