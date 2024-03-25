@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from TutorRegister.models import ProfileT, Expertise, TutoringSession
 from Dashboard.choices import EXPERTISE_CHOICES
+from django.utils import timezone
 
 
 class TutorFilterForm(forms.Form):
@@ -102,8 +103,12 @@ class TutorFilterForm(forms.Form):
 
 
 class TutoringSessionRequestForm(forms.ModelForm):
-    subject = forms.ChoiceField(choices=[])
-    tutoring_mode = forms.ChoiceField(choices=[])
+    subject = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": "form-select"})
+    )
+    tutoring_mode = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": "form-select"})
+    )
 
     def __init__(self, *args, tutor_user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -131,7 +136,7 @@ class TutoringSessionRequestForm(forms.ModelForm):
                         (
                             tutor_profile.preferred_mode,
                             tutor_profile.preferred_mode.capitalize(),
-                        )
+                        ),
                     ]
 
                 self.fields["tutoring_mode"].choices = mode_choices
@@ -140,7 +145,16 @@ class TutoringSessionRequestForm(forms.ModelForm):
         model = TutoringSession
         fields = ["tutoring_mode", "subject", "date", "offering_rate", "message"]
         widgets = {
-            "date": forms.DateInput(attrs={"type": "date", "id": "date_selector"}),
-            "offering_rate": forms.NumberInput(),
-            "message": forms.Textarea(attrs={"rows": 3, "placeholder": "Message"}),
+            "date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "min": timezone.localdate(),
+                    "class": "form-control",
+                    "id": "date_selector",
+                }
+            ),
+            "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
+            "message": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3, "placeholder": "Message"}
+            ),
         }

@@ -116,9 +116,7 @@ def request_tutoring_session(request, tutor_id):
             selected_timeslots = json.loads(
                 request.POST.get("selected_timeslots", "[]")
             )
-            print(selected_timeslots)
             for timeslot in selected_timeslots:
-                print(timeslot)
                 tutoring_session = TutoringSession(
                     student_id=request.user,
                     tutor_id=tutor_user,
@@ -140,11 +138,11 @@ def request_tutoring_session(request, tutor_id):
             print(form.errors.as_json())
     else:
         form = TutoringSessionRequestForm(tutor_user=tutor_user)
-    print(tutor_profile.intro)
+        availabilities = Availability.objects.filter(user_id=tutor_id)
     return render(
         request,
         "TutorFilter/request_tutoring_session.html",
-        {"form": form, "tutor": tutor_profile},
+        {"form": form, "tutor": tutor_profile, "availabilities": availabilities},
     )
 
 
@@ -153,15 +151,12 @@ def get_available_times(request, tutor_id, selected_date):
         selected_date_obj = datetime.strptime(selected_date, "%Y-%m-%d").date()
         day_of_week = selected_date_obj.strftime("%A")
         day = day_of_week
-        print("Called get_available_times")
         availabilities = Availability.objects.filter(
             user_id=tutor_id, day_of_week=day.lower()
         )
         booked_sessions = TutoringSession.objects.filter(
             tutor_id=tutor_id, date=selected_date, status="Accepted"
         )
-        print(day_of_week)
-        print(availabilities)
         available_slots = []
         for availability in availabilities:
             start = datetime.combine(selected_date_obj, availability.start_time)
@@ -175,5 +170,4 @@ def get_available_times(request, tutor_id, selected_date):
                 ).exists():
                     available_slots.append(current.strftime("%H:%M"))
                 current = slot_end
-        print(available_slots)
         return JsonResponse({"available_slots": available_slots, "day": day.lower()})
