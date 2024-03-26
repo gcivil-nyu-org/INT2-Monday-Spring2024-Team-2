@@ -78,10 +78,10 @@ class TutoringSession(models.Model):
 
 
 class Favorite(models.Model):
-    student = models.ForeignKey(
+    student_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="student_favorites"
     )
-    tutor = models.ForeignKey(
+    tutor_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="tutor_favorites"
     )
     category = models.CharField(max_length=100, blank=True, null=True)
