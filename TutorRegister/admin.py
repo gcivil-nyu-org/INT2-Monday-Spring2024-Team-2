@@ -21,4 +21,3 @@ admin.site.register(ProfileT)
 admin.site.register(TutoringSession)
 admin.site.register(TutorReview)
 admin.site.register(Favorite)
-
