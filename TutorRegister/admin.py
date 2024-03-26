@@ -10,6 +10,7 @@ from .models import (
     ProfileT,
     TutoringSession,
     TutorReview,
+    Favorite,
 )
 
 admin.site.register(UserType)
@@ -19,3 +20,5 @@ admin.site.register(ProfileS)
 admin.site.register(ProfileT)
 admin.site.register(TutoringSession)
 admin.site.register(TutorReview)
+admin.site.register(Favorite)
+
