@@ -72,10 +72,11 @@ class TutoringSession(models.Model):
     offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
     message = models.TextField()
     status = models.TextField(default="Pending")
-    attachment = models.FileField(upload_to='attachments/', null=True, blank=True)
-    
+    attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
+
     def human_readable_subject(self):
         return self.subject.replace("_", " ")
+
 
 class TutorReview(models.Model):
     student_id = models.ForeignKey(
@@ -90,7 +91,6 @@ class TutorReview(models.Model):
 
     def __str__(self):
         return f"Review by {self.student_id} for {self.tutor_id}"
-
 
 
 # Two blank lines before the new function definition
