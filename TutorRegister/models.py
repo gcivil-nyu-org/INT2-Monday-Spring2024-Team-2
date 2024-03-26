@@ -77,6 +77,16 @@ class TutoringSession(models.Model):
         return self.subject.replace("_", " ")
 
 
+class Favorite(models.Model):
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="student_favorites"
+    )
+    tutor = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tutor_favorites"
+    )
+    category = models.CharField(max_length=100, blank=True, null=True)
+
+
 # Two blank lines before the new function definition
 # Signal to automatically create or update UserType when a User instance is saved
 @receiver(post_save, sender=User)
