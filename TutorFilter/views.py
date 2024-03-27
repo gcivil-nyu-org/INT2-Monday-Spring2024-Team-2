@@ -111,8 +111,11 @@ def request_tutoring_session(request, tutor_id):
     tutor_user = get_object_or_404(User, pk=tutor_id)
     tutor_profile = get_object_or_404(ProfileT, user=tutor_user)
     availabilities = Availability.objects.filter(user_id=tutor_id)
+
     if request.method == "POST":
-        form = TutoringSessionRequestForm(request.POST, tutor_user=tutor_user)
+        form = TutoringSessionRequestForm(
+            request.POST, request.FILES, tutor_user=tutor_user
+        )
         if form.is_valid():
             selected_timeslots = json.loads(
                 request.POST.get("selected_timeslots", "[]")
@@ -128,15 +131,17 @@ def request_tutoring_session(request, tutor_id):
                     end_time=datetime.strptime(timeslot["end"], "%H:%M").time(),
                     offering_rate=form.cleaned_data["offering_rate"],
                     message=form.cleaned_data["message"],
+                    attachment=form.cleaned_data.get(
+                        "attachment"
+                    ),  # Include the attachment
                     status="Pending",
                 )
                 tutoring_session.save()
 
-            return redirect(
-                "Dashboard:dashboard",
-            )
+            return redirect("Dashboard:dashboard")
     else:
         form = TutoringSessionRequestForm(tutor_user=tutor_user)
+
     return render(
         request,
         "TutorFilter/request_tutoring_session.html",
