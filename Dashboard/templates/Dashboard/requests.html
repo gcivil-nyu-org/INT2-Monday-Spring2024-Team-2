@@ -1,5 +1,6 @@
 {% extends baseTemplate %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Tutoring Requests{% endblock %}
 
@@ -57,6 +58,9 @@
                             <div class="col-md-7">
                                 {% if userType == "tutor" %}
                                 <p><strong>Message: </strong>{{ request.message }}</p>
+                                {% endif %}
+                                {% if request.attachment %}
+                                <p><strong>Attachment:</strong> <a href="{% url 'Dashboard:download_attachment' request.id %}" download>{{ request.attachment.name|remove_prefix:'attachments/' }}</a></p>
                                 {% endif %}
                             </div>
                             <div class="col-md-3 d-flex align-items-end">

@@ -143,7 +143,14 @@ class TutoringSessionRequestForm(forms.ModelForm):
 
     class Meta:
         model = TutoringSession
-        fields = ["tutoring_mode", "subject", "date", "offering_rate", "message"]
+        fields = [
+            "tutoring_mode",
+            "subject",
+            "date",
+            "offering_rate",
+            "message",
+            "attachment",
+        ]
         widgets = {
             "date": forms.DateInput(
                 attrs={
@@ -157,4 +164,5 @@ class TutoringSessionRequestForm(forms.ModelForm):
             "message": forms.Textarea(
                 attrs={"class": "form-control", "rows": 3, "placeholder": "Message"}
             ),
+            "attachment": forms.FileInput(attrs={"class": "form-control"}),
         }

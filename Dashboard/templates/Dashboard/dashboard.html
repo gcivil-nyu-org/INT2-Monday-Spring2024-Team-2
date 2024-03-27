@@ -1,5 +1,6 @@
 {% extends baseTemplate %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -46,6 +47,9 @@
                             <div class="col-md-8">
                                 {% if userType == "tutor" %}
                                     <p><strong>Message: </strong>{{ session.message }}</p>
+                                {% endif %}
+                                {% if session.attachment %}
+                                <p><strong>Attachment:</strong> <a href="{% url 'Dashboard:download_attachment' session.id %}" download>{{ session.attachment.name|remove_prefix:'attachments/' }}</a></p>
                                 {% endif %}
                             </div>
                             <div class="col-md-2 d-flex align-items-end">

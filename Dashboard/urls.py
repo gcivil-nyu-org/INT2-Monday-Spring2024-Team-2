@@ -16,4 +16,9 @@ urlpatterns = [
         "cancel-request/<int:session_id>/", views.CancelRequest, name="cancel_request"
     ),
     path("logout/", views.logout_view, name="logout"),
+    path(
+        "download_attachment/<int:session_id>/",
+        views.download_attachment,
+        name="download_attachment",
+    ),
 ]

@@ -23,6 +23,9 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+import mimetypes
 
 
 @login_required
@@ -352,3 +355,23 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, time)):
             return obj.strftime("%H:%M")
         return json.JSONEncoder.default(self, obj)
+
+
+@login_required
+def download_attachment(request, session_id):
+    session = get_object_or_404(TutoringSession, pk=session_id)
+
+    if session.attachment:
+        # Open the file directly from the storage backend
+        file = session.attachment.open("rb")
+        # Create a FileResponse with the file's content
+        response = FileResponse(
+            file, as_attachment=True, filename=session.attachment.name
+        )
+        # Set the content type to the file's content type, if available
+        content_type, _ = mimetypes.guess_type(session.attachment.name)
+        if content_type:
+            response["Content-Type"] = content_type
+        return response
+
+    return redirect("Dashboard:requests")
