@@ -56,10 +56,12 @@ def login_request(request):
                 if user.usertype.has_profile_complete:
                     return HttpResponseRedirect(reverse("Dashboard:dashboard"))
                 else:
-                    if user.usertype.user_type == "tutor":   
+                    if user.usertype.user_type == "tutor":
                         return HttpResponseRedirect(reverse("Dashboard:tutor_profile"))
                     else:
-                        return HttpResponseRedirect(reverse("Dashboard:student_profile"))
+                        return HttpResponseRedirect(
+                            reverse("Dashboard:student_profile")
+                        )
 
             else:
                 messages.error(request, "Invalid email or password.")
