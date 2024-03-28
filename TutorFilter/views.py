@@ -27,13 +27,16 @@ def filter_tutors(request):
     average_ratings = TutorReview.objects.values('tutor_id').annotate(average_rating=Avg('rating'))
     for rating in average_ratings:
         tutor_ratings[rating['tutor_id']] = round(rating['average_rating'], 1)
-    print(tutor_ratings)
+    sorted_tutors_ids = sorted(tutor_ratings, key=tutor_ratings.get, reverse=True)
+    
     has_profile = (
         UserType.objects.all()
         .filter(has_profile_complete=True)
         .values_list("user", flat=True)
     )
     users = users.filter(user__in=has_profile)
+
+    #users.sort(key=lambda x: sorted_tutors_ids.index(x.id))
 
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
@@ -66,7 +69,14 @@ def filter_tutors(request):
             elif(form.cleaned_data["rating"]=="= 5 stars"):
                 high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 5}
                 users = users.filter(id__in=high_rating_tutors.keys())
-
+        if form.cleaned_data["sortBy"]:
+            if form.cleaned_data["sortBy"]=="Highest Rating":
+                users = list(users)
+                users.sort(key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True)
+            elif form.cleaned_data["sortBy"]=="Highest Price":
+                users = users.order_by('-salary_max')
+            elif form.cleaned_data["sortBy"]=="Lowest Price":
+                users = users.order_by('salary_max')
     return render(
         request,
         "TutorFilter/filter_results.html",

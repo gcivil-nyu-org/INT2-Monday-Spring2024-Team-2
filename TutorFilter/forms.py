@@ -73,6 +73,13 @@ class TutorFilterForm(forms.Form):
         ("= 5 stars", "= 5 stars"),
     ]
 
+    SORT_CHOICE = [
+        ("..", ".."),
+        ("Highest Rating", "Highest Rating"),
+        ("Highest Price", "Highest Price"),
+        ("Lowest Price", "Lowest Price"),
+    ]
+
     preferred_mode = forms.ChoiceField(
         choices=MODE_CHOICES,
         widget=forms.Select(
@@ -111,6 +118,20 @@ class TutorFilterForm(forms.Form):
     )
     rating = forms.ChoiceField(
         choices=RATE_CHOICE,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+        required=False,
+    )
+    saved = forms.ChoiceField(
+        choices=SORT_CHOICE,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+        ),
+        required=False,
+    )
+    sortBy = forms.ChoiceField(
+        choices=SORT_CHOICE,
         widget=forms.Select(
             attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
         ),

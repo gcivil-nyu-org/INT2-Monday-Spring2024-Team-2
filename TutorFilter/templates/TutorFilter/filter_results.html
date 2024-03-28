@@ -62,7 +62,20 @@
                 <label style="color: #600E90"> Max Hourly Rate: </label>
                 {{ form.salary_max}}
             </div>
-            <div class="form-group col-md-2">
+
+                <div class="form-group col-md-4">
+                    <label style="color: #600E90;"> My Saved Tutors: </label>
+                    {{ form.saved}}
+                    <span style="color: #600E90;">
+                    Add a Category
+                    </span>
+                </div>
+                <div class="form-group col-md-4">
+                    <label style="color: #600E90"> Sort by: </label>
+                    {{ form.sortBy}}
+                </div>
+            
+            <div class="form-group col-md-3 text-end">
                 <label>  </label>
                 <button class="btn btn-outline-success" style="background-color: #600E90; color: white; border-color: #600E90">Show Results</button>
             </div>
