@@ -24,11 +24,12 @@ def filter_tutors(request):
     users = ProfileT.objects.all()
 
     tutor_ratings = {user.id: 0.0 for user in users}  # Default rating is 0
-    average_ratings = TutorReview.objects.values('tutor_id').annotate(average_rating=Avg('rating'))
+    average_ratings = TutorReview.objects.values("tutor_id").annotate(
+        average_rating=Avg("rating")
+    )
     for rating in average_ratings:
-        tutor_ratings[rating['tutor_id']] = round(rating['average_rating'], 1)
-    sorted_tutors_ids = sorted(tutor_ratings, key=tutor_ratings.get, reverse=True)
-    
+        tutor_ratings[rating["tutor_id"]] = round(rating["average_rating"], 1)
+
     has_profile = (
         UserType.objects.all()
         .filter(has_profile_complete=True)
@@ -36,7 +37,7 @@ def filter_tutors(request):
     )
     users = users.filter(user__in=has_profile)
 
-    #users.sort(key=lambda x: sorted_tutors_ids.index(x.id))
+    # users.sort(key=lambda x: sorted_tutors_ids.index(x.id))
 
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
@@ -54,36 +55,58 @@ def filter_tutors(request):
         if form.cleaned_data["salary_max"]:
             users = users.filter(salary_min__lt=form.cleaned_data["salary_max"])
         if form.cleaned_data["rating"]:
-            if(form.cleaned_data["rating"]==">= 1 star"):
-                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 1}
+            if form.cleaned_data["rating"] == ">= 1 star":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 1
+                }
                 users = users.filter(id__in=high_rating_tutors.keys())
-            elif(form.cleaned_data["rating"]==">= 2 stars"):
-                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 2}
+            elif form.cleaned_data["rating"] == ">= 2 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 2
+                }
                 users = users.filter(id__in=high_rating_tutors.keys())
-            elif(form.cleaned_data["rating"]==">= 3 stars"):
-                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 3}
+            elif form.cleaned_data["rating"] == ">= 3 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 3
+                }
                 users = users.filter(id__in=high_rating_tutors.keys())
-            elif(form.cleaned_data["rating"]==">= 4 stars"):
-                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 4}
+            elif form.cleaned_data["rating"] == ">= 4 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 4
+                }
                 users = users.filter(id__in=high_rating_tutors.keys())
-            elif(form.cleaned_data["rating"]=="= 5 stars"):
-                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 5}
+            elif form.cleaned_data["rating"] == "= 5 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 5
+                }
                 users = users.filter(id__in=high_rating_tutors.keys())
         if form.cleaned_data["sortBy"]:
-            if form.cleaned_data["sortBy"]=="Highest Rating":
+            if form.cleaned_data["sortBy"] == "Highest Rating":
                 users = list(users)
-                users.sort(key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True)
-            elif form.cleaned_data["sortBy"]=="Highest Price":
-                users = users.order_by('-salary_max')
-            elif form.cleaned_data["sortBy"]=="Lowest Price":
-                users = users.order_by('salary_max')
+                users.sort(
+                    key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True
+                )
+            elif form.cleaned_data["sortBy"] == "Highest Price":
+                users = users.order_by("-salary_max")
+            elif form.cleaned_data["sortBy"] == "Lowest Price":
+                users = users.order_by("salary_max")
     return render(
         request,
         "TutorFilter/filter_results.html",
         {
             "form": form,
             "users": users,
-            'average_ratings': tutor_ratings.items(),
+            "average_ratings": tutor_ratings.items(),
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
