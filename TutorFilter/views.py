@@ -7,24 +7,34 @@ from TutorRegister.models import (
     UserType,
     ProfileS,
     TutoringSession,
+    TutorReview,
+    Favorite,
 )
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
+from django.db.models import Avg
 
 
 def filter_tutors(request):
     form = TutorFilterForm(request.GET)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
+
+    tutor_ratings = {user.id: 0.0 for user in users}  # Default rating is 0
+    average_ratings = TutorReview.objects.values('tutor_id').annotate(average_rating=Avg('rating'))
+    for rating in average_ratings:
+        tutor_ratings[rating['tutor_id']] = round(rating['average_rating'], 1)
+    print(tutor_ratings)
     has_profile = (
         UserType.objects.all()
         .filter(has_profile_complete=True)
         .values_list("user", flat=True)
     )
     users = users.filter(user__in=has_profile)
+
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
             users_expertise_id = users_expertise.filter(
@@ -39,14 +49,31 @@ def filter_tutors(request):
         if form.cleaned_data["zipcode"] and form.cleaned_data["zipcode"] != "..":
             users = users.filter(zip=form.cleaned_data["zipcode"])
         if form.cleaned_data["salary_max"]:
-            users = users
             users = users.filter(salary_min__lt=form.cleaned_data["salary_max"])
+        if form.cleaned_data["rating"]:
+            if(form.cleaned_data["rating"]==">= 1 star"):
+                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 1}
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif(form.cleaned_data["rating"]==">= 2 stars"):
+                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 2}
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif(form.cleaned_data["rating"]==">= 3 stars"):
+                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 3}
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif(form.cleaned_data["rating"]==">= 4 stars"):
+                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 4}
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif(form.cleaned_data["rating"]=="= 5 stars"):
+                high_rating_tutors = {user: rating for user,rating in tutor_ratings.items() if rating >= 5}
+                users = users.filter(id__in=high_rating_tutors.keys())
+
     return render(
         request,
         "TutorFilter/filter_results.html",
         {
             "form": form,
             "users": users,
+            'average_ratings': tutor_ratings.items(),
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )

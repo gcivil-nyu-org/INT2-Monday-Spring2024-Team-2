@@ -64,6 +64,15 @@ class TutorFilterForm(forms.Form):
         ("violin", "Violin"),
     ]
 
+    RATE_CHOICE = [
+        ("..", ".."),
+        (">= 1 star", ">= 1 star"),
+        (">= 2 stars", ">= 2 stars"),
+        (">= 3 stars", ">= 3 stars"),
+        (">= 4 stars", ">= 4 stars"),
+        ("= 5 stars", "= 5 stars"),
+    ]
+
     preferred_mode = forms.ChoiceField(
         choices=MODE_CHOICES,
         widget=forms.Select(
@@ -97,6 +106,13 @@ class TutorFilterForm(forms.Form):
     salary_max = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+        ),
+        required=False,
+    )
+    rating = forms.ChoiceField(
+        choices=RATE_CHOICE,
+        widget=forms.Select(
+            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
