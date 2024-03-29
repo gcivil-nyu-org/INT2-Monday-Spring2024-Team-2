@@ -49,17 +49,22 @@ class TutorFilterTest(TestCase):
             grade="undergrad",
             zip="12345",
         )
-        # Assign the expertise to the user somehow, according to your model structure
+
+        User.objects.create_user(username="student", password="studentpassword")
 
     def test_filter_tutors(self):
+        c = Client()
+        c.login(username="student", password="studentpassword")
         form_data = {
             "preferred_mode": "remote",
             "grade": "freshman",
             "expertise": "math",
             "zipcode": "12345",
             "salary_max": 60,
+            "category": "..",
+            "sortBy": "Lowest Price",
         }
-        response = self.client.get(
+        response = c.get(
             reverse("TutorFilter:filter_tutors"),
             form_data,
         )
@@ -69,13 +74,15 @@ class TutorFilterTest(TestCase):
 
     def test_filter_tutors2(self):
         c = Client()
-        # Simulate a GET request with query parameters
+        c.login(username="student", password="studentpassword")
         form_data2 = {
             "preferred_mode": "remote",
             "grade": "grad",
             "expertise": "math",
             "zipcode": "11111",
             "salary_max": 20,
+            "category": "..",
+            "sortBy": "Highest Rating",
         }
         # form = TutorFilterForm(data=form_data)
 
