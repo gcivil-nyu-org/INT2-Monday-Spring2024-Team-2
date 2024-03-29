@@ -6,43 +6,45 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card mt-5">
+            <div class="card mt-5 rounded-4 shadow">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
-                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
+                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 100px; height: 100px; margin: 10px" alt="Tutor Image">
+                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 20px;">{{ profilet.fname }} {{profilet.lname}}</h2>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="margin-left:20px; margin-right:20px">
                     <p>{{ profilet.intro }}</p>
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">About {{ profilet.fname }}:</h3>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p>Gender: {{ profilet.gender|capfirst }}</p>
-                            <p>Major: {{ profilet.major|capfirst  }}</p>
-                            <p>Zipcode: {{ profilet.zip }}</p>
-                            <p>Grade: {{ profilet.grade|capfirst  }}</p>
-                            <p>Preferred Mode: {{ profilet.preferred_mode|capfirst  }}</p>
-                            <p>Salaray Range: ${{ profilet.salary_min }} - {{ profilet.salary_max }}/Hour</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>Expertise:
+                        <div class="col-md-12">
+                            <p><strong>Gender:</strong> {{ profilet.gender|capfirst }}</p>
+                            <p><strong>Major: </strong> {{ profilet.major|capfirst  }}</p>
+                            <p><strong> Zipcode:</strong> {{ profilet.zip }}</p>
+                            <p><strong>Grade: </strong>{{ profilet.grade|capfirst  }}</p>
+                            <p><strong>Preferred Mode: </strong>{{ profilet.preferred_mode|capfirst  }}</p>
+                            <p><strong>Salary Range:</strong> ${{ profilet.salary_min }} - {{ profilet.salary_max }}/Hour</p>
+                        {% comment %} </div>
+                        <div class="col-md-6"> {% endcomment %}
+                            <p><strong>Expertise:</strong>
                                 {% for e in expertise %}
                                     {{ e|capfirst }}{% if not forloop.last %},{% endif %}
                                 {% endfor %}
                             </p>
-                            <p>Availability:</p>
+                            <p><strong>Availability:</strong></p>
                             <ul>
                                 {% for a in availability %}
-                                    <li>{{ a.day_of_week|capfirst  }} {{ a.start_time|capfirst  }} - {{ a.end_time|capfirst  }}</li>
+                                    <li>{{ a.day_of_week|capfirst  }}  {{ a.start_time|time:"H:i"}} - {{ a.end_time|time:"H:i" }}</li>
                                 {% endfor %}
-                            </ul>
+                            </ul> 
                         </div>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-center">
-                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
+                <div class="container d-flex justify-content-left">
+                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
+                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 30px" onclick="#">Message {{ profilet.fname }}</button>
+
                 </div>
             </div>
         </div>
