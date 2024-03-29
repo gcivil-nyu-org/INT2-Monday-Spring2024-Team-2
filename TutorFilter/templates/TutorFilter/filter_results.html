@@ -97,48 +97,48 @@
 <body>
     <br/>
     <div class="container">
-    <form method="get">
-        <div class="row g-3 d-flex align-items-buttom">
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> {{ form.preferred_mode.label}}: </label>
-                {{ form.preferred_mode}}
-            </div>
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> Tutor Grade:  </label>
-                {{ form.grade}}
-            </div>
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> Subject:  </label>
-                {{ form.expertise}}
-            </div>
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> Rating: </label>
-                {{ form.rating}}
-            </div>
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> Zip Code:  </label>
-                {{ form.zipcode}}
-            </div>
-            <div class="form-group col-md-2">
-                <label style="color: #600E90"> Max Hourly Rate: </label>
-                {{ form.salary_max}}
-            </div>
-
-            <div class="form-group col-md-4">
+        <form method="get">
+            <div class="row g-3 d-flex align-items-end"> <!-- Use align-items-end to align elements at the bottom -->
+                <!-- Add grid classes to each form group to control the width -->
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> {{ form.preferred_mode.label}}: </label>
+                    {{ form.preferred_mode}}
+                </div>
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> Tutor Grade:  </label>
+                    {{ form.grade}}
+                </div>
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> Subject:  </label>
+                    {{ form.expertise}}
+                </div>
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> Rating: </label>
+                    {{ form.rating}}
+                </div>
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> Zip Code:  </label>
+                    {{ form.zipcode}}
+                </div>
+                <div class="form-group col-md-2">
+                    <label style="color: #600E90"> Max Hourly Rate: </label>
+                    {{ form.salary_max}}
+                </div>
+                <!-- For the second row, adjust the grid to allocate space for the button -->
+                <div class="form-group col-md-4">
                     <label style="color: #600E90;"> My Saved Tutors: </label>
                     {{ form.category}}
-            </div>
-            <div class="form-group col-md-4">
+                </div>
+                <div class="form-group col-md-4">
                     <label style="color: #600E90"> Sort by: </label>
                     {{ form.sortBy}}
+                </div>
+                <div class="col-md-4 d-flex col align-self-center justify-content-end"> <!-- Adjust this to move the button to the end -->
+                    <!-- Set the button to align with the 'Sort by' select input -->
+                    <button type="submit" class="btn btn-outline-success btn-lg" style="background-color: #600E90; color: white; border-color: #600E90;">Show Results</button>
+                </div>
             </div>
-            
-            <div class="form-group col-md-3 text-end">
-                <label>  </label>
-                <button class="btn btn-outline-success" style="background-color: #600E90; color: white; border-color: #600E90">Show Results</button>
-            </div>
-        </div>
-    </form>
+        </form>
 <br/>
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
         <!-- Repeat this block for each tutor result -->
