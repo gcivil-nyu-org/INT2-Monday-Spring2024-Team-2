@@ -19,10 +19,10 @@ from django.db.models import Avg
 
 
 def filter_tutors(request):
-    form = TutorFilterForm(request.GET)
+    form = TutorFilterForm(request.GET, user=request.user)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
-
+    favorites = Favorite.objects.all().filter(student=request.user)
     tutor_ratings = {user.id: 0.0 for user in users}  # Default rating is 0
     average_ratings = TutorReview.objects.values("tutor_id").annotate(
         average_rating=Avg("rating")
@@ -90,6 +90,14 @@ def filter_tutors(request):
                     if rating >= 5
                 }
                 users = users.filter(id__in=high_rating_tutors.keys())
+        if form.cleaned_data["category"]:
+            category = form.cleaned_data["category"]
+            if category != "..":
+                users = users
+                users_favorite_id = favorites.filter(category=category).values_list(
+                    "tutor", flat=True
+                )
+                users = users.filter(user__in=users_favorite_id)
         if form.cleaned_data["sortBy"]:
             if form.cleaned_data["sortBy"] == "Highest Rating":
                 users = list(users)
@@ -100,6 +108,9 @@ def filter_tutors(request):
                 users = users.order_by("-salary_max")
             elif form.cleaned_data["sortBy"] == "Lowest Price":
                 users = users.order_by("salary_max")
+    categories = list(set(favorites.values_list("category", flat=True)))
+    favorites = favorites.values_list("tutor", flat=True)
+
     return render(
         request,
         "TutorFilter/filter_results.html",
@@ -107,9 +118,43 @@ def filter_tutors(request):
             "form": form,
             "users": users,
             "average_ratings": tutor_ratings.items(),
+            "favorites": favorites,
+            "categories": categories,
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
+
+
+def add_favorite(request):
+    if request.method == "POST":
+        category_name = request.POST.get("category_name")
+        tutor_id = request.POST.get("tutor_id")
+        # print(tutor_id)
+        # print(category_name)
+        tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
+        # Now, you can add this to your database
+        new_record = Favorite(category=category_name, student=request.user, tutor=tutor)
+        new_record.save()
+
+        return JsonResponse(
+            {"status": "success", "message": "Add the tutor successfully!"}
+        )
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request"})
+
+
+def remove_favorite(request):
+    if request.method == "POST":
+
+        tutor_id = request.POST.get("tutor_id")
+        tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
+        Favorite.objects.filter(student=request.user, tutor=tutor).delete()
+
+        return JsonResponse(
+            {"status": "success", "message": "Remove the tutor successfully!"}
+        )
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request"})
 
 
 def get_type(user_id):

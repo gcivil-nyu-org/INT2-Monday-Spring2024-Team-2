@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from TutorRegister.models import ProfileT, Expertise, TutoringSession
+from TutorRegister.models import ProfileT, Expertise, TutoringSession, Favorite
 from Dashboard.choices import EXPERTISE_CHOICES
 from django.utils import timezone
 
@@ -80,6 +80,19 @@ class TutorFilterForm(forms.Form):
         ("Lowest Price", "Lowest Price"),
     ]
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(TutorFilterForm, self).__init__(*args, **kwargs)
+        # Set the choices for the 'category' field
+        self.fields["category"] = forms.ChoiceField(
+            choices=self.get_user_category_choices(user),
+            required=False,
+            widget=forms.Select(
+                attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            ),
+            label="Select a category..",
+        )
+
     preferred_mode = forms.ChoiceField(
         choices=MODE_CHOICES,
         widget=forms.Select(
@@ -137,6 +150,21 @@ class TutorFilterForm(forms.Form):
         ),
         required=False,
     )
+
+    def get_user_category_choices(self, user):
+        if not user:
+            return []
+
+        # Here we filter the Favorite objects by the current user (student)
+        # and create a tuple for the form's choices field
+        res = []
+        res = res + [
+            (fav.category, fav.category)
+            for fav in Favorite.objects.filter(student=user).distinct()
+        ]
+        res = list(set(res))
+        res.insert(0, ("..", ".."))
+        return res
 
 
 class TutoringSessionRequestForm(forms.ModelForm):
