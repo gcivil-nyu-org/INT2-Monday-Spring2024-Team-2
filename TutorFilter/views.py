@@ -10,7 +10,6 @@ from TutorRegister.models import (
     TutorReview,
 )
 from django.contrib.auth.models import User
-from django.db.models import Avg
 from django.conf import settings
 from django.http import JsonResponse
 from datetime import datetime, timedelta
