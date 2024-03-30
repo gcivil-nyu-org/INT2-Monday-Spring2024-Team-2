@@ -8,6 +8,7 @@ from TutorRegister.models import (
     ProfileS,
     TutoringSession,
     TutorReview,
+    Favorite,
 )
 from django.contrib.auth.models import User
 from django.db.models import Avg
@@ -15,18 +16,30 @@ from django.conf import settings
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
+from django.db.models import Avg
 
 
 def filter_tutors(request):
-    form = TutorFilterForm(request.GET)
+    form = TutorFilterForm(request.GET, user=request.user)
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
+    favorites = Favorite.objects.all().filter(student=request.user)
+    tutor_ratings = {user.id: 0.0 for user in users}  # Default rating is 0
+    average_ratings = TutorReview.objects.values("tutor_id").annotate(
+        average_rating=Avg("rating")
+    )
+    for rating in average_ratings:
+        tutor_ratings[rating["tutor_id"]] = round(rating["average_rating"], 1)
+
     has_profile = (
         UserType.objects.all()
         .filter(has_profile_complete=True)
         .values_list("user", flat=True)
     )
     users = users.filter(user__in=has_profile)
+
+    # users.sort(key=lambda x: sorted_tutors_ids.index(x.id))
+
     if form.is_valid():
         if form.cleaned_data["expertise"] and form.cleaned_data["expertise"] != "..":
             users_expertise_id = users_expertise.filter(
@@ -41,17 +54,108 @@ def filter_tutors(request):
         if form.cleaned_data["zipcode"] and form.cleaned_data["zipcode"] != "..":
             users = users.filter(zip=form.cleaned_data["zipcode"])
         if form.cleaned_data["salary_max"]:
-            users = users
             users = users.filter(salary_min__lt=form.cleaned_data["salary_max"])
+        if form.cleaned_data["rating"]:
+            if form.cleaned_data["rating"] == ">= 1 star":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 1
+                }
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif form.cleaned_data["rating"] == ">= 2 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 2
+                }
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif form.cleaned_data["rating"] == ">= 3 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 3
+                }
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif form.cleaned_data["rating"] == ">= 4 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 4
+                }
+                users = users.filter(id__in=high_rating_tutors.keys())
+            elif form.cleaned_data["rating"] == "= 5 stars":
+                high_rating_tutors = {
+                    user: rating
+                    for user, rating in tutor_ratings.items()
+                    if rating >= 5
+                }
+                users = users.filter(id__in=high_rating_tutors.keys())
+        if form.cleaned_data["category"]:
+            category = form.cleaned_data["category"]
+            if category != "..":
+                users = users
+                users_favorite_id = favorites.filter(category=category).values_list(
+                    "tutor", flat=True
+                )
+                users = users.filter(user__in=users_favorite_id)
+        if form.cleaned_data["sortBy"]:
+            if form.cleaned_data["sortBy"] == "Highest Rating":
+                users = list(users)
+                users.sort(
+                    key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True
+                )
+            elif form.cleaned_data["sortBy"] == "Highest Price":
+                users = users.order_by("-salary_max")
+            elif form.cleaned_data["sortBy"] == "Lowest Price":
+                users = users.order_by("salary_max")
+    categories = list(set(favorites.values_list("category", flat=True)))
+    favorites = favorites.values_list("tutor", flat=True)
+
     return render(
         request,
         "TutorFilter/filter_results.html",
         {
             "form": form,
             "users": users,
+            "average_ratings": tutor_ratings.items(),
+            "favorites": favorites,
+            "categories": categories,
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
+
+
+def add_favorite(request):
+    if request.method == "POST":
+        category_name = request.POST.get("category_name")
+        tutor_id = request.POST.get("tutor_id")
+        # print(tutor_id)
+        # print(category_name)
+        tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
+        # Now, you can add this to your database
+        new_record = Favorite(category=category_name, student=request.user, tutor=tutor)
+        new_record.save()
+
+        return JsonResponse(
+            {"status": "success", "message": "Add the tutor successfully!"}
+        )
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request"})
+
+
+def remove_favorite(request):
+    if request.method == "POST":
+
+        tutor_id = request.POST.get("tutor_id")
+        tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
+        Favorite.objects.filter(student=request.user, tutor=tutor).delete()
+
+        return JsonResponse(
+            {"status": "success", "message": "Remove the tutor successfully!"}
+        )
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request"})
 
 
 def get_type(user_id):

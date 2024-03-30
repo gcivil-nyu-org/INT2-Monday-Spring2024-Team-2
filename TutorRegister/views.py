@@ -59,13 +59,16 @@ def login_request(request):
                     if user.usertype.user_type == "tutor":
                         return HttpResponseRedirect(reverse("Dashboard:tutor_profile"))
                     else:
-                        HttpResponseRedirect(reverse("Dashboard:student_profile"))
+                        return HttpResponseRedirect(
+                            reverse("Dashboard:student_profile")
+                        )
 
             else:
                 messages.error(request, "Invalid email or password.")
         else:
             messages.error(request, "Invalid email or password.")
     form = AuthenticationForm()
+    print(request.method)
     return render(request, "TutorRegister/login.html", {"login_form": form})
 
 
