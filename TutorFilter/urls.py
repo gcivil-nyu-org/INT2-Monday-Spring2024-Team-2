@@ -18,4 +18,6 @@ urlpatterns = [
         views.get_available_times,
         name="get-available-times",
     ),
+    path("add_favorite/", views.add_favorite, name="add_favorite"),
+    path("remove_favorite/", views.remove_favorite, name="remove_favorite"),
 ]
