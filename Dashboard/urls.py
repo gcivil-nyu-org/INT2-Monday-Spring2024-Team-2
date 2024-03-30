@@ -21,4 +21,5 @@ urlpatterns = [
         views.download_attachment,
         name="download_attachment",
     ),
+    path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
 ]

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0012_tutoringsession_attachment_tutorreview"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

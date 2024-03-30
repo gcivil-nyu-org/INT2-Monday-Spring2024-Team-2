@@ -7,8 +7,10 @@ from TutorRegister.models import (
     UserType,
     ProfileS,
     TutoringSession,
+    TutorReview,
 )
 from django.contrib.auth.models import User
+from django.db.models import Avg
 from django.conf import settings
 from django.http import JsonResponse
 from datetime import datetime, timedelta
@@ -76,6 +78,11 @@ def view_tutor_profile(request, user_id):
     expertises = [get_display_expertise(e.subject) for e in expertise]
 
     availability = Availability.objects.all().filter(user=profilet.user)
+
+    reviews = TutorReview.objects.all().filter(tutor_id=user_id)
+
+    average_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0
+
     return render(
         request,
         "TutorFilter/view_tutor_profile.html",
@@ -83,6 +90,8 @@ def view_tutor_profile(request, user_id):
             "profilet": profilet,
             "expertise": expertises,
             "availability": availability,
+            "reviews": reviews,
+            "average_rating": average_rating,
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
