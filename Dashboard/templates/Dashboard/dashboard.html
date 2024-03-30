@@ -128,6 +128,12 @@
                                     <p><strong>Message: </strong>{{ session.message }}</p>
                                 {% endif %}
                             </div>
+
+                            <div class="col-md-2 d-flex align-items-end">
+                                {% if userType == "student" %}
+                                    <a href="{% url 'Dashboard:feedback' session.id %}" class="btn btn-outline-primary">Provide Feedback</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

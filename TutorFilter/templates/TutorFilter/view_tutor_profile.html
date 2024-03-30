@@ -4,13 +4,30 @@
 
 {% block content %}
 <div class="container-fluid">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card mt-5 rounded-4 shadow">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 100px; height: 100px; margin: 10px" alt="Tutor Image">
-                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 20px;">{{ profilet.fname }} {{profilet.lname}}</h2>
+                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
+                        <div>
+                            <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
+                            <div class="mb-0 fs-5" id="rating" style="margin-left: 10px;">
+                                {% for _ in "12345" %}
+                                    {% if forloop.counter <= average_rating %}
+                                        <i class="fas fa-star" style="color: gold;"></i>
+                                    {% else %}
+                                        <i class="fas fa-star" style="color: #ccc;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if average_rating|floatformat:1 > average_rating|floatformat:0 %}
+                                    <i class="fas fa-star-half-alt" style="color: gold; width: 70%;"></i>
+                                {% endif %}
+                                <span style="color: rgb(0, 0, 0);">{{ average_rating|floatformat:1 }}</span> <!-- Updated color to blue -->
+                                <a href="#reviews-container" style="color: rgb(0, 213, 255); text-decoration: none;">({{ reviews.count }} Comments)</a> <!-- Add link to jump to review section -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body" style="margin-left:20px; margin-right:20px">
@@ -40,6 +57,26 @@
                             </ul> 
                         </div>
                     </div>
+                    <hr>
+                    <h3 class="fw-bold mb-3 fs-4">Recent Reviews:</h3>
+                    <div id="reviews-container">
+                        {% for review in reviews %}
+                            <div class="review">
+                                <div class="rating">
+                                    {% for _ in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star" style="color: gold;"></i>
+                                        {% else %}
+                                            <i class="fas fa-star" style="color: #ccc;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {{ review.rating }}
+                                </div>
+                                <p>{{ review.review }}</p>
+                                <p>Date: {{ review.review_date }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="container d-flex justify-content-left">
                     <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
@@ -50,5 +87,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('show-more-btn').addEventListener('click', function() {
+        // Fetch more reviews via AJAX and append them to the reviews-container
+        // You can implement this part using JavaScript and AJAX
+    });
+</script>
 
 {% endblock %}

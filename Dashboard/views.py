@@ -3,12 +3,14 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
 from .forms.student_info import StudentForm, StudentImageForm
+from .forms.review_form import TutorReviewForm
 from TutorRegister.models import (
     Expertise,
     Availability,
     ProfileT,
     ProfileS,
     TutoringSession,
+    TutorReview,
 )
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -238,6 +240,28 @@ def UserDashboard(request):
     }
 
     return render(request, "Dashboard/dashboard.html", context)
+
+
+@login_required
+def ProvideFeedback(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+
+    s_id = session.student_id
+    t_id = session.tutor_id
+
+    tutor_profile = get_object_or_404(ProfileT, user=t_id)
+
+    if request.method == "POST":
+        form = TutorReviewForm(request.POST, s_id=s_id, t_id=t_id)
+
+        if form.is_valid():
+            form.save()
+            return redirect("Dashboard:dashboard")
+    else:
+        form = TutorReviewForm(s_id=s_id, t_id=t_id)
+    return render(
+        request, "Dashboard/feedback.html", {"form": form, "profilet": tutor_profile}
+    )
 
 
 @login_required
