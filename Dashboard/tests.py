@@ -1,4 +1,10 @@
-from django.test import TestCase, Client, RequestFactory, override_settings, TransactionTestCase
+from django.test import (
+    TestCase,
+    Client,
+    RequestFactory,
+    override_settings,
+    TransactionTestCase,
+)
 from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import Expertise, Availability, ProfileT, TutoringSession
@@ -166,7 +172,7 @@ class CancelSessionTestCase(TestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Cancelled")
         self.assertEqual(len(mail.outbox), 1)
-        
+
     def tearDown(self) -> None:
         self.session.status = "Accepted"
         self.session.save()
@@ -197,7 +203,7 @@ class AcceptRequestTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Accepted")
-        
+
     def tearDown(self) -> None:
         self.session.status = "Pending"
         self.session.save()
@@ -217,7 +223,7 @@ class DeclineRequestTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Declined")
-        
+
     def tearDown(self) -> None:
         self.session.status = "Pending"
         self.session.save()

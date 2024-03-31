@@ -175,7 +175,7 @@ PASSWORD_RESET_EMAIL_TEMPLATE_NAME = "registration/password_reset_email.html"
 TEST_RUNNER = "TutorNYU.test_runner.GlobalTestRunner"
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }

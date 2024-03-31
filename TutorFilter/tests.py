@@ -294,7 +294,7 @@ class TutoringSessionTests(TestCase):
         )
         Expertise.objects.create(user=cls.user, subject="math")
         User.objects.create_user(username="student", password="studentpassword")
-        
+
         cls.num_sessions = TutoringSession.objects.count()
 
     def setUp(self):

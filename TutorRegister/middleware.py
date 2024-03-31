@@ -9,7 +9,7 @@ class LoginRequiredMiddleware:
 
     def __call__(self, request):
         LOGIN_EXEMPT_URLS = ("auth/", "admin/", "verification/")
-        
+
         # Allow homepage access
         if request.path_info == "/":
             return self.get_response(request)
@@ -18,5 +18,5 @@ class LoginRequiredMiddleware:
             path = request.path_info.lstrip("/")
             if not any(path.startswith(allowed) for allowed in LOGIN_EXEMPT_URLS):
                 return redirect("TutorRegister:login")
-            
+
         return self.get_response(request)
