@@ -104,9 +104,9 @@ def filter_tutors(request):
                 users.sort(
                     key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True
                 )
-            elif form.cleaned_data["sortBy"] == "Highest Hourly Rate":
+            elif form.cleaned_data["sortBy"] == "Highest Price":
                 users = users.order_by("-salary_max")
-            elif form.cleaned_data["sortBy"] == "Lowest Hourly Rate":
+            elif form.cleaned_data["sortBy"] == "Lowest Price":
                 users = users.order_by("salary_max")
     categories = list(set(favorites.values_list("category", flat=True)))
     favorites = favorites.values_list("tutor", flat=True)

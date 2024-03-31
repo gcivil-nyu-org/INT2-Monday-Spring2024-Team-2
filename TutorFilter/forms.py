@@ -76,8 +76,8 @@ class TutorFilterForm(forms.Form):
     SORT_CHOICE = [
         ("..", ".."),
         ("Highest Rating", "Highest Rating"),
-        ("Highest Hourly Rate", "Highest Hourly Rate"),
-        ("Lowest Hourly Rate", "Lowest Hourly Rate"),
+        ("Highest Price", "Highest Price"),
+        ("Lowest Price", "Lowest Price"),
     ]
 
     def __init__(self, *args, **kwargs):
