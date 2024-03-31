@@ -1,0 +1,195 @@
+{% extends baseTemplate %}
+{% load static %}
+
+    {% block extra_css %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+    <style>
+        .contact-list {
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+
+        .contact-list-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .contact-list-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .contact-list-item.active {
+            background-color: #e0e0e0;
+        }
+
+        .contact-list img {
+            border-radius: 50%;
+        }
+
+        .contact-list .preview {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .contact-list-item-anchor.selectedme .contact-list-item {
+            background-color: #600d91;
+            color: white;
+        }
+
+        .chat-area-header {
+            border-bottom: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        #chat-log {
+            padding: 15px;
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .message {
+            border-radius: 20px;
+            display: block;
+            clear: both;
+            margin-top: 5px;
+            padding: 10px;
+            font-weight: normal;
+        }
+
+        .message.incoming {
+            background-color: #e0e0e0;
+            text-align: left;
+            float: left;
+        }
+
+        .message.outgoing {
+            background-color: #600d91;
+            color: white;
+            text-align: right;
+            float: right;
+        }
+
+        #chat-message-input {
+            margin: 0;
+            border-radius: 0;
+            border: 1px solid #ddd;
+        }
+
+        #chat-message-submit {
+            width: auto;
+            padding: 10px 15px;
+            border-radius: 0;
+            background-color: #600d91;
+        }
+    </style>
+    {% endblock %}
+
+    {% block content %}
+    <div class="container-fluid h-100 p-0">
+        <div class="row no-gutters h-100">
+            <div class="col-md-4 contact-list">
+                {% for profile in profiles %}
+                <a href="{% url 'Chat:chat_view' other_user_id=profile.user.id %}"
+                    class="contact-list-item-anchor {% if profile.user.id == other_user_id %}selectedme{% endif %}">
+                    <div class="contact-list-item active">
+                        <img src="{{ profile.image.url }}" alt="{{ profile.fname }} {{ profile.lname }}"
+                            class="card-img-top" style="height: 60px; width: auto">
+                        <strong>{{ profile.fname }} {{ profile.lname }}</strong>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-8">
+                <div class="chat-area-header">
+                    {% if request.user.usertype.user_type == "student" %}
+                            <strong>{{ tutor.fname }} {{ tutor.lname }}
+                                {% else %}
+                                <strong>{{ student.fname }} {{ student.lname }}
+                                    {% endif %}
+                </div>
+                <div id="chat-log">
+                    {% for message in messages %}
+                    <div
+                        class="message {% if message.author.id == request.user.id %}outgoing{% else %}incoming{% endif %}">
+                        {% if message.author.id == request.user.id %}
+                        You{% else %}
+                            {% if message.author.id == student.user_id %}
+                            {{ student.fname }}
+                                {% else %}{{ tutor.fname }}{% endif %}{% endif %}: {{ message.message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="input-group">
+                    <textarea id="chat-message-input" class="form-control"
+                        placeholder="Your message here..."></textarea>
+                    <div class="input-group-append">
+                        <button id="chat-message-submit" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% endblock %}
+    {% block javascript %}
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const selectedChat = document.querySelector('.contact-list-item-anchor.selectedme');
+            if (selectedChat) {
+                selectedChat.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+        window.onload = function () {
+            var chatLog = document.querySelector('#chat-log');
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
+        var studentId = "{{ student.user_id }}";
+        var tutorId = "{{ tutor.user_id }}";
+        const user_id = "{{ request.user.id }}";
+        const other_user_id = "{{ other_user_id }}";
+
+        const chatSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${other_user_id}/`
+        );
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            if (data.author_id === studentId) {
+                senderName = "{{ student.fname }}";
+            } else if (data.author_id === tutorId) {
+                senderName = "{{ tutor.fname }}";
+            }
+            let messageClass = (data.author_id == user_id) ? 'outgoing' : 'incoming';
+            let sender = (data.author_id == user_id) ? 'You' : senderName;
+            console.log(data.author_id, studentId, tutorId)
+            console.log(senderName);
+            const messageElement = `<div class="message ${messageClass}">${sender}: ${data.message}</div>`;
+            document.querySelector('#chat-log').insertAdjacentHTML('beforeend', messageElement);
+            document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
+        };
+
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function (e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({ 'message': message }));
+            messageInputDom.value = '';
+        };
+
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // Enter key
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+    </script>
+    {% endblock %}

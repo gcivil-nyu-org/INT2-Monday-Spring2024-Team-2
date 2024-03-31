@@ -57,6 +57,25 @@ class UserType(models.Model):
     has_profile_complete = models.BooleanField(default=False, null=False)
 
 
+class ChatSession(models.Model):
+    tutor = models.ForeignKey(
+        User, related_name="tutor_chats", on_delete=models.CASCADE
+    )
+    student = models.ForeignKey(
+        User, related_name="student_chats", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Message(models.Model):
+    chat_session = models.ForeignKey(
+        ChatSession, related_name="messages", on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+
 class TutoringSession(models.Model):
     student_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="student_sessions"

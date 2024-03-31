@@ -33,4 +33,8 @@ python-dotenv==1.0.1
 pillow==10.2.0
 django-storages==1.14.2
 boto3==1.34.69
+daphne==4.1.0
+channels==4.0.0
+channels-redis==4.2.0
+supervisor
 

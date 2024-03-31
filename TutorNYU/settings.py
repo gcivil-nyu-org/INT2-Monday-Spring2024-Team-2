@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "verify_email.apps.VerifyEmailConfig",
     "TutorFilter",
     "storages",
+    "channels",
+    "chat",
 ]
 
 MIDDLEWARE = [
@@ -79,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "TutorNYU.wsgi.application"
+ASGI_APPLICATION = "TutorNYU.asgi.application"
 
 
 # Database
@@ -95,6 +98,14 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("tutornyu.g0snws.ng.0001.usw2.cache.amazonaws.com", 6379)],
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

@@ -4,137 +4,165 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <!-- Dashboard content -->
-    <div class="mt-4">
-        <h3 style="color: #600d91">Welcome to your Dashboard</h3>
-        <br>
-        <p class="col-md-8 fs-4">Upcoming Sessions:</p>
-        {% if upcomingSessions %}
-            {% for session in upcomingSessions %}
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-body p-5 pt-10">
-                        <div class="row">
-                            <div class="col-md-2">
-                                {% if userType == "student" %}
-                                    <img src="{{ session.tutor_id.profilet.image.url }}" alt="Tutor" class="card-img-top" style="max-height: 100px; width: auto">
-                                {% else %}
-                                    <img src="{{ session.student_id.profiles.image.url }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4">
-                                {% if userType == "student" %}
-                                    <p><strong>Tutor Name:</strong> <a href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
-                                        {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a></p>
-                                {% else %}
-                                    <p><strong>Student Name:</strong> <a href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
-                                        {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a></p>
-                                {% endif %}
-                                <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
-                                <p><strong>Tutoring Mode: </strong>
-                                {% if session.tutoring_mode == "inperson" %}
-                                In Person
-                                {% else %}
-                                Remote
-                                {% endif %}
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Date: </strong>{{ session.date }}</p>
-                                <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
-                            </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-8">
-                                {% if userType == "tutor" %}
-                                    <p><strong>Message: </strong>{{ session.message }}</p>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
+<!-- Dashboard content -->
+<div class="mt-4">
+    <h3 style="color: #600d91">Welcome to your Dashboard</h3>
+    <br>
+    <p class="col-md-8 fs-4">Upcoming Sessions:</p>
+    {% if upcomingSessions %}
+    {% for session in upcomingSessions %}
+    <div class="modal-content rounded-4 shadow">
+        <div class="modal-body p-5 pt-10">
+            <div class="row">
+                <div class="col-md-2">
+                    {% if userType == "student" %}
+                    <img src="{{ session.tutor_id.profilet.image.url }}" alt="Tutor" class="card-img-top"
+                        style="max-height: 100px; width: auto">
+                    {% else %}
+                    <img src="{{ session.student_id.profiles.image.url }}" alt="Student" class="card-img-top"
+                        style="max-height: 100px; width: auto">
+                    {% endif %}
                 </div>
+                <div class="col-md-4">
+                    {% if userType == "student" %}
+                    <p><strong>Tutor Name:</strong> <a
+                            href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
+                            {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a></p>
+                    {% else %}
+                    <p><strong>Student Name:</strong> <a
+                            href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
+                            {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a></p>
+                    {% endif %}
+                    <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
+                    <p><strong>Tutoring Mode: </strong>
+                        {% if session.tutoring_mode == "inperson" %}
+                        In Person
+                        {% else %}
+                        Remote
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date: </strong>{{ session.date }}</p>
+                    <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+                    {% if userType == "tutor" %}
+                    <p><strong>Message: </strong>{{ session.message }}</p>
+                    {% endif %}
+                </div>
+                {% if userType == "student" %}
+                <div class="col-md-2 d-flex">
+                    <a href="{% url 'Chat:chat_view' other_user_id=session.tutor_id.id %}"
+                        class="btn btn-primary">Chat</a>
+                </div>
+                {% else %}
+                <a href="{% url 'Chat:chat_view' other_user_id=session.student_id.id %}"
+                    class="btn btn-primary">Chat</a>
+            </div>
+            {% endif %}
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Cancel Confirmation Modal -->
-                <div class="modal fade" id="exampleModal{{ session.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ session.id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Cancel Confirmation</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to cancel this session?</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
-                                <form action="{% url 'Dashboard:cancel_session' session.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger">Yes</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p style="color:#AC658F; margin-left: 20px"> You currently have no upcoming sessions. <p>
-        {% endif %}
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="exampleModal{{ session.id }}" tabindex="-1"
+    aria-labelledby="exampleModalLabel{{ session.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this session?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                <form action="{% url 'Dashboard:cancel_session' session.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<p style="color:#AC658F; margin-left: 20px"> You currently have no upcoming sessions.
+<p>
+    {% endif %}
 
-        <br>
-        <p class="col-md-8 fs-4">Completed Sessions:</p>
-        {% if pastSessions %}
-            {% for session in pastSessions %}
-                <div class="modal-content rounded-4 shadow">
-                    <div class="modal-body p-5 pt-10">
-                        <div class="row">
-                            <div class="col-md-2">
-                                {% if userType == "student" %}
-                                    <img src="{{ session.tutor_id.profilet.image.url }}" alt="Tutor" class="card-img-top" style="max-height: 100px; width: auto">
-                                {% else %}
-                                    <img src="{{ session.student_id.profiles.image.url }}" alt="Student" class="card-img-top" style="max-height: 100px; width: auto">
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4">
-                                <p>
-                                {% if userType == "student" %}
-                                    <strong>Tutor Name:</strong> <a href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
-                                        {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a>
-                                {% else %}
-                                    <strong>Student Name:</strong> <a href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
-                                        {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a>
-                                {% endif %}
-                                </p>
-                                <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
-                                <p><strong>Tutoring Mode: </strong>
-                                {% if session.tutoring_mode == "inperson" %}
-                                In Person
-                                {% else %}
-                                Remote
-                                {% endif %}
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Date: </strong>{{ session.date }}</p>
-                                <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
-                            </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-8">
-                                {% if userType == "tutor" %}
-                                    <p><strong>Message: </strong>{{ session.message }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p style="color:#AC658F; margin-left: 20px"> You currently have no completed sessions. <p>
-        {% endif %}
+    <br>
+<p class="col-md-8 fs-4">Completed Sessions:</p>
+{% if pastSessions %}
+{% for session in pastSessions %}
+<div class="modal-content rounded-4 shadow">
+    <div class="modal-body p-5 pt-10">
+        <div class="row">
+            <div class="col-md-2">
+                {% if userType == "student" %}
+                <img src="{{ session.tutor_id.profilet.image.url }}" alt="Tutor" class="card-img-top"
+                    style="max-height: 100px; width: auto">
+                {% else %}
+                <img src="{{ session.student_id.profiles.image.url }}" alt="Student" class="card-img-top"
+                    style="max-height: 100px; width: auto">
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <p>
+                    {% if userType == "student" %}
+                    <strong>Tutor Name:</strong> <a
+                        href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
+                        {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a>
+                    {% else %}
+                    <strong>Student Name:</strong> <a
+                        href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
+                        {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a>
+                    {% endif %}
+                </p>
+                <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
+                <p><strong>Tutoring Mode: </strong>
+                    {% if session.tutoring_mode == "inperson" %}
+                    In Person
+                    {% else %}
+                    Remote
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Date: </strong>{{ session.date }}</p>
+                <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                {% if userType == "tutor" %}
+                <p><strong>Message: </strong>{{ session.message }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<p style="color:#AC658F; margin-left: 20px"> You currently have no completed sessions.
+<p>
+    {% endif %}
     </div>
     <br>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    {% endblock %}
