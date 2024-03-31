@@ -75,7 +75,6 @@ class TutoringSession(models.Model):
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
     reviewed_by_student = models.BooleanField(default=False)
 
-
     def human_readable_subject(self):
         return self.subject.replace("_", " ")
 
@@ -88,7 +87,10 @@ class TutorReview(models.Model):
         User, on_delete=models.CASCADE, related_name="tutor_reviews"
     )
     tutoring_session = models.ForeignKey(
-        TutoringSession, on_delete=models.CASCADE, related_name="session_reviews", null=True
+        TutoringSession,
+        on_delete=models.CASCADE,
+        related_name="session_reviews",
+        null=True,
     )
     review_date = models.DateField(auto_now_add=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1)

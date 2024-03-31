@@ -258,7 +258,7 @@ def ProvideFeedback(request, session_id):
             review = form.save(commit=False)
             review.tutoring_session = session
             review.save()
-            
+
             session.reviewed_by_student = True
             session.save()
             return redirect("Dashboard:dashboard")
@@ -271,10 +271,13 @@ def ProvideFeedback(request, session_id):
 
 @login_required
 def TutorFeedback(request):
-    reviews = TutorReview.objects.all().filter(tutor_id=request.user.id).select_related("student_id__profiles")
-    return render(
-        request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
-                  
+    reviews = (
+        TutorReview.objects.all()
+        .filter(tutor_id=request.user.id)
+        .select_related("student_id__profiles")
+    )
+    return render(request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
+
 
 @login_required
 def CancelSession(request, session_id):
