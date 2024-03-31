@@ -182,7 +182,7 @@ def view_tutor_profile(request, user_id):
 
     availability = Availability.objects.all().filter(user=profilet.user)
 
-    reviews = TutorReview.objects.all().filter(tutor_id=user_id)
+    reviews = TutorReview.objects.all().filter(tutor_id=user_id).select_related("student_id__profiles")
 
     average_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0
 
