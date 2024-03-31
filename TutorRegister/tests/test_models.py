@@ -16,7 +16,7 @@ from django.db.models.signals import post_save
 class ExpertiseModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
+            username="testuser@example.com", password="12345"
         )
         Expertise.objects.create(user=self.user, subject="math", level="advanced")
 
@@ -29,7 +29,7 @@ class ExpertiseModelTest(TestCase):
 class AvailablilityModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
+            username="testuser@example.com", password="12345"
         )
         Availability.objects.create(
             user=self.user,
@@ -48,7 +48,7 @@ class AvailablilityModelTest(TestCase):
 class ProfileSModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
+            username="testuser@example.com", password="12345"
         )
         ProfileS.objects.create(
             user=self.user,
@@ -76,7 +76,7 @@ class ProfileSModelTest(TestCase):
 
 class ProfileTModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="test@nyu.edu", password="12345")
+        self.user = User.objects.create_user(username="tutor@nyu.edu", password="12345")
         ProfileT.objects.create(
             user=self.user,
             fname="Test",

@@ -187,8 +187,10 @@ class RequestsTestCase(TestCase):
 class AcceptRequestTestCase(TestCase):
     def setUp(self):
         self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.client = Client()
 
     def test_accept_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:accept_request", args=(self.session.pk,))
         )
@@ -205,8 +207,10 @@ class AcceptRequestTestCase(TestCase):
 class DeclineRequestTestCase(TestCase):
     def setUp(self):
         self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.client = Client()
 
     def test_decline_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:decline_request", args=(self.session.pk,))
         )
@@ -223,7 +227,8 @@ class DeclineRequestTestCase(TestCase):
 class LogoutTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(pk=cache.get("student"))
-        self.client = Client(username="test@example.com", password="testpassword")
+        self.client = Client()
+        self.client.login(username="test@example.com", password="testpassword")
 
     def test_logout_view(self):
         self.assertNotEqual(str(self.user), "AnonymousUser")
