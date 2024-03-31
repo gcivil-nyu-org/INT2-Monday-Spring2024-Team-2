@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        #chat-log {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            padding: 5px;
+            background-color: #f9f9f9;
+        }
+
+        #chat-message-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+
+        #chat-message-submit {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-log">
+        {% for message in messages %}
+        <div class="message">
+            {% if message.author.id == student.user_id %}
+            <strong>{{ student.fname }}
+                {% else %}
+                <strong>{{ tutor.fname }}
+                    {% endif %}
+                    :</strong> {{ message.message }}
+        </div>
+        {% endfor %}
+    </div>
+    <textarea id="chat-message-input" placeholder="Type your message here..."></textarea>
+    <button id="chat-message-submit">Send</button>
+
+    <script>
+        var studentId = "{{ student.user_id }}";
+        var tutorId = "{{ tutor.user_id }}";
+        const user_id = "{{ request.user.id }}";
+        const other_user_id = "{{ other_user_id }}";
+
+        const chatSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${other_user_id}/`
+        );
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            if (data.author_id === studentId) {
+                senderName = "{{ student.fname }}";
+            } else if (data.author_id === tutorId) {
+                senderName = "{{ tutor.fname }}";
+            }
+            console.log(data.author_id, studentId, tutorId)
+            console.log(senderName);
+            const messageElement = `<div class="message"><strong>${senderName}:</strong> ${data.message}</div>`;
+            document.querySelector('#chat-log').innerHTML += messageElement;
+        };
+
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function (e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({ 'message': message }));
+            messageInputDom.value = '';
+        };
+
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // Enter key
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+    </script>
+</body>
+
+</html>
+
