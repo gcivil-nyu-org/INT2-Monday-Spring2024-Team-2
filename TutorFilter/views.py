@@ -23,7 +23,7 @@ def filter_tutors(request):
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
     favorites = Favorite.objects.all().filter(student=request.user)
-    tutor_ratings = {user.id: 0.0 for user in users}  # Default rating is 0
+    tutor_ratings = {user.id: float(0.0) for user in users}  # Default rating is 0
     average_ratings = TutorReview.objects.values("tutor_id").annotate(
         average_rating=Avg("rating")
     )
@@ -102,7 +102,7 @@ def filter_tutors(request):
             if form.cleaned_data["sortBy"] == "Highest Rating":
                 users = list(users)
                 users.sort(
-                    key=lambda tutor: tutor_ratings.get(tutor.id, 0), reverse=True
+                    key=lambda tutor: tutor_ratings.get(tutor.user_id, 0), reverse=True
                 )
             elif form.cleaned_data["sortBy"] == "Highest Price":
                 users = users.order_by("-salary_max")
@@ -110,7 +110,6 @@ def filter_tutors(request):
                 users = users.order_by("salary_max")
     categories = list(set(favorites.values_list("category", flat=True)))
     favorites = favorites.values_list("tutor", flat=True)
-
     return render(
         request,
         "TutorFilter/filter_results.html",

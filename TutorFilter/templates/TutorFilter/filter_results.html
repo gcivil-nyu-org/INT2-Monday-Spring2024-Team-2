@@ -157,8 +157,8 @@
                     <p class="lh-sm">Zipcode: {{ user.zip }}</p>
 
                     {% for tutor_id, avg in average_ratings %}
-                        {% if tutor_id == user.id %}
-                        <p class="lh-sm">Rating: {{ avg|default:"Not available" }}</p>
+                        {% if tutor_id == user.user_id %}
+                        <p class="lh-sm">Rating: {{ avg }}</p>
                         {% endif %}
                     {% endfor %}
                     
@@ -308,9 +308,6 @@ $(document).ready(function(){
             },
             success: function(data) {
                 if (data.status === 'success') {
-               // Notify user of success, e.g., using an alert or updating the DOM
-                alert(data.message); // Simple alert
-
                 // Refresh the page
                  window.location.reload();
                 } else {
@@ -348,9 +345,6 @@ $(document).ready(function(){
             },
             success: function(data) {
                 if (data.status === 'success') {
-               // Notify user of success, e.g., using an alert or updating the DOM
-                alert(data.message); // Simple alert
-
                 // Refresh the page
                  window.location.reload();
                 } else {
@@ -379,9 +373,6 @@ $(document).ready(function(){
             },
             success: function(data) {
                 if (data.status === 'success') {
-               // Notify user of success, e.g., using an alert or updating the DOM
-                alert(data.message); // Simple alert
-
                 // Refresh the page
                  window.location.reload();
                 } else {
