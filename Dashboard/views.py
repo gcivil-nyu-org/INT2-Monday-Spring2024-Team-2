@@ -270,6 +270,13 @@ def ProvideFeedback(request, session_id):
 
 
 @login_required
+def TutorFeedback(request):
+    reviews = TutorReview.objects.all().filter(tutor_id=request.user.id).select_related("student_id__profiles")
+    return render(
+        request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
+                  
+
+@login_required
 def CancelSession(request, session_id):
     userType = request.user.usertype.user_type
 

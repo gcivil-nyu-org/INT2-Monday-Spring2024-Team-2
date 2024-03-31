@@ -20,9 +20,9 @@
                                     {% else %}
                                         <script>
                                             var difference = {{ forloop.counter }} - {{ average_rating }};
-                                            if (difference < 0.5) {
+                                            if (difference < 0.2) {
                                                 document.write('<i class="fas fa-star" style="color: purple; font-size: 16px;"></i>');
-                                            } else if (difference >= 0.5 && difference < 1){
+                                            } else if (difference >= 0.2 && difference < 0.8){
                                                 document.write('<i class="fas fa-star-half-alt" style="color: purple; font-size: 16px;"></i>');
                                             } else{
                                                 document.write('<i class="fas fa-star" style="color: #ccc; font-size: 16px;"></i>');
@@ -79,22 +79,31 @@
                     <div id="reviews-container">
                         {% if reviews%}
                             {% for review in reviews %}
-                                <strong>{{review.student_id.profiles.fname}} {{review.student_id.profiles.lname}}:</strong>
-                                <div class="review">
-                                    <div class="rating">
-                                        {% for _ in "12345" %}
-                                            {% if forloop.counter <= review.rating %}
-                                                <i class="fas fa-star" style="color: gold;"></i>
-                                            {% else %}
-                                                <i class="fas fa-star" style="color: #ccc;"></i>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {{ review.rating }}
-                                    </div>
-                                    <p style="margin-bottom: 0px">{{ review.review }}
-                                    <p style="font-size:13px; margin-top: 0px; color:grey">{{ review.review_date }}</p>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="{{ review.student_id.profiles.image.url }}" alt="Student" class="card-img-top" style="max-height: 70px; width: auto; margin-left:20px">
                                 </div>
+                                <div class="col-md-7">
+                                    <strong>{{review.student_id.profiles.fname}} {{review.student_id.profiles.lname}}:</strong>
+                                    <div class="review">
+                                        <div class="rating">
+                                            {% for _ in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star" style="color: gold;"></i>
+                                                {% else %}
+                                                    <i class="fas fa-star" style="color: #ccc;"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ review.rating }}
+                                        </div>
+                                        <p style="margin-bottom: 0px">{{ review.review }}
+                                        <p style="font-size:13px; margin-top: 0px; color:grey">{{ review.review_date }}</p>
+                                    </div>
+                                </div>    
+                            </div>
+                            <br>
                             {% endfor %}
+                        
                         {% else %}
                              <p style="font-size:15px"> This tutor has no recent reviews. <p>   
                         {% endif %}
