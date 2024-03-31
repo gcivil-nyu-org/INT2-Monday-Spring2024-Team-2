@@ -132,7 +132,12 @@
 
                             <div class="col-md-2 d-flex align-items-end">
                                 {% if userType == "student" %}
-                                    <a href="{% url 'Dashboard:feedback' session.id %}" class="btn btn-outline-primary btn-sm" style="white-space: nowrap;">Provide Feedback</a>
+                                    {% if not session.reviewed_by_student %}
+                                        <a href="{% url 'Dashboard:feedback' session.id %}" class="btn btn-outline-primary btn-sm" style="white-space: nowrap;">Provide Feedback</a>
+                                    {% else %}
+                                        <p style="color: #359AF7; white-space: nowrap;"> Review Submitted </p>
+                                        {% comment %} <a class="btn btn-outline-primary btn-sm" style="white-space: nowrap;"> Reviewed Submitted </a> {% endcomment %}
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>

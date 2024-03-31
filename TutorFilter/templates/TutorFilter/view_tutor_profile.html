@@ -77,23 +77,27 @@
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">Recent Reviews:</h3>
                     <div id="reviews-container">
-                        {% for review in reviews %}
-                            <strong>{{review.student_id.profiles.fname}} {{review.student_id.profiles.lname}}:</strong>
-                            <div class="review">
-                                <div class="rating">
-                                    {% for _ in "12345" %}
-                                        {% if forloop.counter <= review.rating %}
-                                            <i class="fas fa-star" style="color: gold;"></i>
-                                        {% else %}
-                                            <i class="fas fa-star" style="color: #ccc;"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                    {{ review.rating }}
+                        {% if reviews%}
+                            {% for review in reviews %}
+                                <strong>{{review.student_id.profiles.fname}} {{review.student_id.profiles.lname}}:</strong>
+                                <div class="review">
+                                    <div class="rating">
+                                        {% for _ in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star" style="color: gold;"></i>
+                                            {% else %}
+                                                <i class="fas fa-star" style="color: #ccc;"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ review.rating }}
+                                    </div>
+                                    <p style="margin-bottom: 0px">{{ review.review }}
+                                    <p style="font-size:13px; margin-top: 0px; color:grey">{{ review.review_date }}</p>
                                 </div>
-                                <p style="margin-bottom: 0px">{{ review.review }}
-                                <p style="font-size:13px; margin-top: 0px; color:grey">{{ review.review_date }}</p>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                             <p style="font-size:15px"> This tutor has no recent reviews. <p>   
+                        {% endif %}
                     </div>
                 </div>
                 

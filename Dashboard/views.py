@@ -255,7 +255,12 @@ def ProvideFeedback(request, session_id):
         form = TutorReviewForm(request.POST, s_id=s_id, t_id=t_id)
 
         if form.is_valid():
-            form.save()
+            review = form.save(commit=False)
+            review.tutoring_session = session
+            review.save()
+            
+            session.reviewed_by_student = True
+            session.save()
             return redirect("Dashboard:dashboard")
     else:
         form = TutorReviewForm(s_id=s_id, t_id=t_id)
