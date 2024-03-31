@@ -34,7 +34,23 @@
                         <textarea class="form-control" id="review" name="review" rows="4" style="margin-left:30px;margin-bottom:20px;max-width: 90%;" placeholder="Enter Your Review Here"></textarea>
                     </div>
                     <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px">Submit Review</button>
+                        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#successModal" 
+                        style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px">Submit Review</button>
+                    </div>
+
+                     <!-- Success Modal -->
+                     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    You have successfully submitted your feedback.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
