@@ -3,12 +3,14 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
 from .forms.student_info import StudentForm, StudentImageForm
+from .forms.review_form import TutorReviewForm
 from TutorRegister.models import (
     Expertise,
     Availability,
     ProfileT,
     ProfileS,
     TutoringSession,
+    TutorReview,
 )
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -23,6 +25,9 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+import mimetypes
 
 
 @login_required
@@ -238,6 +243,43 @@ def UserDashboard(request):
 
 
 @login_required
+def ProvideFeedback(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+
+    s_id = session.student_id
+    t_id = session.tutor_id
+
+    tutor_profile = get_object_or_404(ProfileT, user=t_id)
+
+    if request.method == "POST":
+        form = TutorReviewForm(request.POST, s_id=s_id, t_id=t_id)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.tutoring_session = session
+            review.save()
+
+            session.reviewed_by_student = True
+            session.save()
+            return redirect("Dashboard:dashboard")
+    else:
+        form = TutorReviewForm(s_id=s_id, t_id=t_id)
+    return render(
+        request, "Dashboard/feedback.html", {"form": form, "profilet": tutor_profile}
+    )
+
+
+@login_required
+def TutorFeedback(request):
+    reviews = (
+        TutorReview.objects.all()
+        .filter(tutor_id=request.user.id)
+        .select_related("student_id__profiles")
+    )
+    return render(request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
+
+
+@login_required
 def CancelSession(request, session_id):
     userType = request.user.usertype.user_type
 
@@ -352,3 +394,23 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, time)):
             return obj.strftime("%H:%M")
         return json.JSONEncoder.default(self, obj)
+
+
+@login_required
+def download_attachment(request, session_id):
+    session = get_object_or_404(TutoringSession, pk=session_id)
+
+    if session.attachment:
+        # Open the file directly from the storage backend
+        file = session.attachment.open("rb")
+        # Create a FileResponse with the file's content
+        response = FileResponse(
+            file, as_attachment=True, filename=session.attachment.name
+        )
+        # Set the content type to the file's content type, if available
+        content_type, _ = mimetypes.guess_type(session.attachment.name)
+        if content_type:
+            response["Content-Type"] = content_type
+        return response
+
+    return redirect("Dashboard:requests")

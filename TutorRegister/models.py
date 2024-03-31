@@ -91,9 +91,42 @@ class TutoringSession(models.Model):
     offering_rate = models.DecimalField(max_digits=6, decimal_places=0)
     message = models.TextField()
     status = models.TextField(default="Pending")
+    attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
+    reviewed_by_student = models.BooleanField(default=False)
 
     def human_readable_subject(self):
         return self.subject.replace("_", " ")
+
+
+class TutorReview(models.Model):
+    student_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="student_reviews"
+    )
+    tutor_id = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tutor_reviews"
+    )
+    tutoring_session = models.ForeignKey(
+        TutoringSession,
+        on_delete=models.CASCADE,
+        related_name="session_reviews",
+        null=True,
+    )
+    review_date = models.DateField(auto_now_add=True)
+    rating = models.DecimalField(max_digits=2, decimal_places=1)
+    review = models.TextField()
+
+    def __str__(self):
+        return f"Review by {self.student_id} for {self.tutor_id}"
+
+
+class Favorite(models.Model):
+    student = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="student_favorites"
+    )
+    tutor = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tutor_favorites"
+    )
+    category = models.CharField(max_length=100, null=True, blank=True)
 
 
 # Two blank lines before the new function definition

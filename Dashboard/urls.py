@@ -6,6 +6,7 @@ app_name = "Dashboard"
 urlpatterns = [
     path("", views.UserDashboard, name="dashboard"),
     path("requests", views.Requests, name="requests"),
+    path("feedback/", views.TutorFeedback, name="tutor_feedback"),
     path("student/profile", views.StudentInformation, name="student_profile"),
     path("tutor/profile", views.TutorInformation, name="tutor_profile"),
     path("cancel/<int:session_id>/", views.CancelSession, name="cancel_session"),
@@ -16,4 +17,10 @@ urlpatterns = [
         "cancel-request/<int:session_id>/", views.CancelRequest, name="cancel_request"
     ),
     path("logout/", views.logout_view, name="logout"),
+    path(
+        "download_attachment/<int:session_id>/",
+        views.download_attachment,
+        name="download_attachment",
+    ),
+    path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
 ]

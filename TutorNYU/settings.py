@@ -56,7 +56,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # "TutorRegister.middleware.LoginRequiredMiddleware",
+    "TutorRegister.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -181,3 +181,12 @@ DEFAULT_FROM_EMAIL = "tutornyuengineeringverify@gmail.com"
 # VERIFICATION_SUCCESS_TEMPLATE = "TutorRegister/templates/TutorRegister/successful_register.html"
 LOGIN_URL = "TutorRegister:login"
 PASSWORD_RESET_EMAIL_TEMPLATE_NAME = "registration/password_reset_email.html"
+
+# Global test runner
+TEST_RUNNER = "TutorNYU.test_runner.GlobalTestRunner"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
