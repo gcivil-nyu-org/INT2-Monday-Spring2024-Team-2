@@ -61,35 +61,35 @@ def filter_tutors(request):
                     for user, rating in tutor_ratings.items()
                     if rating >= 1
                 }
-                users = users.filter(id__in=high_rating_tutors.keys())
+                users = users.filter(user_id__in=high_rating_tutors.keys())
             elif form.cleaned_data["rating"] == ">= 2 stars":
                 high_rating_tutors = {
                     user: rating
                     for user, rating in tutor_ratings.items()
                     if rating >= 2
                 }
-                users = users.filter(id__in=high_rating_tutors.keys())
+                users = users.filter(user_id__in=high_rating_tutors.keys())
             elif form.cleaned_data["rating"] == ">= 3 stars":
                 high_rating_tutors = {
                     user: rating
                     for user, rating in tutor_ratings.items()
                     if rating >= 3
                 }
-                users = users.filter(id__in=high_rating_tutors.keys())
+                users = users.filter(user_id__in=high_rating_tutors.keys())
             elif form.cleaned_data["rating"] == ">= 4 stars":
                 high_rating_tutors = {
                     user: rating
                     for user, rating in tutor_ratings.items()
                     if rating >= 4
                 }
-                users = users.filter(id__in=high_rating_tutors.keys())
+                users = users.filter(user_id__in=high_rating_tutors.keys())
             elif form.cleaned_data["rating"] == "= 5 stars":
                 high_rating_tutors = {
                     user: rating
                     for user, rating in tutor_ratings.items()
                     if rating >= 5
                 }
-                users = users.filter(id__in=high_rating_tutors.keys())
+                users = users.filter(user_id__in=high_rating_tutors.keys())
         if form.cleaned_data["category"]:
             category = form.cleaned_data["category"]
             if category != "..":
