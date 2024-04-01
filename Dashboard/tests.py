@@ -7,7 +7,13 @@ from django.test import (
 )
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import Expertise, Availability, ProfileT, TutoringSession, TutorReview
+from TutorRegister.models import (
+    Expertise,
+    Availability,
+    ProfileT,
+    TutoringSession,
+    TutorReview,
+)
 import json
 from .views import StudentInformation, Requests, TutorFeedback
 from TutorRegister.models import ProfileS
@@ -251,14 +257,16 @@ class ProvideFeedbackTestCase(TestCase):
         self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
         self.client = Client()
         self.client.login(username="test@example.com", password="testpassword")
-        
+
     def test_provide_feedback(self):
-        response = self.client.post(reverse('Dashboard:feedback', args=[self.session.pk]), {
-            'rating': 5.0,
-            'review': 'Great tutor!'
-        })
+        response = self.client.post(
+            reverse("Dashboard:feedback", args=[self.session.pk]),
+            {"rating": 5.0, "review": "Great tutor!"},
+        )
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(TutoringSession.objects.get(pk=self.session.pk).reviewed_by_student)
+        self.assertTrue(
+            TutoringSession.objects.get(pk=self.session.pk).reviewed_by_student
+        )
 
 
 class TutorFeedbackTestCase(TestCase):
@@ -266,16 +274,18 @@ class TutorFeedbackTestCase(TestCase):
         self.tutor = User.objects.get(pk=cache.get("tutor"))
         self.student = User.objects.get(pk=cache.get("student"))
         self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
-        self.review = TutorReview.objects.create(tutor_id=self.tutor, 
-                                                 student_id=self.student, 
-                                                 tutoring_session=self.session,
-                                                 rating=4.5, 
-                                                 review='Good tutor')
+        self.review = TutorReview.objects.create(
+            tutor_id=self.tutor,
+            student_id=self.student,
+            tutoring_session=self.session,
+            rating=4.5,
+            review="Good tutor",
+        )
         self.factory = RequestFactory()
 
     def test_tutor_feedback(self):
         self.client.force_login(self.tutor)
-        request = self.factory.get(reverse('Dashboard:tutor_feedback'))
+        request = self.factory.get(reverse("Dashboard:tutor_feedback"))
         request.user = self.tutor
         response = TutorFeedback(request)
         print(response.status_code)
