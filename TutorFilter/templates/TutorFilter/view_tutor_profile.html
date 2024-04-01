@@ -72,7 +72,7 @@
                     </div>
                     <div class="container d-flex justify-content-left">
                         <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px;" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
-                        <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 30px" onclick="#">Message {{ profilet.fname }}</button>
+                        <a href="{% url 'Chat:chat_view' other_user_id=profilet.user_id %}" class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 30px" onclick="#">Message {{ profilet.fname }}</a>
                     </div>
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">Recent Reviews:</h3>
