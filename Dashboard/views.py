@@ -252,10 +252,12 @@ def ProvideFeedback(request, session_id):
     tutor_profile = get_object_or_404(ProfileT, user=t_id)
 
     if request.method == "POST":
-        form = TutorReviewForm(request.POST, s_id=s_id, t_id=t_id)
+        form = TutorReviewForm(request.POST)
 
         if form.is_valid():
             review = form.save(commit=False)
+            review.student_id = s_id
+            review.tutor_id = t_id
             review.tutoring_session = session
             review.save()
 
@@ -263,7 +265,7 @@ def ProvideFeedback(request, session_id):
             session.save()
             return redirect("Dashboard:dashboard")
     else:
-        form = TutorReviewForm(s_id=s_id, t_id=t_id)
+        form = TutorReviewForm()
     return render(
         request, "Dashboard/feedback.html", {"form": form, "profilet": tutor_profile}
     )

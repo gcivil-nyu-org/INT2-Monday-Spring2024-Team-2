@@ -58,56 +58,20 @@
                     {% endif %}
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
+                    {% if userType == "student" %}
+                        <a href="{% url 'Chat:chat_view' other_user_id=session.tutor_id.id %}" class="btn btn-outline-primary">
+                            Chat</a>
+                    {% else %}
+                        <a href="{% url 'Chat:chat_view' other_user_id=session.student_id.id %}" class="btn btn-outline-primary">
+                            Chat</a>
+                    {% endif %}
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
+                        data-bs-target="#exampleModal{{ session.id }}" style="margin-left:5px">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        {% if userType == "student" %}
-        <p><strong>Tutor Name:</strong> <a
-                href="{% url 'TutorFilter:view_tutor_profile' user_id=session.tutor_id.profilet.user_id %}">
-                {{ session.tutor_id.profilet.fname }} {{ session.tutor_id.profilet.lname }}</a></p>
-        {% else %}
-        <p><strong>Student Name:</strong> <a
-                href="{% url 'TutorFilter:view_student_profile' user_id=session.student_id.profiles.user_id %}">
-                {{ session.student_id.profiles.fname }} {{ session.student_id.profiles.lname }}</a></p>
-        {% endif %}
-        <p><strong>Subject:</strong> {{ session.human_readable_subject | title }}</p>
-        <p><strong>Tutoring Mode: </strong>
-            {% if session.tutoring_mode == "inperson" %}
-            In Person
-            {% else %}
-            Remote
-            {% endif %}
-        </p>
-    </div>
-    <div class="col-md-6">
-        <p><strong>Date: </strong>{{ session.date }}</p>
-        <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
-    </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        {% if userType == "tutor" %}
-        <p><strong>Message: </strong>{{ session.message }}</p>
-        {% endif %}
-    </div>
-    {% if userType == "student" %}
-    <div class="col-md-2 d-flex">
-        <a href="{% url 'Chat:chat_view' other_user_id=session.tutor_id.id %}" class="btn btn-primary">Chat</a>
-    </div>
-    {% else %}
-    <a href="{% url 'Chat:chat_view' other_user_id=session.student_id.id %}" class="btn btn-primary">Chat</a>
-</div>
-{% endif %}
-<div class="col-md-2 d-flex align-items-end">
-    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-        data-bs-target="#exampleModal{{ session.id }}">Cancel</button>
-</div>
-</div>
-</div>
-</div>
+
 
 <!-- Cancel Confirmation Modal -->
 <div class="modal fade" id="exampleModal{{ session.id }}" tabindex="-1"
