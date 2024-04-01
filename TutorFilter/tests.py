@@ -231,6 +231,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_profile_tutor(self):
         # Test view_profile for a tutor user
+        self.client.login(username="test@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_profile", args=[self.testuser.id])
         )
@@ -239,6 +240,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_profile_student(self):
         # Test view_profile for a student user
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_profile", args=[self.testuser2.id])
         )
@@ -247,6 +249,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_tutor_profile(self):
         # Test view_tutor_profile
+        self.client.login(username="testuser2@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_tutor_profile", args=[self.testuser.id])
         )
@@ -255,6 +258,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_student_profile(self):
         # Test view_student_profile
+        self.client.login(username="testuser@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_student_profile", args=[self.testuser2.id])
         )
@@ -291,6 +295,8 @@ class TutoringSessionTests(TestCase):
         Expertise.objects.create(user=cls.user, subject="math")
         User.objects.create_user(username="student", password="studentpassword")
 
+        cls.num_sessions = TutoringSession.objects.count()
+
     def setUp(self):
         self.client = Client()
         self.client.login(username="student", password="studentpassword")
@@ -313,7 +319,7 @@ class TutoringSessionTests(TestCase):
             reverse("TutorFilter:request", args=[self.user.id]), data
         )
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(TutoringSession.objects.exists())
+        self.assertEqual(TutoringSession.objects.count(), self.num_sessions + 1)
 
     def test_request_tutoring_session_post_invalid(self):
         data = {
@@ -328,7 +334,7 @@ class TutoringSessionTests(TestCase):
             reverse("TutorFilter:request", args=[self.user.id]), data
         )
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(TutoringSession.objects.exists())
+        self.assertEqual(TutoringSession.objects.count(), self.num_sessions)
 
     def test_get_available_times(self):
         response = self.client.post(
