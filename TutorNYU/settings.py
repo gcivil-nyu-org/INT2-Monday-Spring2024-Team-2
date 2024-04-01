@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "verify_email.apps.VerifyEmailConfig",
     "TutorFilter",
     "storages",
+    "channels",
+    "chat",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +56,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # "TutorRegister.middleware.LoginRequiredMiddleware",
+    "TutorRegister.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -79,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "TutorNYU.wsgi.application"
+ASGI_APPLICATION = "TutorNYU.asgi.application"
 
 
 # Database
@@ -95,6 +98,14 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("tutornyu.g0snws.ng.0001.usw2.cache.amazonaws.com", 6379)],
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -170,3 +181,12 @@ DEFAULT_FROM_EMAIL = "tutornyuengineeringverify@gmail.com"
 # VERIFICATION_SUCCESS_TEMPLATE = "TutorRegister/templates/TutorRegister/successful_register.html"
 LOGIN_URL = "TutorRegister:login"
 PASSWORD_RESET_EMAIL_TEMPLATE_NAME = "registration/password_reset_email.html"
+
+# Global test runner
+TEST_RUNNER = "TutorNYU.test_runner.GlobalTestRunner"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}

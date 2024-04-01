@@ -7,5 +7,6 @@ exclude =
     venv,
     eb-virt,
     settings,
-    migrations
-ignore = F401, W503
+    migrations,
+    TutorNYU/asgi.py
+ignore = F401, W503, E203

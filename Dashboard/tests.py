@@ -1,25 +1,34 @@
-from django.test import TestCase, Client, RequestFactory, override_settings
+from django.test import (
+    TestCase,
+    Client,
+    RequestFactory,
+    override_settings,
+    TransactionTestCase,
+)
 from django.urls import reverse
 from django.contrib.auth.models import User
-from TutorRegister.models import Expertise, Availability, ProfileT, TutoringSession
+from TutorRegister.models import (
+    Expertise,
+    Availability,
+    ProfileT,
+    TutoringSession,
+    TutorReview,
+)
 import json
-from .views import StudentInformation, Requests
+from .views import StudentInformation, Requests, TutorFeedback
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
 from django.core import mail
+from django.core.cache import cache
 
 
 # Create your tests here.
 class StudentDashboardTestCase(TestCase):
     def setUp(self):
-        # Create a user for testing login
-        self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
         self.client = Client()
 
     def test_student_dashboard_view_with_login(self):
-        self.client.login(username="test@example.com", password="12345")
+        self.client.login(username="test@example.com", password="testpassword")
         url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -35,12 +44,10 @@ class StudentDashboardTestCase(TestCase):
 
 class TutorDashboardTestCase(TestCase):
     def setUp(self):
-        # Create a user for testing login
-        self.user = User.objects.create_user(username="test@nyu.edu", password="12345")
         self.client = Client()
 
     def test_tutor_dashboard_view_with_login(self):
-        self.client.login(username="test@nyu.edu", password="12345")
+        self.client.login(username="test@nyu.edu", password="testpassword")
         url = reverse("Dashboard:dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -65,27 +72,12 @@ class HomepageTestCase(TestCase):
 class TutorInformationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="tutor@test.com", password="password123"
-        )
-        cls.user.usertype.user_type = "tutor"
-        cls.user.usertype.save()
+        cls.user = User.objects.get(pk=cache.get("tutor"))
         cls.url = reverse("Dashboard:tutor_profile")
-        ProfileT.objects.create(
-            user=cls.user,
-            fname="Test",
-            lname="User",
-            gender="prefernottosay",
-            major="Computer Science",
-            zip="00000",
-            grade="grad",
-            preferred_mode="remote",
-            intro="ello \nyello \njelo",
-        )
 
     def setUp(self):
         self.client = Client()
-        self.client.login(username="tutor@test.com", password="password123")
+        self.client.login(username="test@nyu.edu", password="testpassword")
 
     def test_get_request(self):
         response = self.client.get(self.url)
@@ -146,18 +138,13 @@ class TutorInformationTest(TestCase):
 
 class StudentInformationTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
-        self.user.usertype.user_type = "student"
-        self.user.usertype.save()
-        self.client = Client(username="test@example.com", password="12345")
+        self.user = User.objects.get(pk=cache.get("student"))
+        self.client = Client()
         self.factory = RequestFactory()
 
     def test_student_information_view(self):
+        self.client.login(username="test@example.com", password="testpassword")
         url = reverse("Dashboard:student_profile")
-        profile, created = ProfileS.objects.get_or_create(user=self.user)
-
         form_data = {
             "fname": "Test",
             "lname": "User",
@@ -169,50 +156,21 @@ class StudentInformationTestCase(TestCase):
             "intro": "Hello, this is a test.",
         }
 
-        student_form = StudentForm(data=form_data, instance=profile)
+        student_form = StudentForm(data=form_data)
         request = self.factory.post(url, data=student_form.data)
         request.user = self.user
         response = StudentInformation(request)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(self.user.usertype.has_profile_complete)
 
-    def tearDown(self):
-        self.user.delete()
-
 
 class CancelSessionTestCase(TestCase):
     def setUp(self):
-        self.student = User.objects.create_user(
-            username="testuser@example.com",
-            password="testpassword",
-        )
-
-        self.student.usertype.user_type = "student"
-        self.student.usertype.save()
-
-        self.tutor = User.objects.create_user(
-            username="testuser@nyu.edu",
-            password="testpassword",
-        )
-        self.tutor.usertype.user_type = "tutor"
-        self.tutor.usertype.save()
-
-        self.session = TutoringSession.objects.create(
-            student_id=self.student,
-            tutor_id=self.tutor,
-            date="2024-03-20",
-            start_time="10:00:00",
-            end_time="11:00:00",
-            status="Accepted",
-            message="test",
-            offering_rate=10,
-            subject="test",
-            tutoring_mode="remote",
-        )
+        self.session = TutoringSession.objects.get(pk=cache.get("upcoming_session"))
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_cancel_session(self):
-        self.client.login(username="testuser@nyu.edu", password="testpassword")
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:cancel_session", args=(self.session.pk,))
         )
@@ -221,39 +179,15 @@ class CancelSessionTestCase(TestCase):
         self.assertEqual(self.session.status, "Cancelled")
         self.assertEqual(len(mail.outbox), 1)
 
+    def tearDown(self) -> None:
+        self.session.status = "Accepted"
+        self.session.save()
+        super().tearDown()
+
 
 class RequestsTestCase(TestCase):
     def setUp(self):
-        self.student = User.objects.create_user(
-            username="testuser@example.com",
-            password="testpassword",
-        )
-        self.tutor = User.objects.create_user(
-            username="testuser@nyu.com",
-            password="testpassword",
-        )
-        self.session = TutoringSession.objects.create(
-            student_id=self.student,
-            tutor_id=self.tutor,
-            date="2024-03-20",
-            start_time="10:00:00",
-            end_time="11:00:00",
-            status="Pending",
-            message="test",
-            offering_rate=10,
-            subject="test",
-            tutoring_mode="remote",
-        )
-        self.student_profile = ProfileS.objects.create(
-            user=self.student,
-            fname="test",
-            lname="test",
-            gender="female",
-            zip="12345",
-            school="test",
-            preferred_mode="remote",
-            intro="test",
-        )
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
 
     def test_tutor_request(self):
         request = RequestFactory().get(reverse("Dashboard:requests"))
@@ -264,28 +198,11 @@ class RequestsTestCase(TestCase):
 
 class AcceptRequestTestCase(TestCase):
     def setUp(self):
-        self.student = User.objects.create_user(
-            username="testuser@example.com",
-            password="testpassword",
-        )
-        self.tutor = User.objects.create_user(
-            username="testuser@nyu.com",
-            password="testpassword",
-        )
-        self.session = TutoringSession.objects.create(
-            student_id=self.student,
-            tutor_id=self.tutor,
-            date="2024-03-20",
-            start_time="10:00:00",
-            end_time="11:00:00",
-            status="Pending",
-            message="test",
-            offering_rate=10,
-            subject="test",
-            tutoring_mode="remote",
-        )
+        self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.client = Client()
 
     def test_accept_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:accept_request", args=(self.session.pk,))
         )
@@ -293,31 +210,19 @@ class AcceptRequestTestCase(TestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Accepted")
 
+    def tearDown(self) -> None:
+        self.session.status = "Pending"
+        self.session.save()
+        super().tearDown()
+
 
 class DeclineRequestTestCase(TestCase):
     def setUp(self):
-        self.student = User.objects.create_user(
-            username="testuser@example.com",
-            password="testpassword",
-        )
-        self.tutor = User.objects.create_user(
-            username="testuser@nyu.com",
-            password="testpassword",
-        )
-        self.session = TutoringSession.objects.create(
-            student_id=self.student,
-            tutor_id=self.tutor,
-            date="2024-03-20",
-            start_time="10:00:00",
-            end_time="11:00:00",
-            status="Pending",
-            message="test",
-            offering_rate=10,
-            subject="test",
-            tutoring_mode="remote",
-        )
+        self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.client = Client()
 
-    def test_accept_request(self):
+    def test_decline_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("Dashboard:decline_request", args=(self.session.pk,))
         )
@@ -325,13 +230,17 @@ class DeclineRequestTestCase(TestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "Declined")
 
+    def tearDown(self) -> None:
+        self.session.status = "Pending"
+        self.session.save()
+        super().tearDown()
+
 
 class LogoutTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="test@example.com", password="12345"
-        )
-        self.client = Client(username="test@example.com", password="12345")
+        self.user = User.objects.get(pk=cache.get("student"))
+        self.client = Client()
+        self.client.login(username="test@example.com", password="testpassword")
 
     def test_logout_view(self):
         self.assertNotEqual(str(self.user), "AnonymousUser")
@@ -342,5 +251,42 @@ class LogoutTestCase(TestCase):
         user_after_logout = response.wsgi_request.user
         self.assertEqual(str(user_after_logout), "AnonymousUser")
 
-    def tearDown(self):
-        self.user.delete()
+
+class ProvideFeedbackTestCase(TestCase):
+    def setUp(self):
+        self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
+        self.client = Client()
+        self.client.login(username="test@example.com", password="testpassword")
+
+    def test_provide_feedback(self):
+        response = self.client.post(
+            reverse("Dashboard:feedback", args=[self.session.pk]),
+            {"rating": 5.0, "review": "Great tutor!"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            TutoringSession.objects.get(pk=self.session.pk).reviewed_by_student
+        )
+
+
+class TutorFeedbackTestCase(TestCase):
+    def setUp(self):
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
+        self.student = User.objects.get(pk=cache.get("student"))
+        self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
+        self.review = TutorReview.objects.create(
+            tutor_id=self.tutor,
+            student_id=self.student,
+            tutoring_session=self.session,
+            rating=4.5,
+            review="Good tutor",
+        )
+        self.factory = RequestFactory()
+
+    def test_tutor_feedback(self):
+        self.client.force_login(self.tutor)
+        request = self.factory.get(reverse("Dashboard:tutor_feedback"))
+        request.user = self.tutor
+        response = TutorFeedback(request)
+        print(response.status_code)
+        self.assertEqual(response.status_code, 200)

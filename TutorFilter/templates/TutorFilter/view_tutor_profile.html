@@ -4,49 +4,122 @@
 
 {% block content %}
 <div class="container-fluid">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card mt-5">
+            <div class="card mt-5 rounded-4 shadow">
                 <div class="card-header">
-                    <div class="d-flex align-items-center">
-                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 80px; height: 80px;" alt="Tutor Image">
-                        <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
+                    <div class="d-flex align-items-center" style="margin:15px">
+                        <img src="{{profilet.image.url}}" class="rounded-circle mr-3" style="width: 100px; height: 100px;" alt="Tutor Image">
+                        <div>
+                            <h2 class="fw-bold mb-0 fs-2" style="margin-left: 10px;">{{ profilet.fname }} {{profilet.lname}}</h2>
+                            <div class="mb-0 fs-5" id="rating" style="margin-left: 10px;">
+                                {% for _ in "12345" %}
+                                    {% if forloop.counter <= average_rating %}
+                                        <i class="fas fa-star" style="color: purple; font-size: 16px;"></i>
+                                    {% else %}
+                                        <script>
+                                            var difference = {{ forloop.counter }} - {{ average_rating }};
+                                            if (difference < 0.2) {
+                                                document.write('<i class="fas fa-star" style="color: purple; font-size: 16px;"></i>');
+                                            } else if (difference >= 0.2 && difference < 0.8){
+                                                document.write('<i class="fas fa-star-half-alt" style="color: purple; font-size: 16px;"></i>');
+                                            } else{
+                                                document.write('<i class="fas fa-star" style="color: #ccc; font-size: 16px;"></i>');
+                                            }
+                                        </script>
+                                    {% endif %}
+                                {% endfor %}
+                                <span style="color: rgb(0, 0, 0); font-size:16px">{{ average_rating|floatformat:1 }}</span>
+                                <h5 style="display: inline; margin-left: 5px; font-size: 16px;">(
+                                    <a href="#reviews-container" style="color:#4998f2; font-size:16px">
+                                        {{ reviews.count }} 
+                                        {% if reviews.count == 1 %}
+                                        Comment
+                                        {% else %}
+                                        Comments
+                                        {% endif %}
+                                    </a>)
+                                </h5> 
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="margin-left:20px; margin-right:20px">
                     <p>{{ profilet.intro }}</p>
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">About {{ profilet.fname }}:</h3>
                     <div class="row">
-                        <div class="col-md-6">
-                            <p>Gender: {{ profilet.gender|capfirst }}</p>
-                            <p>Major: {{ profilet.major|capfirst  }}</p>
-                            <p>Zipcode: {{ profilet.zip }}</p>
-                            <p>Grade: {{ profilet.grade|capfirst  }}</p>
-                            <p>Preferred Mode: {{ profilet.preferred_mode|capfirst  }}</p>
-                            <p>Salaray Range: ${{ profilet.salary_min }} - {{ profilet.salary_max }}/Hour</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>Expertise:
+                        <div class="col-md-12">
+                            <p><strong>Gender:</strong> {{ profilet.gender|capfirst }}</p>
+                            <p><strong>Major: </strong> {{ profilet.major|capfirst  }}</p>
+                            <p><strong> Zipcode:</strong> {{ profilet.zip }}</p>
+                            <p><strong>Grade: </strong>{{ profilet.grade|capfirst  }}</p>
+                            <p><strong>Preferred Mode: </strong>{{ profilet.preferred_mode|capfirst  }}</p>
+                            <p><strong>Salary Range:</strong> ${{ profilet.salary_min }} - {{ profilet.salary_max }}/Hour</p>
+                            <p><strong>Expertise:</strong>
                                 {% for e in expertise %}
                                     {{ e|capfirst }}{% if not forloop.last %},{% endif %}
                                 {% endfor %}
                             </p>
-                            <p>Availability:</p>
+                            <p><strong>Availability:</strong></p>
                             <ul>
                                 {% for a in availability %}
-                                    <li>{{ a.day_of_week|capfirst  }} {{ a.start_time|capfirst  }} - {{ a.end_time|capfirst  }}</li>
+                                    <li>{{ a.day_of_week|capfirst  }}  {{ a.start_time|time:"H:i"}} - {{ a.end_time|time:"H:i" }}</li>
                                 {% endfor %}
-                            </ul>
+                            </ul> 
                         </div>
                     </div>
+                    <div class="container d-flex justify-content-left">
+                        <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px;" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
+                        <a href="{% url 'Chat:chat_view' other_user_id=profilet.user_id %}" class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 30px" onclick="#">Message {{ profilet.fname }}</a>
+                    </div>
+                    <hr>
+                    <h3 class="fw-bold mb-3 fs-4">Recent Reviews:</h3>
+                    <div id="reviews-container">
+                        {% if reviews%}
+                            {% for review in reviews %}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <img src="{{ review.student_id.profiles.image.url }}" alt="Student" class="card-img-top" style="max-height: 70px; width: auto; margin-left:20px">
+                                </div>
+                                <div class="col-md-7">
+                                    <strong>{{review.student_id.profiles.fname}} {{review.student_id.profiles.lname}}:</strong>
+                                    <div class="review">
+                                        <div class="rating">
+                                            {% for _ in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star" style="color: gold;"></i>
+                                                {% else %}
+                                                    <i class="fas fa-star" style="color: #ccc;"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ review.rating }}
+                                        </div>
+                                        <p style="margin-bottom: 0px">{{ review.review }}
+                                        <p style="font-size:13px; margin-top: 0px; color:grey">{{ review.review_date }}</p>
+                                    </div>
+                                </div>    
+                            </div>
+                            <br>
+                            {% endfor %}
+                        
+                        {% else %}
+                             <p style="font-size:15px"> This tutor has no recent reviews. <p>   
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="card-footer d-flex justify-content-center">
-                    <button class="btn btn-primary mt-3" style="background-color: #600E90; color: white; border-color: #600E90" onclick="location.href ='{% url 'TutorFilter:request' tutor_id=profilet.user_id %}'">Request a Session</button>
-                </div>
+                
             </div>
         </div>
     </div>
 </div>
+
+{% comment %} <script>
+    document.getElementById('show-more-btn').addEventListener('click', function() {
+        // Fetch more reviews via AJAX and append them to the reviews-container
+        // You can implement this part using JavaScript and AJAX
+    });
+</script> {% endcomment %}
 
 {% endblock %}
