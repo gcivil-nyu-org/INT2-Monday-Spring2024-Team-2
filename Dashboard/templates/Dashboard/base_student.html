@@ -17,13 +17,13 @@
         <!-- Navigation Bar -->
         <header
             class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-            <div class="col-md-3 mb-2 mb-md-0">
+            <div class="col-md-2 mb-2 mb-md-0">
                 <a href="{% url 'home' %}" class="d-inline-flex align-items-center mb-2 mb-lg-0 text-decoration-none">
                     <img src="{% static 'images/logo.png' %}" alt="Logo" width="120">
                 </a>
             </div>
 
-            <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <ul class="nav col-10 col-md-auto mb-2 justify-content-center mb-md-0">
                 <!-- Navigation links -->
                 <li><a href="{% url 'Dashboard:dashboard' %}" class="nav-link px-2" style="color: #600d91;">My
                         Sessions</a></li>
@@ -37,7 +37,7 @@
                         style="color: #600d91; margin-left:10px">My Chats</a></li>
             </ul>
 
-            <div class="col-md-3 text-end">
+            <div class="col-md-2 text-end">
                 <form method="post" action="{% url 'Dashboard:logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary"
