@@ -94,7 +94,7 @@ class RegisterUserFormTest(TestCase):
     def test_save_new_user(self):
         form_data = {
             "user_type": "student",
-            "email": "test@example.com",
+            "email": "newuser@example.com",
             "first_name": "John",
             "last_name": "Doe",
             "password1": "Testpassword123",

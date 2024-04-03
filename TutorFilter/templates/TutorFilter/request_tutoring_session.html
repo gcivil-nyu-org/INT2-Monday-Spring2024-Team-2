@@ -83,7 +83,7 @@
                 </div>
                 <div class="card-body">
                     <h3 class="h5 mb-3">Request a tutoring session with {{ tutor.fname }}: </h3>
-                    <form method="post" id="tutoring-session-form">
+                    <form method="post" id="tutoring-session-form" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="mb-3">
                             {{ form.subject.label_tag }}
@@ -113,6 +113,10 @@
                         <div class="mb-3">
                             {{ form.message.label_tag }}
                             {{ form.message }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.attachment.label_tag }}
+                            {{ form.attachment }}
                         </div>
                         <input type="hidden" name="selected_timeslots" id="selected-timeslots-field">
                         <button type="submit" class="btn btn-custom">Request</button>

@@ -8,6 +8,7 @@ from TutorRegister.models import (
     UserType,
     Availability,
     TutoringSession,
+    Favorite,
 )
 from django.test import Client
 from datetime import datetime, timedelta
@@ -35,47 +36,57 @@ class TutorFilterTest(TestCase):
         cls.testuser.usertype.save()
         cls.testuser2.usertype.save()
         Expertise.objects.create(user=cls.testuser, subject="math")
-        ProfileT.objects.create(
+
+        cls.profile_t = ProfileT.objects.create(
             user=cls.testuser,
             preferred_mode="remote",
             grade="freshman",
             zip="12345",
             salary_min=50,
         )
-        ProfileS.objects.create(
+        cls.profile_s = ProfileS.objects.create(
             user=cls.testuser2,
             school="CUNY",
             preferred_mode="remote",
             grade="undergrad",
             zip="12345",
         )
-        # Assign the expertise to the user somehow, according to your model structure
+
+        User.objects.create_user(username="student", password="studentpassword")
 
     def test_filter_tutors(self):
+        c = Client()
+        c.login(username="student", password="studentpassword")
         form_data = {
             "preferred_mode": "remote",
             "grade": "freshman",
             "expertise": "math",
             "zipcode": "12345",
             "salary_max": 60,
+            "rating": ">= 2 stars",
+            "category": "..",
+            "sortBy": "Lowest Price",
         }
-        response = self.client.get(
+        response = c.get(
             reverse("TutorFilter:filter_tutors"),
             form_data,
         )
         self.assertEqual(response.status_code, 200)
         users_in_context = response.context["users"]
-        self.assertTrue(any(user.user == self.testuser for user in users_in_context))
+        self.assertFalse(any(user.user == self.testuser for user in users_in_context))
 
     def test_filter_tutors2(self):
         c = Client()
-        # Simulate a GET request with query parameters
+        c.login(username="student", password="studentpassword")
         form_data2 = {
             "preferred_mode": "remote",
             "grade": "grad",
             "expertise": "math",
             "zipcode": "11111",
             "salary_max": 20,
+            "rating": ">= 1 star",
+            "category": "..",
+            "sortBy": "Highest Rating",
         }
         # form = TutorFilterForm(data=form_data)
 
@@ -91,8 +102,136 @@ class TutorFilterTest(TestCase):
         # Check if the response context contains the expected user
         self.assertEqual(len(response2.context["users"]), 0)
 
+    def test_filter_tutors3(self):
+        c = Client()
+        c.login(username="student", password="studentpassword")
+        form_data2 = {
+            "preferred_mode": "remote",
+            "grade": "grad",
+            "expertise": "math",
+            "zipcode": "11111",
+            "salary_max": 20,
+            "rating": ">= 3 stars",
+            "category": "..",
+            "sortBy": "Highest Price",
+        }
+        # form = TutorFilterForm(data=form_data)
+
+        response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
+
+        # Check if the response is 200 OK
+        self.assertEqual(response2.status_code, 200)
+
+        response2 = c.get(
+            reverse("TutorFilter:filter_tutors"),
+            form_data2,
+        )
+        # Check if the response context contains the expected user
+        self.assertEqual(len(response2.context["users"]), 0)
+
+    def test_filter_tutors4(self):
+        c = Client()
+        c.login(username="student", password="studentpassword")
+        form_data2 = {
+            "preferred_mode": "remote",
+            "grade": "grad",
+            "expertise": "math",
+            "zipcode": "11111",
+            "salary_max": 20,
+            "rating": ">= 4 stars",
+            "category": "..",
+            "sortBy": "Highest Price",
+        }
+        # form = TutorFilterForm(data=form_data)
+
+        response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
+
+        # Check if the response is 200 OK
+        self.assertEqual(response2.status_code, 200)
+
+        response2 = c.get(
+            reverse("TutorFilter:filter_tutors"),
+            form_data2,
+        )
+        # Check if the response context contains the expected user
+        self.assertEqual(len(response2.context["users"]), 0)
+
+    def test_filter_tutors5(self):
+        c = Client()
+        c.login(username="student", password="studentpassword")
+        form_data2 = {
+            "preferred_mode": "remote",
+            "grade": "grad",
+            "expertise": "math",
+            "zipcode": "11111",
+            "salary_max": 20,
+            "rating": "= 5 stars",
+            "category": "..",
+            "sortBy": "Highest Price",
+        }
+        # form = TutorFilterForm(data=form_data)
+
+        response2 = c.post(reverse("TutorFilter:filter_tutors"), form_data2)
+
+        # Check if the response is 200 OK
+        self.assertEqual(response2.status_code, 200)
+
+        response2 = c.get(
+            reverse("TutorFilter:filter_tutors"),
+            form_data2,
+        )
+        # Check if the response context contains the expected user
+        self.assertEqual(len(response2.context["users"]), 0)
+
+    def test_add_favorite(cls):
+        # Assuming you have a URL named 'add_favorite' pointing to your add_favorite view
+        c = Client()
+        c.login(username="testuser2@example.com", password="testpassword")
+        url = reverse("TutorFilter:add_favorite")
+        data = {
+            "category_name": "Math",
+            "tutor_id": cls.profile_t.user.id,
+        }
+        response = c.post(url, data)
+
+        cls.assertEqual(response.status_code, 200)
+        cls.assertEqual(
+            response.json(),
+            {"status": "success", "message": "Add the tutor successfully!"},
+        )
+        # Check if Favorite object was indeed created
+        cls.assertTrue(
+            Favorite.objects.filter(student=cls.testuser2, tutor=cls.testuser).exists()
+        )
+
+    def test_remove_favorite(self):
+        # First, create a Favorite object to be removed
+        c = Client()
+        c.login(username="testuser2@example.com", password="testpassword")
+
+        Favorite.objects.create(
+            category="Math", student=self.testuser2, tutor=self.testuser
+        )
+
+        url = reverse("TutorFilter:remove_favorite")
+        data = {
+            "tutor_id": self.profile_t.user.id,
+        }
+        response = c.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"status": "success", "message": "Remove the tutor successfully!"},
+        )
+        # Check if Favorite object was indeed removed
+        self.assertFalse(
+            Favorite.objects.filter(student=self.testuser, tutor=self.testuser).exists()
+        )
+
     def test_view_profile_tutor(self):
         # Test view_profile for a tutor user
+        self.client.login(username="test@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_profile", args=[self.testuser.id])
         )
@@ -101,6 +240,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_profile_student(self):
         # Test view_profile for a student user
+        self.client.login(username="test@nyu.edu", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_profile", args=[self.testuser2.id])
         )
@@ -109,6 +249,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_tutor_profile(self):
         # Test view_tutor_profile
+        self.client.login(username="testuser2@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_tutor_profile", args=[self.testuser.id])
         )
@@ -117,6 +258,7 @@ class TutorFilterTest(TestCase):
 
     def test_view_student_profile(self):
         # Test view_student_profile
+        self.client.login(username="testuser@example.com", password="testpassword")
         response = self.client.get(
             reverse("TutorFilter:view_student_profile", args=[self.testuser2.id])
         )
@@ -153,6 +295,8 @@ class TutoringSessionTests(TestCase):
         Expertise.objects.create(user=cls.user, subject="math")
         User.objects.create_user(username="student", password="studentpassword")
 
+        cls.num_sessions = TutoringSession.objects.count()
+
     def setUp(self):
         self.client = Client()
         self.client.login(username="student", password="studentpassword")
@@ -175,7 +319,7 @@ class TutoringSessionTests(TestCase):
             reverse("TutorFilter:request", args=[self.user.id]), data
         )
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(TutoringSession.objects.exists())
+        self.assertEqual(TutoringSession.objects.count(), self.num_sessions + 1)
 
     def test_request_tutoring_session_post_invalid(self):
         data = {
@@ -190,7 +334,7 @@ class TutoringSessionTests(TestCase):
             reverse("TutorFilter:request", args=[self.user.id]), data
         )
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(TutoringSession.objects.exists())
+        self.assertEqual(TutoringSession.objects.count(), self.num_sessions)
 
     def test_get_available_times(self):
         response = self.client.post(
