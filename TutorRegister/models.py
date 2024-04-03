@@ -52,7 +52,6 @@ class ProfileT(models.Model):
     qualified = models.BooleanField(default=False)
 
 
-
 # Two blank lines before the new class definition
 class UserType(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -133,23 +132,19 @@ class Favorite(models.Model):
 
 
 class Post(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_post"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_post")
     title = models.CharField(max_length=250)
     content = models.TextField
     label = models.CharField(max_length=100)
     post_date = models.DateField(auto_now_add=True)
-    
-    
+
+
 class Reply(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_reply"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_reply")
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()
     reply_date = models.DateField(auto_now_add=True)
-    
+
 
 # Two blank lines before the new function definition
 # Signal to automatically create or update UserType when a User instance is saved
