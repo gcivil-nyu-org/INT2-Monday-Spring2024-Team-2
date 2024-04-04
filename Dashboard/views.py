@@ -27,6 +27,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 import mimetypes
 
 
@@ -227,6 +229,28 @@ def UserDashboard(request):
     pastSessions = sessions.filter(
         Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
     )
+    has_upcomingSessions = upcomingSessions
+    has_pastSessions = pastSessions
+
+    page_number1 = request.GET.get('upcoming_page', 1)
+    page_number2 = request.GET.get('past_page', 1)
+
+    paginator1 = Paginator(upcomingSessions, 3)
+    paginator2 = Paginator(pastSessions, 3)
+
+    try:
+        upcomingSessions = paginator1.page(page_number1)
+    except PageNotAnInteger:
+        upcomingSessions = paginator1.page(1)
+    except EmptyPage:
+        upcomingSessions = paginator1.page(paginator1.num_pages)
+    
+    try:
+        pastSessions = paginator2.page(page_number2)
+    except PageNotAnInteger:
+        pastSessions = paginator2.page(1)
+    except EmptyPage:
+        pastSessions = paginator2.page(paginator2.num_pages)
 
     context = {
         "baseTemplate": (
@@ -236,7 +260,11 @@ def UserDashboard(request):
         ),
         "userType": userType,
         "upcomingSessions": upcomingSessions,
+        "has_upcomingSessions":has_upcomingSessions,
         "pastSessions": pastSessions,
+        "has_pastSessions": pastSessions,
+        'upcoming_page': page_number1,
+        'past_page': page_number2,
     }
 
     return render(request, "Dashboard/dashboard.html", context)
@@ -278,7 +306,20 @@ def TutorFeedback(request):
         .filter(tutor_id=request.user.id)
         .select_related("student_id__profiles")
     )
-    return render(request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
+
+    has_reviews = reviews
+    page = request.GET.get('page')
+    paginator = Paginator(reviews, 5)
+    try:
+        reviews = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        reviews= paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        reviews = paginator.page(paginator.num_pages)
+
+    return render(request, "Dashboard/tutor_feedback.html", {"has_reviews":has_reviews, "reviews": reviews})
 
 
 @login_required
@@ -340,6 +381,18 @@ def Requests(request):
             student_id=request.user.id, status__in=["Pending", "Declined"]
         ).select_related("tutor_id__profilet")
 
+    has_tutorRequests = tutorRequests
+    page = request.GET.get('page')
+    paginator = Paginator(tutorRequests, 5)
+    try:
+        tutorRequests = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        tutorRequests = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        tutorRequests = paginator.page(paginator.num_pages)
+
     context = {
         "baseTemplate": (
             "Dashboard/base_student.html"
@@ -348,8 +401,8 @@ def Requests(request):
         ),
         "userType": userType,
         "tutorRequests": tutorRequests,
+        "has_tutorRequests": has_tutorRequests,
     }
-
     return render(request, "Dashboard/requests.html", context)
 
 

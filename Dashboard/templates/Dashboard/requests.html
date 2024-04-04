@@ -9,7 +9,7 @@
     <div class="mt-4">
         <h3 style="color: #600d91">Your Tutoring Requests: </h3>
         <br>
-        {% if tutorRequests %}
+        {% if has_tutorRequests %}
             {% for request in tutorRequests %}
                 <div class="modal-content rounded-4 shadow mb-3">
                     <div class="modal-body p-5 pt-10">
@@ -147,6 +147,24 @@
                     </div>
                 </div>
             {% endfor %}
+            <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+                <span class="step-links" style = "gap: 20px;">
+                    <span class="current" style="color: #600E90;">
+                        Page {{ tutorRequests.number }} of {{ tutorRequests.paginator.num_pages }}.
+                    </span>
+                    {% if tutorRequests.has_previous %}
+                        <a href="?page=1">first</a>
+                        <a href="?page={{ tutorRequests.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    {% if tutorRequests.has_next %}
+                        <a href="?page={{ tutorRequests.next_page_number }}">next</a>
+                        <a href="?page={{ tutorRequests.paginator.num_pages }}">last</a>
+                    {% endif %}
+                    
+                </span>
+            </div>
+            
         {% else %}
             <p style="color:#AC658F; margin-left: 20px"> You currently have no tutoring requests. <p></p>
         {% endif %}
