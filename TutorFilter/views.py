@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
 from django.db.models import Avg
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def filter_tutors(request):
@@ -110,6 +111,17 @@ def filter_tutors(request):
                 users = users.order_by("salary_max")
     categories = list(set(favorites.values_list("category", flat=True)))
     favorites = favorites.values_list("tutor", flat=True)
+
+    paginator = Paginator(users, 20)
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        users = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        users = paginator.page(paginator.num_pages)
     return render(
         request,
         "TutorFilter/filter_results.html",
@@ -119,6 +131,7 @@ def filter_tutors(request):
             "average_ratings": tutor_ratings.items(),
             "favorites": favorites,
             "categories": categories,
+            "page": page,
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
