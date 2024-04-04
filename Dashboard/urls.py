@@ -23,4 +23,5 @@ urlpatterns = [
         name="download_attachment",
     ),
     path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
+    path("videocall/", views.VideoCall, name="video_call"),
 ]
