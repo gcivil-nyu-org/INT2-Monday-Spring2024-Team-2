@@ -419,7 +419,7 @@ def download_attachment(request, session_id):
 
 
 def VideoCall(request):
-    if (request.user.usertype.user_type == "tutor"):
+    if request.user.usertype.user_type == "tutor":
         tutor = ProfileT.objects.get(user=request.user)
         fname = tutor.fname
         lname = tutor.lname
@@ -427,4 +427,4 @@ def VideoCall(request):
         student = ProfileS.objects.get(user=request.user)
         fname = student.fname
         lname = student.lname
-    return render(request, "Dashboard/video_call.html", {'name': fname + " " + lname})
+    return render(request, "Dashboard/video_call.html", {"name": fname + " " + lname})
