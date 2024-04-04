@@ -48,7 +48,7 @@ class ProfileT(models.Model):
     salary_min = models.IntegerField(default=0)
     salary_max = models.IntegerField(default=0)
     image = models.ImageField(upload_to="images/", default="images/profile_icon.png")
-
+    qualified = models.BooleanField(default=False, null=True, blank=True)
 
 # Two blank lines before the new class definition
 class UserType(models.Model):
