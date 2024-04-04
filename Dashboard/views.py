@@ -232,8 +232,8 @@ def UserDashboard(request):
     has_upcomingSessions = upcomingSessions
     has_pastSessions = pastSessions
 
-    page_number1 = request.GET.get('upcoming_page', 1)
-    page_number2 = request.GET.get('past_page', 1)
+    page_number1 = request.GET.get("upcoming_page", 1)
+    page_number2 = request.GET.get("past_page", 1)
 
     paginator1 = Paginator(upcomingSessions, 3)
     paginator2 = Paginator(pastSessions, 3)
@@ -244,7 +244,7 @@ def UserDashboard(request):
         upcomingSessions = paginator1.page(1)
     except EmptyPage:
         upcomingSessions = paginator1.page(paginator1.num_pages)
-    
+
     try:
         pastSessions = paginator2.page(page_number2)
     except PageNotAnInteger:
@@ -260,11 +260,11 @@ def UserDashboard(request):
         ),
         "userType": userType,
         "upcomingSessions": upcomingSessions,
-        "has_upcomingSessions":has_upcomingSessions,
+        "has_upcomingSessions": has_upcomingSessions,
         "pastSessions": pastSessions,
-        "has_pastSessions": pastSessions,
-        'upcoming_page': page_number1,
-        'past_page': page_number2,
+        "has_pastSessions": has_pastSessions,
+        "upcoming_page": page_number1,
+        "past_page": page_number2,
     }
 
     return render(request, "Dashboard/dashboard.html", context)
@@ -308,18 +308,22 @@ def TutorFeedback(request):
     )
 
     has_reviews = reviews
-    page = request.GET.get('page')
+    page = request.GET.get("page")
     paginator = Paginator(reviews, 5)
     try:
         reviews = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        reviews= paginator.page(1)
+        reviews = paginator.page(1)
     except EmptyPage:
         # If page is out of range, deliver last page of results.
         reviews = paginator.page(paginator.num_pages)
 
-    return render(request, "Dashboard/tutor_feedback.html", {"has_reviews":has_reviews, "reviews": reviews})
+    return render(
+        request,
+        "Dashboard/tutor_feedback.html",
+        {"has_reviews": has_reviews, "reviews": reviews},
+    )
 
 
 @login_required
@@ -382,7 +386,7 @@ def Requests(request):
         ).select_related("tutor_id__profilet")
 
     has_tutorRequests = tutorRequests
-    page = request.GET.get('page')
+    page = request.GET.get("page")
     paginator = Paginator(tutorRequests, 5)
     try:
         tutorRequests = paginator.page(page)

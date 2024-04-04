@@ -21,8 +21,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def filter_tutors(request):
     form = TutorFilterForm(request.GET, user=request.user)
-    search_query = request.GET.get('q')
-
     users_expertise = Expertise.objects.all()
     users = ProfileT.objects.all()
     favorites = Favorite.objects.all().filter(student=request.user)
@@ -115,8 +113,12 @@ def filter_tutors(request):
     favorites = favorites.values_list("tutor", flat=True)
 
     paginator = Paginator(users, 12)
-    page = request.GET.get('page')
-    salary_max = "" if form.cleaned_data["salary_max"] == None else form.cleaned_data["salary_max"]
+    page = request.GET.get("page")
+    salary_max = (
+        ""
+        if form.cleaned_data["salary_max"] is None
+        else form.cleaned_data["salary_max"]
+    )
     print(salary_max)
     try:
         users = paginator.page(page)
@@ -137,13 +139,13 @@ def filter_tutors(request):
             "categories": categories,
             "page": page,
             "preferred_mode": form.cleaned_data["preferred_mode"],
-            "grade":form.cleaned_data["grade"],
-            "expertise":form.cleaned_data["expertise"],
-            "rating":form.cleaned_data["rating"],
-            "zipcode":form.cleaned_data["zipcode"],
-            "salary_max":salary_max,
-            "category":form.cleaned_data["category"],
-            "sort_By":form.cleaned_data["sortBy"],
+            "grade": form.cleaned_data["grade"],
+            "expertise": form.cleaned_data["expertise"],
+            "rating": form.cleaned_data["rating"],
+            "zipcode": form.cleaned_data["zipcode"],
+            "salary_max": salary_max,
+            "category": form.cleaned_data["category"],
+            "sort_By": form.cleaned_data["sortBy"],
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
@@ -214,7 +216,7 @@ def view_tutor_profile(request, user_id):
 
     average_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0
 
-    page = request.GET.get('page')
+    page = request.GET.get("page")
     paginator = Paginator(reviews, 5)
     try:
         review_pag = paginator.page(page)
@@ -232,7 +234,7 @@ def view_tutor_profile(request, user_id):
             "expertise": expertises,
             "availability": availability,
             "reviews": review_pag,
-            "has_review":reviews,
+            "has_review": reviews,
             "average_rating": average_rating,
             "MEDIA_URL": settings.MEDIA_URL,
         },
