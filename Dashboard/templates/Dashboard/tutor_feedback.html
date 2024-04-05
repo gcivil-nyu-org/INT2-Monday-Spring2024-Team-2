@@ -6,7 +6,7 @@
 <div class="mt-4">
         <h3 style="color: #600d91">Your Feedback: </h3>
         <br>
-        {% if reviews %}
+        {% if has_reviews %}
             {% for review in reviews %}
             <div class="modal-content rounded-4 shadow mb-3">
                 <div class="modal-body p-5 pt-10">
@@ -32,6 +32,22 @@
                 </div>
             </div>
             {% endfor%}
+            <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+                <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
+                    <span class="current" style="color: #600E90;">
+                        Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.
+                    </span>
+                    {% if reviews.has_previous %}
+                        <a href="?page=1">first</a>
+                        <a href="?page={{ reviews.previous_page_number }}">previous</a>
+                    {% endif %}
+                    
+                    {% if reviews.has_next %}
+                        <a href="?page={{ reviews.next_page_number }}">next</a>
+                        <a href="?page={{ reviews.paginator.num_pages }}">last</a>
+                    {% endif %}
+                </span>
+            </div>
         {% else %}
         <p style="margin-left: 20px; color:#AC658F;"> You currently have no reviews.</p>                
         {% endif %}
