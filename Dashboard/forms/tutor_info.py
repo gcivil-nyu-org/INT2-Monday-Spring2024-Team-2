@@ -200,3 +200,17 @@ class TutorImageForm(forms.ModelForm):
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
         }
+
+
+class TutorTranscriptForm(forms.ModelForm):
+    transcript = forms.FileField(
+        required=True,
+        label="Transcript",
+        widget=forms.FileInput(
+            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+        ),
+    )
+
+    class Meta:
+        model = ProfileT
+        fields = ["transcript"]
