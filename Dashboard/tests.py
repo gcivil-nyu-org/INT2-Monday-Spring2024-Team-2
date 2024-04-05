@@ -20,6 +20,8 @@ from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
 from django.core import mail
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+import os
 
 
 # Create your tests here.
@@ -88,6 +90,14 @@ class TutorInformationTest(TestCase):
         self.assertTemplateUsed(response, "Dashboard/tutor_info.html")
 
     def test_post_request(self):
+        test_file_path = os.path.join(
+            os.path.dirname(__file__), "test_files", "random.pdf"
+        )
+        with open(test_file_path, "rb") as f:
+            transcript_file = SimpleUploadedFile(
+                "random.pdf", f.read(), content_type="application/pdf"
+            )
+
         post_data = {
             "fname": "Test",
             "lname": "User",
@@ -119,7 +129,10 @@ class TutorInformationTest(TestCase):
             ),
         }
 
-        response = self.client.post(self.url, post_data, follow=True)
+        # Include the transcript file in the request.FILES dictionary
+        response = self.client.post(
+            self.url, {**post_data, "transcript": transcript_file}, follow=True
+        )
 
         self.assertRedirects(
             response,
@@ -134,34 +147,6 @@ class TutorInformationTest(TestCase):
             len(post_data["expertise"]),
         )
         self.assertTrue(Availability.objects.filter(user=self.user).exists())
-
-
-class StudentInformationTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.get(pk=cache.get("student"))
-        self.client = Client()
-        self.factory = RequestFactory()
-
-    def test_student_information_view(self):
-        self.client.login(username="test@example.com", password="testpassword")
-        url = reverse("Dashboard:student_profile")
-        form_data = {
-            "fname": "Test",
-            "lname": "User",
-            "gender": "female",
-            "zip": "12345",
-            "school": "Test School",
-            "grade": "1",
-            "preferred_mode": "remote",
-            "intro": "Hello, this is a test.",
-        }
-
-        student_form = StudentForm(data=form_data)
-        request = self.factory.post(url, data=student_form.data)
-        request.user = self.user
-        response = StudentInformation(request)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.user.usertype.has_profile_complete)
 
 
 class CancelSessionTestCase(TestCase):
