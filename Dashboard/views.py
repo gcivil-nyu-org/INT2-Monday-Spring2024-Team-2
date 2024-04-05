@@ -1,7 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
+from .forms.tutor_info import (
+    TutorForm,
+    AvailabilityForm,
+    TutorImageForm,
+    TutorTranscriptForm,
+)
 from .forms.student_info import StudentForm, StudentImageForm
 from .forms.review_form import TutorReviewForm
 from TutorRegister.models import (
@@ -39,8 +44,12 @@ def TutorInformation(request):
             tutor_image_form = TutorImageForm(
                 instance=ProfileT.objects.get(user=request.user)
             )
+            tutor_transcript_form = TutorTranscriptForm(
+                instance=ProfileT.objects.get(user=request.user)
+            )
         except ProfileT.DoesNotExist:
             tutor_image_form = TutorImageForm()
+            tutor_transcript_form = TutorTranscriptForm()
         existing_expertise = list(
             Expertise.objects.filter(user=request.user).values_list(
                 "subject", flat=True
@@ -53,15 +62,18 @@ def TutorInformation(request):
             tutor_image_form = TutorImageForm(
                 request.POST, request.FILES, instance=profile
             )
+            tutor_transcript_form = TutorTranscriptForm(
+                request.POST, request.FILES, instance=profile
+            )
             availability_form = AvailabilityForm(request.POST)
             if (
                 tutor_form.is_valid()
                 and tutor_image_form.is_valid()
+                and tutor_transcript_form.is_valid()
                 and availability_form.is_valid()
             ):
                 user = request.user
                 profile = tutor_form.save(commit=False)
-
                 # Handle the image field separately using tutor_image_form
                 if "image" in request.FILES:
                     image = Image.open(request.FILES["image"])
@@ -89,6 +101,8 @@ def TutorInformation(request):
                     profile.image.save(
                         image_name, ContentFile(image_io.getvalue()), save=False
                     )
+                if "transcript" in request.FILES:
+                    profile.transcript = request.FILES["transcript"]
 
                 profile.user = user
                 profile.save()
@@ -132,6 +146,7 @@ def TutorInformation(request):
         context = {
             "tutor_form": tutor_form,
             "tutor_image_form": tutor_image_form,
+            "tutor_transcript_form": tutor_transcript_form,  # Add this to the context
             "availability_form": availability_form,
             "initial_availabilities_json": initial_availabilities_json,
         }
@@ -416,6 +431,26 @@ def download_attachment(request, session_id):
         return response
 
     return redirect("Dashboard:requests")
+
+
+@login_required
+def download_transcript(request, tutor_id):
+    tutor_profile = get_object_or_404(ProfileT, pk=tutor_id)
+
+    if tutor_profile.transcript:
+        # Open the file directly from the storage backend
+        file = tutor_profile.transcript.open("rb")
+        # Create a FileResponse with the file's content
+        response = FileResponse(
+            file, as_attachment=True, filename=tutor_profile.transcript.name
+        )
+        # Set the content type to the file's content type, if available
+        content_type, _ = mimetypes.guess_type(tutor_profile.transcript.name)
+        if content_type:
+            response["Content-Type"] = content_type
+        return response
+
+    return redirect("Dashboard:tutor_profile")
 
 
 def VideoCall(request):

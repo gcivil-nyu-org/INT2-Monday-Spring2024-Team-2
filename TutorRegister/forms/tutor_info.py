@@ -92,6 +92,13 @@ class TutorForm(ModelForm):
         required=False,
     )
 
+    transcript = forms.FileField(
+        widget=forms.FileInput(
+            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+        ),
+        required=True,
+    )
+
     class Meta:
         model = ProfileT
         fields = [
@@ -105,6 +112,7 @@ class TutorForm(ModelForm):
             "salary_min",
             "salary_max",
             "intro",
+            "transcript",
         ]
         labels = {
             "fname": "First Name",
