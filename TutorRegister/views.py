@@ -53,13 +53,15 @@ def login_request(request):
             if user is not None:
                 login(request, user)
                 if user.is_superuser:
-                     return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
+                    return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
                 else:
                     if user.usertype.has_profile_complete:
                         return HttpResponseRedirect(reverse("Dashboard:dashboard"))
                     else:
                         if user.usertype.user_type == "tutor":
-                            return HttpResponseRedirect(reverse("Dashboard:tutor_profile"))
+                            return HttpResponseRedirect(
+                                reverse("Dashboard:tutor_profile")
+                            )
                         else:
                             return HttpResponseRedirect(
                                 reverse("Dashboard:student_profile")
