@@ -428,3 +428,19 @@ def VideoCall(request):
         fname = student.fname
         lname = student.lname
     return render(request, "Dashboard/video_call.html", {"name": fname + " " + lname})
+
+
+def AdminDashboard(request):
+    tutors = ProfileT.objects.all()
+    return render(request, "Dashboard/admin_dashboard.html", {"tutors": tutors})
+
+
+def UpdateQualification(request):
+    if request.method == "POST":
+        tutor_id = request.POST.get('tutor_id')
+        qualifiction = request.POST.get(f'qualification_{tutor_id}')
+        tutor = ProfileT.objects.get(id=tutor_id)
+        tutor.qualified = (qualifiction == 'qualified')
+        tutor.save()
+        return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
+    return render(request, 'Dashboard/admin_dashboard.html')
