@@ -1,0 +1,126 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <header
+            class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <div class="col-md-2 mb-2 mb-md-0">
+                <a href="{% url 'home' %}" class="d-inline-flex align-items-center mb-2 mb-lg-0 text-decoration-none">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" width="120">
+                </a>
+            </div>
+
+            <div class="col-md-2 text-end">
+                <form method="post" action="{% url 'Dashboard:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary"
+                        style="background: #600d91; border-color: #600d91;">Log Out</button>
+                </form>
+            </div>
+        </header>
+    <!-- Page Content -->
+        <div>
+            <h3 style="color:#600d91">Welcome to Your Admin Dashboard</h3>
+            <br>
+        <div>
+        <div>
+            <form method="post" action="{% url 'Dashboard:update_qualification' %}">
+                {% csrf_token %}
+            <table class="table">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Transcript</th>
+                    <th scope="col">Qualification</th>
+                    <th scope="col">Operation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for tutor in tutors %}
+                    <tr>    
+                        <th scope="row"> {{ tutor.id}} </th>
+                        <td> {{tutor.fname}}</td>
+                        <td> {{tutor.lname}}</td>
+                        <td> <a href="https://tutornyu.s3.us-west-2.amazonaws.com/{{ tutor.transcript }}" target="_blank">{{tutor.transcript|cut:'transcripts/'}}</a></td>
+                        <td>
+                            <select name="qualification_{{ tutor.id }}" class="form-select">
+                                {% if tutor.qualified %}
+                                <option value="qualified" selected>Qualified</option>
+                                <option value="unqualified">Unqualified</option>
+                                {% else %}
+                                <option value="qualified">Qualified</option>
+                                <option value="unqualified" selected>Unqualified</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" name="tutor_id" value="{{ tutor.id }}" class="btn btn-outline-light" style="color: #600d91; border-color: #600d91;" data-bs-toggle="modal" data-bs-target="#successModal"> Confirm </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <!-- Success Modal -->
+        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="successModalLabel">Success</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        You have successfully updated this tutor's qualification.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!--Footer-->
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo" width="80">
+                </a>
+                <span class="mb-3 mb-md-0 text-body-secondary">© 2023 TutorNYU, Inc</span>
+            </div>
+
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#twitter"></use>
+                        </svg></a></li>
+                <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#instagram"></use>
+                        </svg></a></li>
+                <li class="ms-3"><a class="text-body-secondary" href="#"><svg class="bi" width="24" height="24">
+                            <use xlink:href="#facebook"></use>
+                        </svg></a></li>
+            </ul>
+        </footer>
+    </div>
+
+</body>
+
+</html>

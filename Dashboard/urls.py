@@ -29,4 +29,8 @@ urlpatterns = [
     ),
     path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
     path("videocall/", views.VideoCall, name="video_call"),
+    path("admin", views.AdminDashboard, name="admin_dashboard"),
+    path(
+        "update-qualification", views.UpdateQualification, name="update_qualification"
+    ),
 ]
