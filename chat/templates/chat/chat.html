@@ -155,8 +155,9 @@
         const user_id = "{{ request.user.id }}";
         const other_user_id = "{{ other_user_id }}";
 
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
         const chatSocket = new WebSocket(
-            `ws://${window.location.host}/ws/chat/${other_user_id}/`
+            `${wsScheme}://${window.location.host}/ws/chat/${other_user_id}/`
         );
 
         chatSocket.onmessage = function (e) {
