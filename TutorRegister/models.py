@@ -137,6 +137,7 @@ class Post(models.Model):
     content = models.TextField
     label = models.CharField(max_length=100)
     post_date = models.DateField(auto_now_add=True)
+    attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
 
 
 class Reply(models.Model):
