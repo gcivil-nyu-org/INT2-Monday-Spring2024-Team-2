@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from forms import CreatePostForm, CreateReplyForm
+from .forms import CreatePostForm, CreateReplyForm
 from django.db import IntegrityError, DatabaseError
 from django.core.paginator import Paginator
 from TutorRegister.models import Post, Reply
@@ -19,7 +19,16 @@ def view_post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     replies = Reply.objects.filter(post=post).order_by("reply_date")
 
-    # paginator = Paginator(replies, 10)
+    if request.method == "POST":
+        form = CreateReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.user = request.user
+            reply.save()
+
+            # return redirect to post detail page
+        else:
+            form = CreateReplyForm()
 
     # render post detail page
 
@@ -29,9 +38,9 @@ def create_post(request):
         form = CreatePostForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                instance = form.save(commit=False)
-                instance.user = request.user
-                instance.save()
+                post = form.save(commit=False)
+                post.user = request.user
+                post.save()
 
                 # return redirect to post page
             except (IntegrityError, DatabaseError) as e:
