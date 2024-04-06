@@ -134,7 +134,7 @@ class Favorite(models.Model):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_post")
     title = models.CharField(max_length=250)
-    content = models.TextField
+    content = models.TextField()
     label = models.CharField(max_length=100)
     post_date = models.DateField(auto_now_add=True)
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
