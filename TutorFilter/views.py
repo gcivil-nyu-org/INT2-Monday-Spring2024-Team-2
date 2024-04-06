@@ -22,7 +22,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def filter_tutors(request):
     form = TutorFilterForm(request.GET, user=request.user)
     users_expertise = Expertise.objects.all()
-    users = ProfileT.objects.all()
+    users = ProfileT.objects.all().filter(qualified=True)
     favorites = Favorite.objects.all().filter(student=request.user)
     tutor_ratings = {user.user_id: float(0.0) for user in users}  # Default rating is 0
     average_ratings = TutorReview.objects.values("tutor_id").annotate(
