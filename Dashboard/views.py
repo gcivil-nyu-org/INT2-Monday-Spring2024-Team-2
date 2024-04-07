@@ -20,7 +20,7 @@ from TutorRegister.models import (
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import json
-from datetime import datetime, time
+from datetime import datetime, time, date
 from django.db.models import Q
 from PIL import Image, ImageDraw, ImageOps
 from io import BytesIO
@@ -393,11 +393,13 @@ def Requests(request):
 
     if userType == "tutor":
         tutorRequests = TutoringSession.objects.filter(
-            tutor_id=request.user.id, status="Pending"
+            tutor_id=request.user.id, status="Pending", date__gte=date.today()
         ).select_related("student_id__profiles")
     else:
         tutorRequests = TutoringSession.objects.filter(
-            student_id=request.user.id, status__in=["Pending", "Declined"]
+            student_id=request.user.id,
+            status__in=["Pending", "Declined"],
+            date__gte=date.today(),
         ).select_related("tutor_id__profilet")
 
     has_tutorRequests = tutorRequests
@@ -522,9 +524,15 @@ def VideoCall(request):
     return render(request, "Dashboard/video_call.html", {"name": fname + " " + lname})
 
 
+@login_required
 def AdminDashboard(request):
-    tutors = ProfileT.objects.all()
-    return render(request, "Dashboard/admin_dashboard.html", {"tutors": tutors})
+    tutors = ProfileT.objects.order_by("id")
+    expertise = Expertise.objects.all()
+    return render(
+        request,
+        "Dashboard/admin_dashboard.html",
+        {"tutors": tutors, "expertise": expertise},
+    )
 
 
 def UpdateQualification(request):
@@ -534,5 +542,29 @@ def UpdateQualification(request):
         tutor = ProfileT.objects.get(id=tutor_id)
         tutor.qualified = qualifiction == "qualified"
         tutor.save()
+
+        tutor_name = tutor.fname
+        tutor_user = tutor.user
+        tutor_email = tutor_user.username
+
+        if tutor.qualified:
+            html_content = render_to_string(
+                "Email/qualification_email.html", {"tutor_name": tutor_name}
+            )
+        else:
+            html_content = render_to_string(
+                "Email/unqualify_email.html", {"tutor_name": tutor_name}
+            )
+
+        email = EmailMessage(
+            "Qualification Updated -- TutorNYU",
+            html_content,
+            "tutornyuengineeringverify@gmail.com",
+            [tutor_email],
+        )
+        email.content_subtype = "html"
+        email.send()
+
         return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
+
     return render(request, "Dashboard/admin_dashboard.html")
