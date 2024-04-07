@@ -397,7 +397,9 @@ def Requests(request):
         ).select_related("student_id__profiles")
     else:
         tutorRequests = TutoringSession.objects.filter(
-            student_id=request.user.id, status__in=["Pending", "Declined"], date__gte=date.today()
+            student_id=request.user.id,
+            status__in=["Pending", "Declined"],
+            date__gte=date.today(),
         ).select_related("tutor_id__profilet")
 
     has_tutorRequests = tutorRequests
@@ -490,26 +492,6 @@ def download_attachment(request, session_id):
     return redirect("Dashboard:requests")
 
 
-@login_required
-def download_transcript(request, tutor_id):
-    tutor_profile = get_object_or_404(ProfileT, pk=tutor_id)
-
-    if tutor_profile.transcript:
-        # Open the file directly from the storage backend
-        file = tutor_profile.transcript.open("rb")
-        # Create a FileResponse with the file's content
-        response = FileResponse(
-            file, as_attachment=True, filename=tutor_profile.transcript.name
-        )
-        # Set the content type to the file's content type, if available
-        content_type, _ = mimetypes.guess_type(tutor_profile.transcript.name)
-        if content_type:
-            response["Content-Type"] = content_type
-        return response
-
-    return redirect("Dashboard:tutor_profile")
-
-
 def VideoCall(request):
     if request.user.usertype.user_type == "tutor":
         tutor = ProfileT.objects.get(user=request.user)
@@ -522,10 +504,15 @@ def VideoCall(request):
     return render(request, "Dashboard/video_call.html", {"name": fname + " " + lname})
 
 
+@login_required
 def AdminDashboard(request):
-    tutors = ProfileT.objects.order_by('id') 
+    tutors = ProfileT.objects.order_by("id")
     expertise = Expertise.objects.all()
-    return render(request, "Dashboard/admin_dashboard.html", {"tutors": tutors, "expertise": expertise})
+    return render(
+        request,
+        "Dashboard/admin_dashboard.html",
+        {"tutors": tutors, "expertise": expertise},
+    )
 
 
 def UpdateQualification(request):
@@ -535,18 +522,22 @@ def UpdateQualification(request):
         tutor = ProfileT.objects.get(id=tutor_id)
         tutor.qualified = qualifiction == "qualified"
         tutor.save()
-        
+
         tutor_name = tutor.fname
         tutor_user = tutor.user
         tutor_email = tutor_user.username
         print("user", tutor_user)
         print("tutor email", tutor_email)
-        
-        if tutor.qualified:    
-            html_content = render_to_string("Email/qualification_email.html", {"tutor_name": tutor_name})
-        else:    
-            html_content = render_to_string("Email/unqualify_email.html", {"tutor_name": tutor_name})
-        
+
+        if tutor.qualified:
+            html_content = render_to_string(
+                "Email/qualification_email.html", {"tutor_name": tutor_name}
+            )
+        else:
+            html_content = render_to_string(
+                "Email/unqualify_email.html", {"tutor_name": tutor_name}
+            )
+
         email = EmailMessage(
             "Qualification Updated -- TutorNYU",
             html_content,
@@ -555,7 +546,7 @@ def UpdateQualification(request):
         )
         email.content_subtype = "html"
         email.send()
-            
+
         return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
-    
+
     return render(request, "Dashboard/admin_dashboard.html")

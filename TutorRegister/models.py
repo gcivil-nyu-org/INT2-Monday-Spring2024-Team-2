@@ -12,6 +12,7 @@ class Expertise(models.Model):
     def human_readable_subject(self):
         return self.subject.replace("_", " ").capitalize()
 
+
 # Two blank lines before the new class definition
 class Availability(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

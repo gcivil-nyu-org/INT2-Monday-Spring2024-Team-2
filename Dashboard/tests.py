@@ -15,7 +15,7 @@ from TutorRegister.models import (
     TutorReview,
 )
 import json
-from .views import StudentInformation, Requests, TutorFeedback
+from .views import StudentInformation, Requests, TutorFeedback, AdminDashboard
 from TutorRegister.models import ProfileS
 from .forms.student_info import StudentForm
 from django.core import mail
@@ -275,3 +275,65 @@ class TutorFeedbackTestCase(TestCase):
         response = TutorFeedback(request)
         print(response.status_code)
         self.assertEqual(response.status_code, 200)
+
+
+class AdminDashboardTestCase(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="admin", password="admin"
+        )
+        self.client = Client()
+        # self.tutor = User.objects.get(pk=cache.get("tutor"))
+        Expertise.objects.create(subject="Math", user=self.tutor)
+
+    def test_admin_dashboard(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse("Dashboard:admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+
+class VideoCallTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_video_call_tutor(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
+        response = self.client.get(reverse("Dashboard:video_call"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_video_call_student(self):
+        self.client.login(username="test@example.com", password="testpassword")
+        response = self.client.get(reverse("Dashboard:video_call"))
+        self.assertEqual(response.status_code, 200)
+
+
+class UpdateQualificationTestCase(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="admin", password="admin"
+        )
+        self.client = Client()
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
+        self.tutor_profile = ProfileT.objects.get(user=self.tutor)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_update_qualifiction_qualified(self):
+        self.tutor_profile.qualified = True
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(
+            reverse("Dashboard:update_qualification"),
+            {"tutor_id": self.tutor_profile.id, "qualification": "qualified"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_update_qualifiction_unqualified(self):
+        self.tutor_profile.qualified = False
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(
+            reverse("Dashboard:update_qualification"),
+            {"tutor_id": self.tutor_profile.id, "qualification": "unqualified"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
