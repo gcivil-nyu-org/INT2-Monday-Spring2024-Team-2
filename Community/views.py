@@ -3,7 +3,7 @@ from .forms import CreatePostForm, CreateReplyForm
 from django.db import IntegrityError, DatabaseError
 from django.core.paginator import Paginator
 from django.contrib import messages
-from TutorRegister.models import Post, Reply, ProfileT, ProfileS, Reply
+from TutorRegister.models import Post, Reply, ProfileT, ProfileS
 
 
 def view_all_posts(request):
@@ -71,7 +71,7 @@ def view_all_posts(request):
 
 def view_post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    replies = Reply.objects.filter(post=post).order_by("reply_date")
+    #replies = Reply.objects.filter(post=post).order_by("reply_date")
 
     if request.method == "POST":
         form = CreateReplyForm(request.POST)
