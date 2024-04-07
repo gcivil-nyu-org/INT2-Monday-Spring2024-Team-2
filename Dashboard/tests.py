@@ -273,7 +273,6 @@ class TutorFeedbackTestCase(TestCase):
         request = self.factory.get(reverse("Dashboard:tutor_feedback"))
         request.user = self.tutor
         response = TutorFeedback(request)
-        print(response.status_code)
         self.assertEqual(response.status_code, 200)
 
 
@@ -283,7 +282,7 @@ class AdminDashboardTestCase(TestCase):
             username="admin", password="admin"
         )
         self.client = Client()
-        # self.tutor = User.objects.get(pk=cache.get("tutor"))
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
         Expertise.objects.create(subject="Math", user=self.tutor)
 
     def test_admin_dashboard(self):

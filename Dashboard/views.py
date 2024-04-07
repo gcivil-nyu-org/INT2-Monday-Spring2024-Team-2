@@ -546,8 +546,6 @@ def UpdateQualification(request):
         tutor_name = tutor.fname
         tutor_user = tutor.user
         tutor_email = tutor_user.username
-        print("user", tutor_user)
-        print("tutor email", tutor_email)
 
         if tutor.qualified:
             html_content = render_to_string(
