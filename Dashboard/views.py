@@ -535,5 +535,27 @@ def UpdateQualification(request):
         tutor = ProfileT.objects.get(id=tutor_id)
         tutor.qualified = qualifiction == "qualified"
         tutor.save()
+        
+        tutor_name = tutor.fname
+        tutor_user = tutor.user
+        tutor_email = tutor_user.username
+        print("user", tutor_user)
+        print("tutor email", tutor_email)
+        
+        if tutor.qualified:    
+            html_content = render_to_string("Email/qualification_email.html", {"tutor_name": tutor_name})
+        else:    
+            html_content = render_to_string("Email/unqualify_email.html", {"tutor_name": tutor_name})
+        
+        email = EmailMessage(
+            "Qualification Updated -- TutorNYU",
+            html_content,
+            "tutornyuengineeringverify@gmail.com",
+            [tutor_email],
+        )
+        email.content_subtype = "html"
+        email.send()
+            
         return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
+    
     return render(request, "Dashboard/admin_dashboard.html")

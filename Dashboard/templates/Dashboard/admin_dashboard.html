@@ -59,8 +59,7 @@
                         <td> <a href="https://tutornyu.s3.us-west-2.amazonaws.com/{{ tutor.transcript }}" target="_blank">{{tutor.transcript|cut:'transcripts/'}}</a></td>
                         <td>
                             {% for exp in tutor.user.expertise_set.all %}
-                                {{exp.human_readable_subject}}
-                                {% if not forloop.last %}, {% endif %}
+                                {{exp.human_readable_subject}}{% if not forloop.last %}, {% endif %}
                             {% endfor %}
                         </td>
                         <td>
