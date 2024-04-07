@@ -18,7 +18,7 @@ class CreatePostForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "content": forms.Textarea(attrs={"class": "form-control"}),
-            "label": forms.RadioSelect,
+            "label": forms.RadioSelect(attrs={"class": "form-check-input"}),
             "attachment": forms.FileInput(attrs={"class": "form-control-file"}),
         }
 

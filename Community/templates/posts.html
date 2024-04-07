@@ -1,0 +1,105 @@
+{% extends 'Dashboard/base_student.html' %}
+
+{% block title %}All Posts{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Posts</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Define your custom styles here */
+        .post-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            color: #333;
+            font-weight: bold;
+        }
+        .user-icon {
+            max-width: 30px;
+            max-height: 30px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .post-title {
+            color: purple;
+            font-weight: bold;
+        }
+        .post-label {
+            color: #333;
+            background-color: #f0e6ff;
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+        .comments-count {
+            color: #333;
+        }
+        .create-post-btn {
+            background-color: purple;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row align-items-center mb-3">
+            <div class="col">
+                <h1 class="mb-0">All Posts</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{% url 'Community:create_post' %}">
+                    <button class="btn create-post-btn">Create New Post</button>
+                </a>
+            </div>
+        </div>
+        {% for post in posts %}
+        <div class="post-container">
+            <div class="user-info">
+                <img src="{{ post.user.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
+                {{ post.user.username }} <!-- Assuming you have a 'username' attribute in your User model -->
+                {% if post.user.user_type %}
+                    ({{ post.user.user_type }})
+                {% endif %}
+            </div>
+            <div class="post-title">{{ post.title }}</div>
+            <div>{{ post.content }}</div>
+            <div>Post on {{ post.post_date }}</div>
+            <div class="comments-count">Comments: {{ post.comments.count }}</div> <!-- Assuming you have a 'comments' related_name in your Post model -->
+            <div class="post-label">{{ post.label }}</div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination Links -->
+        {% if posts.has_other_pages %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if posts.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ posts.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span class="current">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                </span>
+                {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}">Next</a>
+                <a href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}
