@@ -144,7 +144,6 @@ def add_favorite(request):
 
 def remove_favorite(request):
     if request.method == "POST":
-
         tutor_id = request.POST.get("tutor_id")
         tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
         Favorite.objects.filter(student=request.user, tutor=tutor).delete()

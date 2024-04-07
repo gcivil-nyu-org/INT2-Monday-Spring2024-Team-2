@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0016_profilet_qualified_profilet_transcript_post_reply"),
     ]

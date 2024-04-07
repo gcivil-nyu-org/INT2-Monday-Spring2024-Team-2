@@ -1,6 +1,6 @@
 {% extends 'Dashboard/base_student.html' %}
 
-{% block title %}All Posts{% endblock %}
+{% block title %}Create New Post{% endblock %}
 
 {% block content %}
 
@@ -18,7 +18,11 @@
             background-color: transparent;
             border-color: #800080;
         }
-        .btn-purple.active,
+        .btn-purple.clicked {
+            color: #fff;
+            background-color: #800080;
+            border-color: #800080;
+        }
         .btn-purple:hover {
             color: #fff;
             background-color: #800080;
@@ -27,6 +31,11 @@
         .card-header {
             background: none; /* Remove background */
             border-bottom: none; /* Remove border */
+        }
+        .btn-purple:not(.clicked):hover {
+            background-color: #800080;
+            border-color: #800080;
+            color: white;
         }
     </style>
 </head>
@@ -53,11 +62,10 @@
                             {% endif %}
                             <div class="mb-3">
                                 <label class="form-label">Label:</label>
-                                <div class="btn-group" role="group" aria-label="Label">
-                                    <button type="button" class="btn btn-purple" onclick="selectLabel(this)">Resource</button>
-                                    <button type="button" class="btn btn-purple" onclick="selectLabel(this)">Question</button>
-                                    {% for error in form.label.errors %}
-                                        <div class="text-danger" style="margin-left: 10px;margin-top: 5px;">{{ error }}</div>
+                                <div class="btn-group" role="group" aria-label="User Type">
+                                    {% for value, label in form.label.field.choices %}
+                                        <input type="radio" class="btn-check" name="label" id="label_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
+                                        <label class="btn btn-purple" style="margin-right: 5px;" onclick="selectLabel(this)" for="label_{{ forloop.counter }}">{{ label }}</label>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -83,7 +91,7 @@
                                 {% endfor %}
                             </div>
                             <div class="d-flex justify-content-center">
-                                <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px">Post</button>
+                                <button type="submit" class="btn btn-primary btn-purple" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-left: 20px">Post</button>
                             </div>
                         </form>
                     </div>
@@ -96,12 +104,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function selectLabel(button) {
-            // Remove active class from all buttons
+            // Remove 'clicked' class from all buttons
             document.querySelectorAll('.btn-purple').forEach(btn => {
-                btn.classList.remove('active');
+                btn.classList.remove('clicked');
             });
-            // Add active class to selected button
-            button.classList.add('active');
+            // Add 'clicked' class to selected button
+            button.classList.add('clicked');
         }
     </script>
 </body>

@@ -18,33 +18,77 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 20px;
+            border-radius: 10px; /* Add round rectangle border */
+            position: relative; /* Set position to relative */
         }
         .user-info {
-            color: #333;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
         }
         .user-icon {
-            max-width: 30px;
-            max-height: 30px;
+            max-width: 40px;
+            max-height: 40px;
             vertical-align: middle;
             margin-right: 5px;
         }
-        .post-title {
-            color: purple;
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            margin-left: 5px; /* Add margin to separate from user icon */
+        } 
+        .user-name {
             font-weight: bold;
+            color: rgb(0, 89, 255); /* Make user name clickable */
+            cursor: pointer; /* Change cursor to pointer */
+            text-decoration: underline; /* Add underline */
+        }
+        .user-type {
+            color: #666;
+            font-size: 1.0em;
         }
         .post-label {
+            position: absolute; /* Set position to absolute */
+            top: 10px; /* Adjust top position */
+            right: 10px; /* Adjust right position */
             color: #333;
             background-color: #f0e6ff;
             padding: 2px 5px;
             border-radius: 5px;
         }
+        .post-title {
+            color: purple;
+            font-weight: bold;
+            margin-top: 10px; /* Add margin to separate from user info */
+        }
         .comments-count {
-            color: #333;
+            color: rgb(0, 204, 255); /* Change color to blue */
+            cursor: pointer; /* Add cursor pointer */
         }
         .create-post-btn {
             background-color: purple;
             color: white;
+        }
+        .reply-container {
+            border-top: 1px solid #ccc;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: none;
+        }
+        .reply-form {
+            margin-bottom: 10px; /* Add margin to separate from displayed replies */
+        }
+        .reply {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .reply-form textarea {
+            height: 40px; /* Set height to fit one row of text */
+        }
+        .small-date {
+            font-size: 0.9em; /* Make the date smaller */
+            color: #666; /* Set color to a muted gray */
         }
     </style>
 </head>
@@ -61,20 +105,63 @@
             </div>
         </div>
         {% for post in posts %}
-        <div class="post-container">
-            <div class="user-info">
-                <img src="{{ post.user.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
-                {{ post.user.username }} <!-- Assuming you have a 'username' attribute in your User model -->
-                {% if post.user.user_type %}
-                    ({{ post.user.user_type }})
+            {% for profile in profiles %}
+                {% if post.user == profile.user %}
+                <div class="post-container rounded-3"> <!-- Add 'rounded-3' class for round rectangle border -->
+                    <div class="user-info">
+                        <img src="{{ profile.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
+                        <div class="user-details">
+                            <a href="{% url 'TutorFilter:view_profile' user_id=post.user.id %}" class="user-name">{{ profile.fname }} {{ profile.lname }}</a> <!-- Add link to user profile -->
+                            {% if post.user.usertype.user_type %}
+                                <span class="user-type">{{ post.user.usertype.user_type|capfirst }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="post-label">{{ post.label|capfirst }}</div> <!-- Move label here -->
+                    <div class="post-title">{{ post.title }}</div>
+                    <div>{{ post.content }}</div>
+                    <div class="small-date">Post on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+                    <div class="comments-count" onclick="toggleReplies(this)">
+                        {% for p, c in reply_count.items %}
+                            {% if p == post %}
+                                Reply({{ c }})
+                            {% endif %}
+                        {% endfor %}
+                    </div> <!-- Assuming you have a 'comments' related_name in your Post model -->
+                    <!-- New container for replies -->
+                    <div class="reply-container">
+                        <!-- Reply form -->
+                        <form class="reply-form" action="{% url 'Community:all_posts' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <textarea name="content" class="form-control" placeholder="Enter your reply" rows="1"></textarea>
+                            <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-top: 20px">Reply</button>
+                        </form>
+                        {% for reply in replies %}
+                            {% if reply.post == post %}
+                                <div class="reply">
+                                    {% for r_profile in replied_profiles %}
+                                        {% if reply.user == r_profile.user %}
+                                            <div class="user-info">
+                                                <img src="{{ r_profile.image.url }}" alt="User Icon" class="user-icon">
+                                                <div class="user-details">
+                                                    <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}" class="user-name">{{ r_profile.fname }} {{ r_profile.lname }}</a> <!-- Add link to user profile -->
+                                                    {% if reply.user.usertype.user_type %}
+                                                        <span class="user-type">{{ reply.user.usertype.user_type|capfirst }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div>{{ reply.content }}</div>
+                                    <div class="small-date">Replied on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
                 {% endif %}
-            </div>
-            <div class="post-title">{{ post.title }}</div>
-            <div>{{ post.content }}</div>
-            <div>Post on {{ post.post_date }}</div>
-            <div class="comments-count">Comments: {{ post.comments.count }}</div> <!-- Assuming you have a 'comments' related_name in your Post model -->
-            <div class="post-label">{{ post.label }}</div>
-        </div>
+            {% endfor %}
         {% endfor %}
 
         <!-- Pagination Links -->
@@ -82,15 +169,15 @@
         <div class="pagination">
             <span class="step-links">
                 {% if posts.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ posts.previous_page_number }}">Previous</a>
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ posts.previous_page_number }}">Previous</a>
                 {% endif %}
                 <span class="current">
                     Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
                 </span>
                 {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}">Next</a>
-                <a href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a>
+                    <a href="?page={{ posts.next_page_number }}">Next</a>
+                    <a href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a>
                 {% endif %}
             </span>
         </div>
@@ -99,6 +186,28 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleReplies(element) {
+            var replyContainer = element.nextElementSibling;
+            var replyForm = replyContainer.querySelector('.reply-form');
+            if (replyContainer.style.display === "block") {
+                replyContainer.style.display = "none";
+                replyForm.style.display = "none"; // Hide the reply form
+            } else {
+                replyContainer.style.display = "block";
+                replyForm.style.display = "block"; // Show the reply form
+
+                // Hide other reply forms
+                var allReplyForms = document.querySelectorAll('.reply-form');
+                allReplyForms.forEach(function(form) {
+                    if (form !== replyForm) {
+                        form.style.display = "none";
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
 
