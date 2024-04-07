@@ -492,6 +492,26 @@ def download_attachment(request, session_id):
     return redirect("Dashboard:requests")
 
 
+@login_required
+def download_transcript(request, tutor_id):
+    tutor_profile = get_object_or_404(ProfileT, pk=tutor_id)
+
+    if tutor_profile.transcript:
+        # Open the file directly from the storage backend
+        file = tutor_profile.transcript.open("rb")
+        # Create a FileResponse with the file's content
+        response = FileResponse(
+            file, as_attachment=True, filename=tutor_profile.transcript.name
+        )
+        # Set the content type to the file's content type, if available
+        content_type, _ = mimetypes.guess_type(tutor_profile.transcript.name)
+        if content_type:
+            response["Content-Type"] = content_type
+        return response
+
+    return redirect("Dashboard:tutor_profile")
+
+
 def VideoCall(request):
     if request.user.usertype.user_type == "tutor":
         tutor = ProfileT.objects.get(user=request.user)
