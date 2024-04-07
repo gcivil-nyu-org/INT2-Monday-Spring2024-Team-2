@@ -17,6 +17,7 @@ from TutorRegister.models import (
 import json
 from .views import StudentInformation, Requests, TutorFeedback, AdminDashboard
 from TutorRegister.models import ProfileS
+from .templatetags.custom_filters import remove_prefix
 from .forms.student_info import StudentForm
 from django.core import mail
 from django.core.cache import cache
@@ -336,3 +337,11 @@ class UpdateQualificationTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
+
+
+class RemovePrefixTestCase(TestCase):
+    def test_remove_prefix_starts_with_prefix(self):
+        value = "foobar"
+        prefix = "foo"
+        expected_result = "bar"
+        self.assertEqual(remove_prefix(value, prefix), expected_result)
