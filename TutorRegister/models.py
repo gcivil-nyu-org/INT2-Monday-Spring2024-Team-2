@@ -9,6 +9,8 @@ class Expertise(models.Model):
     subject = models.CharField(max_length=255)
     level = models.CharField(max_length=255)
 
+    def human_readable_subject(self):
+        return self.subject.replace("_", " ").capitalize()
 
 # Two blank lines before the new class definition
 class Availability(models.Model):

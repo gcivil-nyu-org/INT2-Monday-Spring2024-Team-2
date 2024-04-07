@@ -45,6 +45,7 @@
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
                     <th scope="col">Transcript</th>
+                    <th scopt="col">Expertise</th>
                     <th scope="col">Qualification</th>
                     <th scope="col">Operation</th>
                   </tr>
@@ -56,6 +57,12 @@
                         <td> {{tutor.fname}}</td>
                         <td> {{tutor.lname}}</td>
                         <td> <a href="https://tutornyu.s3.us-west-2.amazonaws.com/{{ tutor.transcript }}" target="_blank">{{tutor.transcript|cut:'transcripts/'}}</a></td>
+                        <td>
+                            {% for exp in tutor.user.expertise_set.all %}
+                                {{exp.human_readable_subject}}
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>
                             <select name="qualification_{{ tutor.id }}" class="form-select">
                                 {% if tutor.qualified %}

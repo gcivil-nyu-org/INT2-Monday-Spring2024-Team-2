@@ -523,8 +523,9 @@ def VideoCall(request):
 
 
 def AdminDashboard(request):
-    tutors = ProfileT.objects.all()
-    return render(request, "Dashboard/admin_dashboard.html", {"tutors": tutors})
+    tutors = ProfileT.objects.order_by('id') 
+    expertise = Expertise.objects.all()
+    return render(request, "Dashboard/admin_dashboard.html", {"tutors": tutors, "expertise": expertise})
 
 
 def UpdateQualification(request):
