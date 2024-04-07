@@ -71,7 +71,7 @@ def view_all_posts(request):
 
 def view_post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    #replies = Reply.objects.filter(post=post).order_by("reply_date")
+    # replies = Reply.objects.filter(post=post).order_by("reply_date")
 
     if request.method == "POST":
         form = CreateReplyForm(request.POST)
