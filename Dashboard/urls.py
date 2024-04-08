@@ -22,6 +22,15 @@ urlpatterns = [
         views.download_attachment,
         name="download_attachment",
     ),
+    path(
+        "download_transcript/<int:tutor_id>/",
+        views.download_transcript,
+        name="download_transcript",
+    ),
     path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
     path("videocall/", views.VideoCall, name="video_call"),
+    path("admin", views.AdminDashboard, name="admin_dashboard"),
+    path(
+        "update-qualification", views.UpdateQualification, name="update_qualification"
+    ),
 ]

@@ -77,7 +77,7 @@
                     <hr>
                     <h3 class="fw-bold mb-3 fs-4">Recent Reviews:</h3>
                     <div id="reviews-container">
-                        {% if reviews%}
+                        {% if has_review%}
                             {% for review in reviews %}
                             <div class="row">
                                 <div class="col-md-3">
@@ -103,13 +103,27 @@
                             </div>
                             <br>
                             {% endfor %}
-                        
+                            <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+                                <span class="step-links" style = "gap: 20px; color: #600E90;">
+                                    <span class="current">
+                                        Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.
+                                    </span>
+                                    {% if reviews.has_previous %}
+                                        <a href="?page=1">first</a>
+                                        <a href="?page={{ reviews.previous_page_number }}">previous</a>
+                                    {% endif %}
+                            
+                                    {% if reviews.has_next %}
+                                        <a href="?page={{ reviews.next_page_number }}">next</a>
+                                        <a href="?page={{ reviews.paginator.num_pages }}">last</a>
+                                    {% endif %}
+                                </span>
+                            </div>
                         {% else %}
                              <p style="font-size:15px"> This tutor has no recent reviews. <p>   
                         {% endif %}
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>

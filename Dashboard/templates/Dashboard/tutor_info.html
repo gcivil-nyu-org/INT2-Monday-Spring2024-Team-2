@@ -70,7 +70,14 @@
                       {{ tutor_form.salary_max }}
                     </div>
                   </div>
-
+                  <div class="mb-3">
+                    {{ tutor_transcript_form.transcript.label_tag }}
+                    {% if tutor_form.instance.transcript %}
+                      <p> <a href="{% url 'Dashboard:download_transcript' tutor_form.instance.id %}" download>{{ tutor_form.instance.transcript.name|cut:'transcripts/' }}</a></p>
+                    {% endif %}
+                    {{ tutor_transcript_form.transcript }}
+                    
+                  </div>
                   <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
               </form>
           </div>

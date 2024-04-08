@@ -10,7 +10,7 @@
     <h3 style="color: #600d91">Welcome to your Dashboard</h3>
     <br>
     <p class="col-md-8 fs-4">Upcoming Sessions:</p>
-    {% if upcomingSessions %}
+    {% if has_upcomingSessions %}
     {% for session in upcomingSessions %}
     <div class="modal-content rounded-4 shadow mb-3">
         <div class="modal-body p-5 pt-10">
@@ -103,6 +103,23 @@
 </div>
 
 {% endfor %}
+<!-- First part pagination -->
+<div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+    <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
+        <span class="current" style="color: #600E90;">
+            Page {{ upcomingSessions.number }} of {{ upcomingSessions.paginator.num_pages }}.
+        </span>
+        {% if upcomingSessions.has_previous %}
+            <a href="?upcoming_page=1&past_page={{ past_page }}"">first</a>
+            <a href="?upcoming_page={{ upcomingSessions.previous_page_number }}&past_page={{ past_page }}">previous</a>
+        {% endif %}
+        
+        {% if upcomingSessions.has_next %}
+            <a href="?upcoming_page={{ upcomingSessions.next_page_number }}&past_page={{ past_page }}">next</a>
+            <a href="?upcoming_page={{ upcomingSessions.paginator.num_pages }}&past_page={{ past_page }}">last</a>
+        {% endif %}
+    </span>
+</div>
 {% else %}
 <p style="color:#AC658F; margin-left: 20px"> You currently have no upcoming sessions.
 <p>
@@ -110,7 +127,7 @@
 
     <br>
 <p class="col-md-8 fs-4">Completed Sessions:</p>
-{% if pastSessions %}
+{% if has_pastSessions %}
 {% for session in pastSessions %}
 <div class="modal-content rounded-4 shadow mb-3">
     <div class="modal-body p-5 pt-10">
@@ -173,6 +190,23 @@
 </div>
 <br>
 {% endfor %}
+<!-- Second part pagination -->
+<div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+    <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
+        <span class="current" style="color: #600E90;">
+            Page {{ pastSessions.number }} of {{ pastSessions.paginator.num_pages }}.
+        </span>
+        {% if pastSessions.has_previous %}
+            <a href="?past_page=1&upcoming_page={{ upcoming_page }}"">first</a>
+            <a href="?past_page={{ pastSessions.previous_page_number }}&upcoming_page={{ upcoming_page }}">previous</a>
+        {% endif %}
+        
+        {% if pastSessions.has_next %}
+            <a href="?past_page={{ pastSessions.next_page_number }}&upcoming_page={{ upcoming_page }}">next</a>
+            <a href="?past_page={{ pastSessions.paginator.num_pages }}&upcoming_page={{ upcoming_page }}">last</a>
+        {% endif %}
+    </span>
+</div>
 {% else %}
 <p style="color:#AC658F; margin-left: 20px"> You currently have no completed sessions.
 <p>

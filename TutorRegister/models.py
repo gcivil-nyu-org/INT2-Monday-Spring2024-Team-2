@@ -9,6 +9,9 @@ class Expertise(models.Model):
     subject = models.CharField(max_length=255)
     level = models.CharField(max_length=255)
 
+    def human_readable_subject(self):
+        return self.subject.replace("_", " ").capitalize()
+
 
 # Two blank lines before the new class definition
 class Availability(models.Model):
@@ -49,7 +52,7 @@ class ProfileT(models.Model):
     salary_max = models.IntegerField(default=0)
     image = models.ImageField(upload_to="images/", default="images/profile_icon.png")
     transcript = models.FileField(upload_to="transcripts/", null=True, blank=True)
-    qualified = models.BooleanField(default=False)
+    qualified = models.BooleanField(default=False, null=True, blank=True)
 
 
 # Two blank lines before the new class definition
