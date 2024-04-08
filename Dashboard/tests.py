@@ -180,7 +180,7 @@ class StudentInformationTestCase(TestCase):
 
     def tearDown(self):
         self.user.delete()
-        
+
 
 class CancelSessionTestCase(TestCase):
     def setUp(self):
