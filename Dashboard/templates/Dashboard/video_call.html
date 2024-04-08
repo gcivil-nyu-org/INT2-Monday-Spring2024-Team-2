@@ -71,7 +71,7 @@ window.onload = function () {
             
             function sendURLToDjango(url) {
                 $.ajax({
-                    url: "{% url 'Dashboard:video_call' %}",  // Use the correct URL for the VideoCall view
+                    url: "{% url 'Dashboard:video_call' %}",
                     method: "POST",
                     data: {
                         "action": "url",

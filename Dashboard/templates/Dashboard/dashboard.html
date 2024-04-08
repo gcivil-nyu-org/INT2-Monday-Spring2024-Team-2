@@ -125,7 +125,7 @@
             Page {{ upcomingSessions.number }} of {{ upcomingSessions.paginator.num_pages }}.
         </span>
         {% if upcomingSessions.has_previous %}
-            <a href="?upcoming_page=1&past_page={{ past_page }}"">first</a>
+            <a href="?upcoming_page=1&past_page={{ past_page }}">first</a>
             <a href="?upcoming_page={{ upcomingSessions.previous_page_number }}&past_page={{ past_page }}">previous</a>
         {% endif %}
         
@@ -230,10 +230,9 @@
     <br>
     <script>
         function sendSession(event, sessionID) {
-            event.preventDefault(); // Prevent the default behavior of the anchor tag
+            event.preventDefault();
             console.log("triggered");
             console.log("SessionId:", sessionID)
-            // Send an AJAX request to the VideoCall view function
             $.ajax({
                 url: "{% url 'Dashboard:video_call' %}",
                 method: "POST",
@@ -249,7 +248,6 @@
                     console.log("error", err)
                 }
             });
-            //window.open("{% url 'Dashboard:video_call' %}", "_blank");
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -258,9 +256,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
-    {% comment %} <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script> {% endcomment %}
+        crossorigin="anonymous"></script> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 
