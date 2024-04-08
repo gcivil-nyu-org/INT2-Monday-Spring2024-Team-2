@@ -380,6 +380,6 @@ class RemovePrefixTestCase(TestCase):
 
     def test_remove_prefix_without_prefix(self):
         value = "foo"
-        prefix = ""
+        prefix = "baz"
         expected_result = "foo"
         self.assertEqual(remove_prefix(value, prefix), expected_result)
