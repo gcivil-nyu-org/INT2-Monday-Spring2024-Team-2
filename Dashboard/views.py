@@ -239,11 +239,11 @@ def UserDashboard(request):
     now = datetime.now()
 
     upcomingSessions = sessions.filter(
-        Q(date__gt=now.date()) | Q(date=now.date(), end_time__gt=now.time())
+        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
     )
 
     pastSessions = sessions.filter(
-        Q(date__lt=now.date()) | Q(date=now.date(), end_time__lt=now.time())
+        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
     )
     has_upcomingSessions = upcomingSessions
     has_pastSessions = pastSessions
