@@ -22,6 +22,14 @@ script:
 after_script:
   - coveralls
 
+before_deploy:
+  - >
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
+      cp .ebextensions/django.config.master .ebextensions/django.config
+    elif [ "$TRAVIS_BRANCH" == "develop" ]; then
+      cp .ebextensions/django.config.dev .ebextensions/django.config
+    fi
+
   
 deploy:
   - provider: elasticbeanstalk
