@@ -47,6 +47,13 @@
                 <div class="col-md-6">
                     <p><strong>Date: </strong>{{ session.date }}</p>
                     <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+                    {% if userType == "student" %}
+                        {% if session.meeting_link%}
+                        <p><strong>Meeting Link: </strong><a href="{{ session.meeting_link }}" target="_blank">{{ session.meeting_link }}</a></p>
+                        {% else %}
+                        <p><strong>Meeting Link: </strong>Not Available yet</p>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <div class="col-md-2"></div>
                 <div class="col-md-8">
