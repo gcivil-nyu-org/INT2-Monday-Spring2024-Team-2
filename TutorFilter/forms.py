@@ -3,6 +3,7 @@ from django.forms import ModelForm
 from TutorRegister.models import ProfileT, Expertise, TutoringSession, Favorite
 from Dashboard.choices import EXPERTISE_CHOICES
 from django.utils import timezone
+from datetime import timedelta
 
 
 class TutorFilterForm(forms.Form):
@@ -216,11 +217,12 @@ class TutoringSessionRequestForm(forms.ModelForm):
             "message",
             "attachment",
         ]
+        tomorrow = timezone.localdate() + timedelta(days=1)
         widgets = {
             "date": forms.DateInput(
                 attrs={
                     "type": "date",
-                    "min": timezone.localdate(),
+                    "min": tomorrow.isoformat(),
                     "class": "form-control",
                     "id": "date_selector",
                 }

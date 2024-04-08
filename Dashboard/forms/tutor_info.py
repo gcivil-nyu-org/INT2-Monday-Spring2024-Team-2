@@ -1,4 +1,5 @@
 from django import forms
+import datetime
 
 # from django.core.validators import RegexValidator, MinValueValidator
 from django.forms import ModelForm
@@ -162,30 +163,32 @@ class AvailabilityForm(forms.ModelForm):
         ),
     )
 
+    TIME_CHOICES = [
+        (time.strftime("%H:%M"), time.strftime("%H:%M"))
+        for time in (
+            datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+            + datetime.timedelta(minutes=x)
+            for x in range(0, 1440, 30)
+        )
+    ]
+
+    start_time = forms.ChoiceField(
+        choices=TIME_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+        ),
+    )
+
+    end_time = forms.ChoiceField(
+        choices=TIME_CHOICES,
+        widget=forms.Select(
+            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+        ),
+    )
+
     class Meta:
         model = Availability
-        fields = [
-            "day_of_week",
-            "start_time",
-            "end_time",
-        ]
-
-        widgets = {
-            "start_time": forms.TimeInput(
-                attrs={
-                    "class": "form-control",
-                    "type": "time",
-                    "style": "margin-bottom: 10px;",
-                }
-            ),
-            "end_time": forms.TimeInput(
-                attrs={
-                    "class": "form-control",
-                    "type": "time",
-                    "style": "margin-bottom: 10px;",
-                }
-            ),
-        }
+        fields = ["day_of_week", "start_time", "end_time"]
 
 
 class TutorImageForm(forms.ModelForm):
