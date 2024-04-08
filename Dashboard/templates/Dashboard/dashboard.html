@@ -61,7 +61,7 @@
                 <div class="col-md-8"></div>
                 <div class="col-md-2 d-flex align-items-end">
                     {% if userType == "tutor" and session.tutoring_mode == "remote" %}
-                        <a href="{% url 'Dashboard:video_call' %}" target="_blank" class="btn btn-outline-success" style="white-space: nowrap; margin-right:5px">Start Session</a>
+                        <a href="{% url 'Dashboard:video_call' %}" target="_blank" class="btn btn-outline-success" data-session-id="{{ session.id }} style="white-space: nowrap; margin-right:5px">Start Session</a>
                     {% endif %}
                     {% if userType == "student" %}
                         <a href="{% url 'Chat:chat_view' other_user_id=session.tutor_id.id %}" class="btn btn-outline-primary">
