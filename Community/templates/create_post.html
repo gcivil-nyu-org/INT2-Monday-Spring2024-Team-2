@@ -107,9 +107,13 @@
             // Remove 'clicked' class from all buttons
             document.querySelectorAll('.btn-purple').forEach(btn => {
                 btn.classList.remove('clicked');
+                btn.style.backgroundColor = "white";
+                btn.style.color='#600E90';
             });
             // Add 'clicked' class to selected button
             button.classList.add('clicked');
+            button.style.backgroundColor='#600E90';
+            button.style.color = 'white';
         }
     </script>
 </body>
