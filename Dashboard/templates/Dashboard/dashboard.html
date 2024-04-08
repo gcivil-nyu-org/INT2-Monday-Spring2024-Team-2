@@ -3,6 +3,7 @@
 {% load custom_filters %}
 
 {% block title %}Dashboard{% endblock %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 {% block content %}
 <!-- Dashboard content -->
@@ -46,6 +47,13 @@
                 <div class="col-md-6">
                     <p><strong>Date: </strong>{{ session.date }}</p>
                     <p><strong>Time:</strong> {{ session.start_time }} - {{ session.end_time }}</p>
+                    {% if userType == "student" %}
+                        {% if session.meeting_link%}
+                        <p><strong>Meeting Link: </strong><a href="{{ session.meeting_link }}" target="_blank">{{ session.meeting_link }}</a></p>
+                        {% else %}
+                        <p><strong>Meeting Link: </strong>Not Available yet</p>
+                        {% endif %}
+                    {% endif %}
                 </div>
                 <div class="col-md-2"></div>
                 <div class="col-md-8">
@@ -61,7 +69,14 @@
                 <div class="col-md-8"></div>
                 <div class="col-md-2 d-flex align-items-end">
                     {% if userType == "tutor" and session.tutoring_mode == "remote" %}
-                        <a href="{% url 'Dashboard:video_call' %}" target="_blank" class="btn btn-outline-success" style="white-space: nowrap; margin-right:5px">Start Session</a>
+                    <button 
+                        target="_blank" 
+                        class="btn btn-outline-success" 
+                        data-session-id="{{ session.id }}" 
+                        style="white-space: nowrap; margin-right:5px"
+                        onclick="sendSession(event,'{{ session.id }}')">                        
+                        Start Session
+                    </button>
                     {% endif %}
                     {% if userType == "student" %}
                         <a href="{% url 'Chat:chat_view' other_user_id=session.tutor_id.id %}" class="btn btn-outline-primary">
@@ -110,7 +125,7 @@
             Page {{ upcomingSessions.number }} of {{ upcomingSessions.paginator.num_pages }}.
         </span>
         {% if upcomingSessions.has_previous %}
-            <a href="?upcoming_page=1&past_page={{ past_page }}"">first</a>
+            <a href="?upcoming_page=1&past_page={{ past_page }}">first</a>
             <a href="?upcoming_page={{ upcomingSessions.previous_page_number }}&past_page={{ past_page }}">previous</a>
         {% endif %}
         
@@ -213,7 +228,28 @@
     {% endif %}
     </div>
     <br>
-
+    <script>
+        function sendSession(event, sessionID) {
+            event.preventDefault();
+            console.log("triggered");
+            console.log("SessionId:", sessionID)
+            $.ajax({
+                url: "{% url 'Dashboard:video_call' %}",
+                method: "POST",
+                data: {
+                    "action": "session",
+                    "sessionID": sessionID,
+                    "csrfmiddlewaretoken": "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    console.log("success");
+                    window.open("{% url 'Dashboard:video_call' %}", "_blank");                },
+                error: function(xhr, errmsg, err) {
+                    console.log("error", err)
+                }
+            });
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
@@ -222,5 +258,8 @@
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
     {% endblock %}

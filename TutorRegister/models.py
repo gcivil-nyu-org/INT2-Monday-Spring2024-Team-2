@@ -98,6 +98,7 @@ class TutoringSession(models.Model):
     status = models.TextField(default="Pending")
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
     reviewed_by_student = models.BooleanField(default=False)
+    meeting_link = models.CharField(max_length=100, null=True, blank=True)
 
     def human_readable_subject(self):
         return self.subject.replace("_", " ")

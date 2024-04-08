@@ -1,6 +1,10 @@
 <html>
 
 <head>
+    <title>Video Call</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <style>
         #root {
             width: 100vw;
@@ -64,6 +68,21 @@ window.onload = function () {
            	showLayoutButton: false,
          
             });
+            
+            function sendURLToDjango(url) {
+                $.ajax({
+                    url: "{% url 'Dashboard:video_call' %}",
+                    method: "POST",
+                    data: {
+                        "action": "url",
+                        "url": url,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    }
+                });
+            }
+        
+            const generatedUrl = window.location.protocol + '//' + window.location.host  + window.location.pathname + '?roomID=' + roomID;
+            sendURLToDjango(generatedUrl);
 }
 </script>
 

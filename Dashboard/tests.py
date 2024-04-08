@@ -150,6 +150,38 @@ class TutorInformationTest(TestCase):
         self.assertTrue(Availability.objects.filter(user=self.user).exists())
 
 
+class StudentInformationTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.get(pk=cache.get("student"))
+        self.client = Client(username="test@example.com", password="testpassword")
+        self.factory = RequestFactory()
+
+    def test_student_information_view(self):
+        url = reverse("Dashboard:student_profile")
+        profile, created = ProfileS.objects.get_or_create(user=self.user)
+
+        form_data = {
+            "fname": "Test",
+            "lname": "User",
+            "gender": "female",
+            "zip": "12345",
+            "school": "Test School",
+            "grade": "1",
+            "preferred_mode": "remote",
+            "intro": "Hello, this is a test.",
+        }
+
+        student_form = StudentForm(data=form_data, instance=profile)
+        request = self.factory.post(url, data=student_form.data)
+        request.user = self.user
+        response = StudentInformation(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(self.user.usertype.has_profile_complete)
+
+    def tearDown(self):
+        self.user.delete()
+
+
 class CancelSessionTestCase(TestCase):
     def setUp(self):
         self.session = TutoringSession.objects.get(pk=cache.get("upcoming_session"))
@@ -344,4 +376,10 @@ class RemovePrefixTestCase(TestCase):
         value = "foobar"
         prefix = "foo"
         expected_result = "bar"
+        self.assertEqual(remove_prefix(value, prefix), expected_result)
+
+    def test_remove_prefix_without_prefix(self):
+        value = "foo"
+        prefix = "baz"
+        expected_result = "foo"
         self.assertEqual(remove_prefix(value, prefix), expected_result)

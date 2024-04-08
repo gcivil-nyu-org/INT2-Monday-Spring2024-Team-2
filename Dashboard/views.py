@@ -33,6 +33,7 @@ from django.utils import timezone
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.views.decorators.csrf import csrf_exempt
 
 import mimetypes
 
@@ -512,7 +513,25 @@ def download_transcript(request, tutor_id):
     return redirect("Dashboard:tutor_profile")
 
 
+@csrf_exempt
 def VideoCall(request):
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "session":
+            sessionId = request.POST.get("sessionID", "")
+            request.session["temp"] = sessionId
+            print("Session ID:", sessionId)
+        elif action == "url":
+            url = request.POST.get("url", "")
+            sessionId = request.session.get("temp")
+            if sessionId:
+                session = TutoringSession.objects.get(pk=sessionId)
+                session.meeting_link = url
+                session.save()
+                print("Received URL:", url)
+            else:
+                print("SessionId not found")
+
     if request.user.usertype.user_type == "tutor":
         tutor = ProfileT.objects.get(user=request.user)
         fname = tutor.fname
