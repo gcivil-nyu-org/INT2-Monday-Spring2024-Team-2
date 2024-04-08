@@ -24,6 +24,7 @@
         .user-info {
             display: flex;
             align-items: center;
+            margin-left: 20px;
         }
         .user-icon {
             max-width: 40px;
@@ -52,6 +53,7 @@
             right: 10px; /* Adjust right position */
             color: #333;
             background-color: #f0e6ff;
+            margin-right: 20px;
             padding: 2px 5px;
             border-radius: 5px;
         }
@@ -71,6 +73,8 @@
         .reply-container {
             border-top: 1px solid #ccc;
             margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
             padding-top: 10px;
             display: none;
         }
@@ -118,10 +122,10 @@
                         </div>
                     </div>
                     <div class="post-label">{{ post.label|capfirst }}</div> <!-- Move label here -->
-                    <div class="post-title">{{ post.title }}</div>
-                    <div>{{ post.content }}</div>
-                    <div class="small-date">Post on {{ post.post_date }}</div> <!-- Make the post date smaller -->
-                    <div class="comments-count" onclick="toggleReplies(this)">
+                    <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>
+                    <div style="margin-left: 30px;">{{ post.content }}</div>
+                    <div class="small-date" style="margin-left: 30px;">Post on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+                    <div class="comments-count" onclick="toggleReplies(this)" style="margin-left: 30px;">
                         {% for p, c in reply_count.items %}
                             {% if p == post %}
                                 Reply({{ c }})
@@ -134,15 +138,15 @@
                         <form class="reply-form" action="{% url 'Community:all_posts' %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="post_id" value="{{ post.id }}">
-                            <textarea name="content" class="form-control" placeholder="Enter your reply" rows="1"></textarea>
-                            <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-top: 20px">Reply</button>
+                            <textarea name="content" class="form-control" placeholder="Enter your reply" rows="1" style="margin-left: 10px;"></textarea>
+                            <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-top: 20px; margin-left: 10px;">Reply</button>
                         </form>
                         {% for reply in replies %}
                             {% if reply.post == post %}
                                 <div class="reply">
                                     {% for r_profile in replied_profiles %}
                                         {% if reply.user == r_profile.user %}
-                                            <div class="user-info">
+                                            <div class="user-info" style="margin-bottom: 10px;">
                                                 <img src="{{ r_profile.image.url }}" alt="User Icon" class="user-icon">
                                                 <div class="user-details">
                                                     <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}" class="user-name">{{ r_profile.fname }} {{ r_profile.lname }}</a> <!-- Add link to user profile -->
@@ -153,8 +157,8 @@
                                             </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <div>{{ reply.content }}</div>
-                                    <div class="small-date">Replied on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
+                                    <div style="margin-left: 30px;">{{ reply.content }}</div>
+                                    <div class="small-date" style="margin-left: 30px">Replied on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
                                 </div>
                             {% endif %}
                         {% endfor %}
