@@ -142,7 +142,9 @@ class Post(models.Model):
 
 class Reply(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_reply")
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="post_replies"
+    )
     content = models.TextField()
     reply_date = models.DateField(auto_now_add=True)
 
