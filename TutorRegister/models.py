@@ -140,7 +140,7 @@ class Post(models.Model):
     title = models.CharField(max_length=250)
     content = models.TextField()
     label = models.CharField(max_length=100)
-    post_date = models.DateField(auto_now_add=True)
+    post_date = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
 
 
@@ -150,7 +150,7 @@ class Reply(models.Model):
         Post, on_delete=models.CASCADE, related_name="post_replies"
     )
     content = models.TextField()
-    reply_date = models.DateField(auto_now_add=True)
+    reply_date = models.DateTimeField(auto_now_add=True)
 
 
 # Two blank lines before the new function definition
