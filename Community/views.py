@@ -7,6 +7,8 @@ from TutorRegister.models import Post, Reply, ProfileT, ProfileS
 
 
 def view_all_posts(request):
+    userType = request.user.usertype.user_type
+    
     posts = Post.objects.all().order_by("-post_date")
     paginator = Paginator(posts, 5)
 
@@ -58,6 +60,11 @@ def view_all_posts(request):
         form = CreateReplyForm()
 
     context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
         "posts": page_obj,
         "profiles": user_profiles,
         "replies": replies,
@@ -90,6 +97,7 @@ def view_post_detail(request, post_id):
 
 
 def create_post(request):
+    userType = request.user.usertype.user_type
     if request.method == "POST":
         form = CreatePostForm(request.POST, request.FILES)
         print(form)
@@ -105,6 +113,15 @@ def create_post(request):
                 # return render to create post page with error message
     else:
         form = CreatePostForm()
+        
+    context = {
+        "form": form,
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
+    }
 
-    return render(request, "create_post.html", {"form": form})
+    return render(request, "create_post.html", context)
     # return render to create post page
