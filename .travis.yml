@@ -18,14 +18,12 @@ script:
   - black --check .
   - flake8
   - coverage run manage.py test --noinput
-
-after_script:
-  - coveralls
-
-before_deploy:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then cp .ebextensions/django.config.master .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" == "develop" ]; then cp .ebextensions/django.config.dev .ebextensions/django.config; fi
 
+after_script:
+  - coveralls
+  
   
 deploy:
   - provider: elasticbeanstalk
