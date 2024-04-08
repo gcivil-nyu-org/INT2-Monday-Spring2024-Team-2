@@ -74,6 +74,7 @@ window.onload = function () {
                     url: "{% url 'Dashboard:video_call' %}",  // Use the correct URL for the VideoCall view
                     method: "POST",
                     data: {
+                        "action": "url",
                         "url": url,
                         csrfmiddlewaretoken: '{{ csrf_token }}'
                     }

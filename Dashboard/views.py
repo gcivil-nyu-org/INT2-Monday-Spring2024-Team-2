@@ -515,9 +515,19 @@ def download_transcript(request, tutor_id):
 @csrf_exempt
 def VideoCall(request):
     if request.method == "POST":
-        url = request.POST.get("url", "")
-        print("Received URL:", url)
-        
+        action = request.POST.get('action')
+        if action == 'session':
+            sessionId = request.POST.get("sessionID", "")
+            request.session['temp'] = sessionId
+            print("Session ID:", sessionId)
+        elif action == 'url':
+            url = request.POST.get("url", "")
+            sessionId = request.session.get('temp')
+            session = TutoringSession.objects.get(pk=sessionId)
+            session.meeting_link = url
+            session.save()
+            print("Received URL:", url)
+            
     if request.user.usertype.user_type == "tutor":
         tutor = ProfileT.objects.get(user=request.user)
         fname = tutor.fname
