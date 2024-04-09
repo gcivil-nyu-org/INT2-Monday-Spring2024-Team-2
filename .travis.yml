@@ -48,6 +48,7 @@ deploy:
     app: "TutorNYU-production"
     env: "production-env"
     bucket_name: "elasticbeanstalk-us-west-2-381492260474"
+    zip_file: deploy_package.zip
     skip_cleanup: true
     on:
         branch: master
