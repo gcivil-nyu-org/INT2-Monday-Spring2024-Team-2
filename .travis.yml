@@ -36,6 +36,7 @@ deploy:
     app: "TutorNYU-dev-branch"
     env: "app-env"
     bucket_name: "elasticbeanstalk-us-west-2-381492260474"
+    skip_cleanup: true
     on:
         branch: develop
         
@@ -46,5 +47,6 @@ deploy:
     app: "TutorNYU-production"
     env: "production-env"
     bucket_name: "elasticbeanstalk-us-west-2-381492260474"
+    skip_cleanup: true
     on:
         branch: master
