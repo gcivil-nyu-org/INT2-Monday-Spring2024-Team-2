@@ -26,7 +26,6 @@ before_deploy:
   - if [ "$TRAVIS_BRANCH" = "master" ]; then cp .ebextensions/django.config.master .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then cp .ebextensions/django.config.dev .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then cat .ebextensions/django.config; fi
-  - rm .ebextensions/django.config.master .ebextensions/django.config.dev
 
 deploy:
   - provider: elasticbeanstalk
