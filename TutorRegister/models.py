@@ -9,6 +9,9 @@ class Expertise(models.Model):
     subject = models.CharField(max_length=255)
     level = models.CharField(max_length=255)
 
+    def human_readable_subject(self):
+        return self.subject.replace("_", " ").capitalize()
+
 
 # Two blank lines before the new class definition
 class Availability(models.Model):
@@ -48,6 +51,8 @@ class ProfileT(models.Model):
     salary_min = models.IntegerField(default=0)
     salary_max = models.IntegerField(default=0)
     image = models.ImageField(upload_to="images/", default="images/profile_icon.png")
+    transcript = models.FileField(upload_to="transcripts/", null=True, blank=True)
+    qualified = models.BooleanField(default=False, null=True, blank=True)
 
 
 # Two blank lines before the new class definition
@@ -93,6 +98,7 @@ class TutoringSession(models.Model):
     status = models.TextField(default="Pending")
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
     reviewed_by_student = models.BooleanField(default=False)
+    meeting_link = models.CharField(max_length=100, null=True, blank=True)
 
     def human_readable_subject(self):
         return self.subject.replace("_", " ")
@@ -127,6 +133,24 @@ class Favorite(models.Model):
         User, on_delete=models.CASCADE, related_name="tutor_favorites"
     )
     category = models.CharField(max_length=100, null=True, blank=True)
+
+
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_post")
+    title = models.CharField(max_length=250)
+    content = models.TextField()
+    label = models.CharField(max_length=100)
+    post_date = models.DateTimeField(auto_now_add=True)
+    attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
+
+
+class Reply(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_reply")
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name="post_replies"
+    )
+    content = models.TextField()
+    reply_date = models.DateTimeField(auto_now_add=True)
 
 
 # Two blank lines before the new function definition

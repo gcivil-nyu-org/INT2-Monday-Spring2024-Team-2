@@ -5,11 +5,16 @@
 {% block content %}
 <style>
   .profile-image {
-    border-radius: 50%; /* Makes the image circular */
-    border: none;       /* Removes the border */
-    width: 300px;       /* Set the width */
-    height: 300px;      /* Set the height */
-    object-fit: cover;  /* Ensures the image covers the area without stretching */
+    border-radius: 50%;
+    /* Makes the image circular */
+    border: none;
+    /* Removes the border */
+    width: 300px;
+    /* Set the width */
+    height: 300px;
+    /* Set the height */
+    object-fit: cover;
+    /* Ensures the image covers the area without stretching */
   }
 </style>
 
@@ -25,74 +30,91 @@
           {% csrf_token %}
           <div class="mb-3 text-center">
             {% if tutor_form.instance.image %}
-              <img src="{{ tutor_form.instance.image.url }}" alt="Profile Image" class="profile-image mb-3">
+            <img src="{{ tutor_form.instance.image.url }}" alt="Profile Image" class="profile-image mb-3">
             {% endif %}
             {{ tutor_image_form.image }}
           </div>
-                  <div class="mb-3">
-                    {% for field in tutor_form %}
-                      {% if field.name != "salary_min" and field.name != "salary_max" %}
-                            {{ field.label_tag }}
-                            {{ field }}
-                      {% endif %}
-                    {% endfor %}
-                    <div class="row g-3 d-flex align-items-top">
-                        <div class="form-group col-md-3">
-                            <label for="{{ availability_form.day_of_week.id_for_label }}">Availability</label>
-                            {{ availability_form.day_of_week }}
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="{{ availability_form.start_time.id_for_label }}">From</label>
-                            {{ availability_form.start_time }}
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="{{ availability_form.end_time.id_for_label }}">To</label>
-                            {{ availability_form.end_time }}
-                        </div>
-                        <div class="form-group col-md-1">
-                            <label>  </label>
-                            <button type="button" class="btn btn-outline-success btn-sm" style="background-color: white; color: #600E90; border-color: #600E90" onclick="addAvailability()">Add</button>
-                        </div>
-                        {% comment %} hidden input to get availabilities {% endcomment %}
-                        <input type="hidden" name="availabilities" id="id_availabilities" />
+          <div class="mb-3">
+            {% for field in tutor_form %}
+            {% if field.name != "salary_min" and field.name != "salary_max" %}
+            {{ field.label_tag }}
+            {{ field }}
+            {% endif %}
+            {% endfor %}
+            <div class="row g-3 d-flex align-items-top position-relative">
+              <div class="form-group col-md-3">
+                <label for="{{ availability_form.day_of_week.id_for_label }}">Availability</label>
+                {{ availability_form.day_of_week }}
+              </div>
+              <div class="form-group col-md-4">
+                <label for="{{ availability_form.start_time.id_for_label }}">From</label>
+                {{ availability_form.start_time }}
+              </div>
+              <div class="form-group col-md-4">
+                <label for="{{ availability_form.end_time.id_for_label }}">To</label>
+                {{ availability_form.end_time }}
+              </div>
+              <div class="form-group col-md-1">
+                <label> </label>
+                <button type="button" class="btn btn-outline-success btn-sm"
+                  style="background-color: white; color: #600E90; border-color: #600E90"
+                  onclick="addAvailability()">Add</button>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div id="availability-error" class="text-danger"
+                    style="bottom: -20px; left: 0; right: 0; display: none;"></div>
+                </div>
+              </div>
+              {% comment %} hidden input to get availabilities {% endcomment %}
+              <input type="hidden" name="availabilities" id="id_availabilities" />
 
-                    </div>
-                    <div id="chosenAvailabilities">
-                    </div>
-                  
-                  <div class="row">
-                    <div class="col-md-5">
-                      {{tutor_form.salary_min.label}}: $
-                      {{tutor_form.salary_min }}
-                    </div>
-                    <div class="col-md-5">
-                      {{tutor_form.salary_max.label}}: $
-                      {{ tutor_form.salary_max }}
-                    </div>
-                  </div>
+            </div>
+            <div id="chosenAvailabilities">
+            </div>
 
-                  <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
-              </form>
-          </div>
+            <div class="row">
+              <div class="col-md-5">
+                {{tutor_form.salary_min.label}}: $
+                {{tutor_form.salary_min }}
+              </div>
+              <div class="col-md-5">
+                {{tutor_form.salary_max.label}}: $
+                {{ tutor_form.salary_max }}
+              </div>
+            </div>
+            <div class="mb-3">
+              {{ tutor_transcript_form.transcript.label_tag }}
+              {% if tutor_form.instance.transcript %}
+              <p> <a href="{% url 'Dashboard:download_transcript' tutor_form.instance.id %}" download>{{tutor_form.instance.transcript.name|cut:'transcripts/' }}</a></p>
+              {% endif %}
+              {{ tutor_transcript_form.transcript }}
+
+            </div>
+            <input type="submit" class="btn btn-primary"
+              style="background-color: #600E90; color: white; border-color: #600E90">
+        </form>
       </div>
+    </div>
   </div>
 </div>
 
 <!-- Image Preview Modal -->
-<div class="modal" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+<div class="modal" id="imagePreviewModal" tabindex="-1" role="dialog" aria-labelledby="imagePreviewModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body d-flex justify-content-center align-items-center">
-              <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid" style="display: none;"/>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Select</button>
-          </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body d-flex justify-content-center align-items-center">
+        <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid" style="display: none;" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Select</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -100,135 +122,178 @@
 <script>
   var initialAvailabilities = JSON.parse('{{ initial_availabilities_json | safe }}');
   var availabilities = [];
-$(document).ready(function() {
+  $(document).ready(function () {
     function prepopulateAvailabilities() {
-        initialAvailabilities.forEach(function(availability, index,array) {
-            var dayOfWeek = availability.day_of_week; 
-            var startTime = availability.start_time;   
-            var endTime = availability.end_time;
+      initialAvailabilities.forEach(function (availability, index, array) {
+        var dayOfWeek = availability.day_of_week;
+        var startTime = availability.start_time;
+        var endTime = availability.end_time;
 
-            var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime}
+        var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime}
                                         <button class="btn btn-danger btn-sm ms-2" onclick="removeAvailability(this)">Remove</button>
                                       </div>`;
-            $("#chosenAvailabilities").append(chosenAvailability);
-            availabilities.push({day_of_week: dayOfWeek, start_time: startTime, end_time: endTime});
-            if (index === array.length - 1) {
-                $("input[name='start_time']").val(startTime);
-                $("input[name='end_time']").val(endTime);
-            }
-        });
-        // Update the hidden input with the serialized data
-        $("#id_availabilities").val(JSON.stringify(availabilities));
+        $("#chosenAvailabilities").append(chosenAvailability);
+        availabilities.push({ day_of_week: dayOfWeek, start_time: startTime, end_time: endTime });
+        if (index === array.length - 1) {
+          $("input[name='start_time']").val(startTime);
+          $("input[name='end_time']").val(endTime);
+        }
+      });
+      $("#id_availabilities").val(JSON.stringify(availabilities));
 
     }
 
     prepopulateAvailabilities();
-});
+  });
 
-    
-    function addAvailability() {
-        
-        var dayOfWeek = $("select[name='day_of_week']").val(); 
-        var startTime = $("input[name='start_time']").val();   
-        var endTime = $("input[name='end_time']").val();   
 
-        var availability = {
-          day_of_week: dayOfWeek,
-          start_time: startTime,
-          end_time: endTime
-        };
+  function addAvailability() {
 
-        availabilities.push(availability);
+    var dayOfWeek = $("#id_day_of_week").val();
+    var startTime = $("#id_start_time").val();
+    var endTime = $("#id_end_time").val();
 
-        var serializedAvailabilities = JSON.stringify(availabilities);
+    var [startHour, startMinute] = startTime.split(':').map(Number);
+    var [endHour, endMinute] = endTime.split(':').map(Number);
+    var startTimeInMinutes = timeToMinutes(startTime);
+    var endTimeInMinutes = timeToMinutes(endTime);
 
-        $("#id_availabilities").val(serializedAvailabilities);
+    if (endTimeInMinutes <= startTimeInMinutes) {
+      displayError("End time must be after start time.");
+      return;
+    } else {
+      clearError();
+    }
 
-        var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime} 
+    var isOverlapping = availabilities.some(function (availability) {
+      return availability.day_of_week === dayOfWeek && !(endTimeInMinutes <= timeToMinutes(availability.start_time) || startTimeInMinutes >= timeToMinutes(availability.end_time));
+    });
+
+    if (isOverlapping) {
+      displayError("This time slot overlaps with an existing availability. Please choose a non-overlapping time slot.");
+      return;
+    } else {
+      clearError();
+    }
+
+
+    var availability = {
+      day_of_week: dayOfWeek,
+      start_time: startTime,
+      end_time: endTime
+    };
+
+    availabilities.push(availability);
+
+    var serializedAvailabilities = JSON.stringify(availabilities);
+
+    $("#id_availabilities").val(serializedAvailabilities);
+
+    var chosenAvailability = `<div class="mb-2">${dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)} from ${startTime} to ${endTime} 
                                     <button class="btn btn-danger btn-sm ms-2" onclick="removeAvailability(this)">Remove</button>
                                   </div>`;
-        $("#chosenAvailabilities").append(chosenAvailability);
-    }
+    $("#chosenAvailabilities").append(chosenAvailability);
+  }
 
-    function removeAvailability(button) {
-        var availabilityDiv = $(button).parent();
+  function timeToMinutes(time) {
+    var [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  }
 
-        var index = $("#chosenAvailabilities").children().index(availabilityDiv);
+  function displayError(message) {
+    var errorDiv = $("#availability-error");
+    errorDiv.text(message);
+    errorDiv.show(); 
+  }
 
-        availabilities.splice(index, 1);
+  function clearError() {
+    var errorDiv = $("#availability-error");
+    errorDiv.hide(); 
+  }
 
-        var serializedAvailabilities = JSON.stringify(availabilities);
-        $("#id_availabilities").val(serializedAvailabilities);
 
-        availabilityDiv.remove();
+  $("#id_day_of_week, #id_start_time, #id_end_time").change(clearError);
 
-        updateIndices();
-    }
+  function removeAvailability(button) {
+    var availabilityDiv = $(button).parent();
 
-    function updateIndices() {
-      // Update indices of each availability div in the display
-      $("#chosenAvailabilities").children().each(function (index) {
-          $(this).find(".btn-danger").attr("onclick", `removeAvailability(this, ${index})`);
-      });
+    var index = $("#chosenAvailabilities").children().index(availabilityDiv);
+
+    availabilities.splice(index, 1);
+
+    var serializedAvailabilities = JSON.stringify(availabilities);
+    $("#id_availabilities").val(serializedAvailabilities);
+
+    availabilityDiv.remove();
+
+    updateIndices();
+  }
+
+  function updateIndices() {
+    // Update indices of each availability div in the display
+    $("#chosenAvailabilities").children().each(function (index) {
+      $(this).find(".btn-danger").attr("onclick", `removeAvailability(this, ${index})`);
+    });
   }
 
   function updateImagePreview() {
     var input = document.getElementById('id_image');
     if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var img = new Image();
-            img.onload = function() {
-                // Create a canvas with the desired dimensions
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                canvas.width = 300;
-                canvas.height = 300;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function () {
+          // Create a canvas with the desired dimensions
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          canvas.width = 300;
+          canvas.height = 300;
 
-                // Calculate the scaling factor and dimensions to maintain aspect ratio
-                var scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-                var scaledWidth = img.width * scale;
-                var scaledHeight = img.height * scale;
+          // Calculate the scaling factor and dimensions to maintain aspect ratio
+          var scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+          var scaledWidth = img.width * scale;
+          var scaledHeight = img.height * scale;
 
-                // Calculate the position to center the image on the canvas
-                var x = (canvas.width - scaledWidth) / 2;
-                var y = (canvas.height - scaledHeight) / 2;
+          // Calculate the position to center the image on the canvas
+          var x = (canvas.width - scaledWidth) / 2;
+          var y = (canvas.height - scaledHeight) / 2;
 
-                // Fill the canvas with a white background
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+          // Fill the canvas with a white background
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Draw the resized and centered image
-                ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+          // Draw the resized and centered image
+          ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
 
-                // Create a circular mask
-                ctx.globalCompositeOperation = 'destination-in';
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, 2 * Math.PI);
-                ctx.closePath();
-                ctx.fill();
+          // Create a circular mask
+          ctx.globalCompositeOperation = 'destination-in';
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, 2 * Math.PI);
+          ctx.closePath();
+          ctx.fill();
 
-                // Update the image preview with the canvas data
-                var imagePreview = document.getElementById('imagePreview');
-                imagePreview.src = canvas.toDataURL();
-                imagePreview.style.display = 'block';
-                $('#imagePreviewModal').modal('show');
-            };
-            img.src = e.target.result;
+          // Update the image preview with the canvas data
+          var imagePreview = document.getElementById('imagePreview');
+          imagePreview.src = canvas.toDataURL();
+          imagePreview.style.display = 'block';
+          $('#imagePreviewModal').modal('show');
         };
-        reader.readAsDataURL(input.files[0]);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
     }
-}
+  }
 
-  
+
   if (window.jQuery) {
-    $(document).ready(function() {
+    $(document).ready(function () {
+      clearError();
       $('#id_image').change(updateImagePreview);
     });
   } else {
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('id_image').addEventListener('change', updateImagePreview);
     });
   }
-  </script>
+</script>
 {% endblock %}

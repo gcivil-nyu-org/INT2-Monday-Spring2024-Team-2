@@ -18,7 +18,7 @@
         <header
             class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
             <div class="col-md-2 mb-2 mb-md-0">
-                <a href="{% url 'home' %}" class="d-inline-flex align-items-center mb-2 mb-lg-0 text-decoration-none">
+                <a href="{% url 'Dashboard:dashboard' %}" class="d-inline-flex align-items-center mb-2 mb-lg-0 text-decoration-none">
                     <img src="{% static 'images/logo.png' %}" alt="Logo" width="120">
                 </a>
             </div>
@@ -33,6 +33,8 @@
                     style="color: #600d91;margin-left:10px">My Requests</a></li>
                 <li><a href="{% url 'Chat:display_chats' %}" class="nav-link px-2"
                         style="color: #600d91;margin-left:10px">My Chats</a></li>
+                <li><a href="{% url 'Community:all_posts' %}" class="nav-link px-2" 
+                        style="color: #600d91;margin-left:10px">Community</a></li>
                 <li><a href="{% url 'Dashboard:student_profile' %}" class="nav-link px-2" 
                     style="color: #600d91;margin-left:10px">My Profile</a></li> 
             </ul>

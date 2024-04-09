@@ -1,7 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from .forms.tutor_info import TutorForm, AvailabilityForm, TutorImageForm
+from .forms.tutor_info import (
+    TutorForm,
+    AvailabilityForm,
+    TutorImageForm,
+    TutorTranscriptForm,
+)
 from .forms.student_info import StudentForm, StudentImageForm
 from .forms.review_form import TutorReviewForm
 from TutorRegister.models import (
@@ -15,7 +20,7 @@ from TutorRegister.models import (
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import json
-from datetime import datetime, time
+from datetime import datetime, time, date
 from django.db.models import Q
 from PIL import Image, ImageDraw, ImageOps
 from io import BytesIO
@@ -27,6 +32,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.views.decorators.csrf import csrf_exempt
+
 import mimetypes
 
 
@@ -39,8 +47,12 @@ def TutorInformation(request):
             tutor_image_form = TutorImageForm(
                 instance=ProfileT.objects.get(user=request.user)
             )
+            tutor_transcript_form = TutorTranscriptForm(
+                instance=ProfileT.objects.get(user=request.user)
+            )
         except ProfileT.DoesNotExist:
             tutor_image_form = TutorImageForm()
+            tutor_transcript_form = TutorTranscriptForm()
         existing_expertise = list(
             Expertise.objects.filter(user=request.user).values_list(
                 "subject", flat=True
@@ -53,15 +65,18 @@ def TutorInformation(request):
             tutor_image_form = TutorImageForm(
                 request.POST, request.FILES, instance=profile
             )
+            tutor_transcript_form = TutorTranscriptForm(
+                request.POST, request.FILES, instance=profile
+            )
             availability_form = AvailabilityForm(request.POST)
             if (
                 tutor_form.is_valid()
                 and tutor_image_form.is_valid()
+                and tutor_transcript_form.is_valid()
                 and availability_form.is_valid()
             ):
                 user = request.user
                 profile = tutor_form.save(commit=False)
-
                 # Handle the image field separately using tutor_image_form
                 if "image" in request.FILES:
                     image = Image.open(request.FILES["image"])
@@ -89,6 +104,8 @@ def TutorInformation(request):
                     profile.image.save(
                         image_name, ContentFile(image_io.getvalue()), save=False
                     )
+                if "transcript" in request.FILES:
+                    profile.transcript = request.FILES["transcript"]
 
                 profile.user = user
                 profile.save()
@@ -132,6 +149,7 @@ def TutorInformation(request):
         context = {
             "tutor_form": tutor_form,
             "tutor_image_form": tutor_image_form,
+            "tutor_transcript_form": tutor_transcript_form,  # Add this to the context
             "availability_form": availability_form,
             "initial_availabilities_json": initial_availabilities_json,
         }
@@ -221,12 +239,34 @@ def UserDashboard(request):
     now = datetime.now()
 
     upcomingSessions = sessions.filter(
-        Q(date__gt=now.date()) | Q(date=now.date(), start_time__gt=now.time())
+        Q(date__gt=now.date()) | Q(date=now.date(), end_time__gt=now.time())
     )
 
     pastSessions = sessions.filter(
-        Q(date__lt=now.date()) | Q(date=now.date(), start_time__lt=now.time())
+        Q(date__lt=now.date()) | Q(date=now.date(), end_time__lt=now.time())
     )
+    has_upcomingSessions = upcomingSessions
+    has_pastSessions = pastSessions
+
+    page_number1 = request.GET.get("upcoming_page", 1)
+    page_number2 = request.GET.get("past_page", 1)
+
+    paginator1 = Paginator(upcomingSessions, 3)
+    paginator2 = Paginator(pastSessions, 3)
+
+    try:
+        upcomingSessions = paginator1.page(page_number1)
+    except PageNotAnInteger:
+        upcomingSessions = paginator1.page(1)
+    except EmptyPage:
+        upcomingSessions = paginator1.page(paginator1.num_pages)
+
+    try:
+        pastSessions = paginator2.page(page_number2)
+    except PageNotAnInteger:
+        pastSessions = paginator2.page(1)
+    except EmptyPage:
+        pastSessions = paginator2.page(paginator2.num_pages)
 
     context = {
         "baseTemplate": (
@@ -236,7 +276,11 @@ def UserDashboard(request):
         ),
         "userType": userType,
         "upcomingSessions": upcomingSessions,
+        "has_upcomingSessions": has_upcomingSessions,
         "pastSessions": pastSessions,
+        "has_pastSessions": has_pastSessions,
+        "upcoming_page": page_number1,
+        "past_page": page_number2,
     }
 
     return render(request, "Dashboard/dashboard.html", context)
@@ -278,7 +322,24 @@ def TutorFeedback(request):
         .filter(tutor_id=request.user.id)
         .select_related("student_id__profiles")
     )
-    return render(request, "Dashboard/tutor_feedback.html", {"reviews": reviews})
+
+    has_reviews = reviews
+    page = request.GET.get("page")
+    paginator = Paginator(reviews, 5)
+    try:
+        reviews = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        reviews = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        reviews = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        "Dashboard/tutor_feedback.html",
+        {"has_reviews": has_reviews, "reviews": reviews},
+    )
 
 
 @login_required
@@ -333,12 +394,26 @@ def Requests(request):
 
     if userType == "tutor":
         tutorRequests = TutoringSession.objects.filter(
-            tutor_id=request.user.id, status="Pending"
+            tutor_id=request.user.id, status="Pending", date__gte=date.today()
         ).select_related("student_id__profiles")
     else:
         tutorRequests = TutoringSession.objects.filter(
-            student_id=request.user.id, status__in=["Pending", "Declined"]
+            student_id=request.user.id,
+            status__in=["Pending", "Declined"],
+            date__gte=date.today(),
         ).select_related("tutor_id__profilet")
+
+    has_tutorRequests = tutorRequests
+    page = request.GET.get("page")
+    paginator = Paginator(tutorRequests, 5)
+    try:
+        tutorRequests = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        tutorRequests = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        tutorRequests = paginator.page(paginator.num_pages)
 
     context = {
         "baseTemplate": (
@@ -348,8 +423,8 @@ def Requests(request):
         ),
         "userType": userType,
         "tutorRequests": tutorRequests,
+        "has_tutorRequests": has_tutorRequests,
     }
-
     return render(request, "Dashboard/requests.html", context)
 
 
@@ -416,3 +491,99 @@ def download_attachment(request, session_id):
         return response
 
     return redirect("Dashboard:requests")
+
+
+@login_required
+def download_transcript(request, tutor_id):
+    tutor_profile = get_object_or_404(ProfileT, pk=tutor_id)
+
+    if tutor_profile.transcript:
+        # Open the file directly from the storage backend
+        file = tutor_profile.transcript.open("rb")
+        # Create a FileResponse with the file's content
+        response = FileResponse(
+            file, as_attachment=True, filename=tutor_profile.transcript.name
+        )
+        # Set the content type to the file's content type, if available
+        content_type, _ = mimetypes.guess_type(tutor_profile.transcript.name)
+        if content_type:
+            response["Content-Type"] = content_type
+        return response
+
+    return redirect("Dashboard:tutor_profile")
+
+
+@csrf_exempt
+def VideoCall(request):
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "session":
+            sessionId = request.POST.get("sessionID", "")
+            request.session["temp"] = sessionId
+            print("Session ID:", sessionId)
+        elif action == "url":
+            url = request.POST.get("url", "")
+            sessionId = request.session.get("temp")
+            if sessionId:
+                session = TutoringSession.objects.get(pk=sessionId)
+                session.meeting_link = url
+                session.save()
+                print("Received URL:", url)
+            else:
+                print("SessionId not found")
+
+    if request.user.usertype.user_type == "tutor":
+        tutor = ProfileT.objects.get(user=request.user)
+        fname = tutor.fname
+        lname = tutor.lname
+    else:
+        student = ProfileS.objects.get(user=request.user)
+        fname = student.fname
+        lname = student.lname
+    return render(request, "Dashboard/video_call.html", {"name": fname + " " + lname})
+
+
+@login_required
+def AdminDashboard(request):
+    tutors = ProfileT.objects.order_by("id")
+    expertise = Expertise.objects.all()
+    return render(
+        request,
+        "Dashboard/admin_dashboard.html",
+        {"tutors": tutors, "expertise": expertise},
+    )
+
+
+def UpdateQualification(request):
+    if request.method == "POST":
+        tutor_id = request.POST.get("tutor_id")
+        qualifiction = request.POST.get(f"qualification_{tutor_id}")
+        tutor = ProfileT.objects.get(id=tutor_id)
+        tutor.qualified = qualifiction == "qualified"
+        tutor.save()
+
+        tutor_name = tutor.fname
+        tutor_user = tutor.user
+        tutor_email = tutor_user.username
+
+        if tutor.qualified:
+            html_content = render_to_string(
+                "Email/qualification_email.html", {"tutor_name": tutor_name}
+            )
+        else:
+            html_content = render_to_string(
+                "Email/unqualify_email.html", {"tutor_name": tutor_name}
+            )
+
+        email = EmailMessage(
+            "Qualification Updated -- TutorNYU",
+            html_content,
+            "tutornyuengineeringverify@gmail.com",
+            [tutor_email],
+        )
+        email.content_subtype = "html"
+        email.send()
+
+        return HttpResponseRedirect(reverse("Dashboard:admin_dashboard"))
+
+    return render(request, "Dashboard/admin_dashboard.html")

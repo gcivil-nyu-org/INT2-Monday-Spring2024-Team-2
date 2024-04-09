@@ -16,14 +16,15 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
 from django.db.models import Avg
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def filter_tutors(request):
     form = TutorFilterForm(request.GET, user=request.user)
     users_expertise = Expertise.objects.all()
-    users = ProfileT.objects.all()
+    users = ProfileT.objects.all().filter(qualified=True)
     favorites = Favorite.objects.all().filter(student=request.user)
-    tutor_ratings = {user.id: float(0.0) for user in users}  # Default rating is 0
+    tutor_ratings = {user.user_id: float(0.0) for user in users}  # Default rating is 0
     average_ratings = TutorReview.objects.values("tutor_id").annotate(
         average_rating=Avg("rating")
     )
@@ -110,6 +111,23 @@ def filter_tutors(request):
                 users = users.order_by("salary_max")
     categories = list(set(favorites.values_list("category", flat=True)))
     favorites = favorites.values_list("tutor", flat=True)
+
+    paginator = Paginator(users, 12)
+    page = request.GET.get("page")
+    salary_max = (
+        ""
+        if form.cleaned_data["salary_max"] is None
+        else form.cleaned_data["salary_max"]
+    )
+    print(salary_max)
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        users = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        users = paginator.page(paginator.num_pages)
     return render(
         request,
         "TutorFilter/filter_results.html",
@@ -119,6 +137,15 @@ def filter_tutors(request):
             "average_ratings": tutor_ratings.items(),
             "favorites": favorites,
             "categories": categories,
+            "page": page,
+            "preferred_mode": form.cleaned_data["preferred_mode"],
+            "grade": form.cleaned_data["grade"],
+            "expertise": form.cleaned_data["expertise"],
+            "rating": form.cleaned_data["rating"],
+            "zipcode": form.cleaned_data["zipcode"],
+            "salary_max": salary_max,
+            "category": form.cleaned_data["category"],
+            "sort_By": form.cleaned_data["sortBy"],
             "MEDIA_URL": settings.MEDIA_URL,
         },
     )
@@ -144,7 +171,6 @@ def add_favorite(request):
 
 def remove_favorite(request):
     if request.method == "POST":
-
         tutor_id = request.POST.get("tutor_id")
         tutor = ProfileT.objects.all().filter(user__id=tutor_id)[:1].get().user
         Favorite.objects.filter(student=request.user, tutor=tutor).delete()
@@ -189,6 +215,16 @@ def view_tutor_profile(request, user_id):
 
     average_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0
 
+    page = request.GET.get("page")
+    paginator = Paginator(reviews, 5)
+    try:
+        review_pag = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        review_pag = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results.
+        review_pag = paginator.page(paginator.num_pages)
     return render(
         request,
         "TutorFilter/view_tutor_profile.html",
@@ -196,7 +232,8 @@ def view_tutor_profile(request, user_id):
             "profilet": profilet,
             "expertise": expertises,
             "availability": availability,
-            "reviews": reviews,
+            "reviews": review_pag,
+            "has_review": reviews,
             "average_rating": average_rating,
             "MEDIA_URL": settings.MEDIA_URL,
         },

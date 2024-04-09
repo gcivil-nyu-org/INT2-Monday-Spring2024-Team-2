@@ -1,0 +1,224 @@
+{% extends baseTemplate %}
+
+{% block title %}All Posts{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Define your custom styles here */
+        .post-container {
+            border: 1px solid #e0e0e0;
+            background-color: #fafafa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 20px; /* Add round rectangle border */
+            position: relative; /* Set position to relative */
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+        .user-icon {
+            max-width: 40px;
+            max-height: 40px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            margin-left: 5px; /* Add margin to separate from user icon */
+        } 
+        .user-name {
+            font-weight: bold;
+            color: #4570DD; /* Make user name clickable */
+            cursor: pointer; /* Change cursor to pointer */
+            text-decoration: underline; /* Add underline */
+        }
+        .user-type {
+            color: #666;
+            font-size: 1.0em;
+        }
+        .post-label {
+            position: absolute; /* Set position to absolute */
+            top: 10px; /* Adjust top position */
+            right: 10px; /* Adjust right position */
+            color: #333;
+            background-color: #edcffa;
+            margin-right: 20px;
+            padding: 6px 24px;
+            border-radius: 10px;
+        }
+        .post-title {
+            color: #5F0B7C;
+            font-weight: bold;
+            margin-top: 10px; /* Add margin to separate from user info */
+        }
+        .comments-count {
+            color: #2E63EA; /* Change color to blue */
+            cursor: pointer; /* Add cursor pointer */
+        }
+        .create-post-btn {
+            background-color: #5F0B7C;
+            color: white;
+            --bs-btn-hover-color: #5F0B7C;
+            --bs-btn-hover-border-color: #5F0B7C;
+        }
+        .reply-container {
+            border-top: 1px solid #ccc;
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding-top: 10px;
+            display: none;
+        }
+        .reply-form {
+            margin-bottom: 10px; /* Add margin to separate from displayed replies */
+        }
+        .reply {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .reply-form textarea {
+            height: 40px; /* Set height to fit one row of text */
+        }
+        .small-date {
+            font-size: 0.8em; /* Make the date smaller */
+            color: #777777; /* Set color to a muted gray */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row align-items-center mb-3">
+            <div class="col">
+                <h1 class="mb-0">All Posts</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{% url 'Community:create_post' %}">
+                    <button class="btn create-post-btn">Create New Post</button>
+                </a>
+            </div>
+        </div>
+        {% for post in posts %}
+            <div class="post-container">
+                <div class="user-info">
+                    {% if post.user.usertype.user_type == "tutor" %}
+                    <img src="{{ post.user.profilet.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
+                    {% else %}
+                    <img src="{{ post.user.profiles.image.url }}" alt="User Icon" class="user-icon">
+                    {% endif %}
+                    <div class="user-details">
+                        <a href="{% url 'TutorFilter:view_profile' user_id=post.user.id %}" class="user-name">
+                            {% if post.user.usertype.user_type == "tutor" %}
+                            {{ post.user.profilet.fname }} {{ post.user.profilet.lname }}
+                            {% else %}
+                            {{ post.user.profiles.fname }} {{ post.user.profiles.lname }}
+                            {% endif %}
+                        </a> <!-- Add link to user profile -->
+                        {% if post.user.usertype.user_type %}
+                            <span class="user-type">{{ post.user.usertype.user_type|capfirst }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="post-label">{{ post.label|capfirst }}</div> <!-- Move label here -->
+                <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>
+                {% if post.attachment %}
+                <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
+                    <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
+                </a>
+                {% endif %}
+                <div style="margin-left: 30px;">{{ post.content }}</div>
+                <div class="small-date" style="margin-left: 30px;">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+                <div class="comments-count" onclick="toggleReplies(this)" style="margin-left: 30px;">
+                    {{ post.reply_count }} Comments
+                </div> 
+                <!-- New container for replies -->
+                <div class="reply-container">
+                    <!-- Reply form -->
+                    <form class="reply-form" action="{% url 'Community:all_posts' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <textarea name="content" class="form-control" placeholder="Enter your reply" rows="1" style="margin-left: 10px;"></textarea>
+                        <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-top: 20px; margin-left: 10px;">Reply</button>
+                    </form>
+                    {% for reply in post.ordered_replies %}
+                        <div class="reply">
+                            <div class="user-info" style="margin-bottom: 10px;">
+                                {% if reply.user.usertype.user_type == "tutor" %}
+                                <img src="{{ reply.user.profilet.image.url }}" alt="User Icon" class="user-icon">
+                                {% else %}
+                                <img src="{{ reply.user.profiles.image.url }}" alt="User Icon" class="user-icon">
+                                {% endif %}
+                                <div class="user-details">
+                                    <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}" class="user-name">
+                                        {% if reply.user.usertype.user_type == "tutor" %}
+                                        {{ reply.user.profilet.fname }} {{ reply.user.profilet.lname }}
+                                        {% else %}
+                                        {{ reply.user.profiles.fname }} {{ reply.user.profiles.lname }}
+                                        {% endif %}
+                                    </a> <!-- Add link to user profile -->
+                                    {% if reply.user.usertype.user_type %}
+                                        <span class="user-type">{{ reply.user.usertype.user_type|capfirst }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div style="margin-left: 30px;">{{ reply.content }}</div>
+                            <div class="small-date" style="margin-left: 30px">Posted on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Pagination Links -->
+        {% if posts.has_other_pages %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if posts.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ posts.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span class="current">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                </span>
+                {% if posts.has_next %}
+                    <a href="?page={{ posts.next_page_number }}">Next</a>
+                    <a href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleReplies(element) {
+            var replyContainer = element.nextElementSibling;
+            var replyForm = replyContainer.querySelector('.reply-form');
+            if (replyContainer.style.display === "block") {
+                replyContainer.style.display = "none";
+                replyForm.style.display = "none"; // Hide the reply form
+            } else {
+                replyContainer.style.display = "block";
+                replyForm.style.display = "block"; // Show the reply form
+
+                // Hide other reply forms
+                var allReplyForms = document.querySelectorAll('.reply-form');
+                allReplyForms.forEach(function(form) {
+                    if (form !== replyForm) {
+                        form.style.display = "none";
+                    }
+                });
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js" integrity="sha512-Ixzuzfxv1EqafeQlTCufWfaC6ful6WFqIz4G+dWvK0beHw0NVJwvCKSgafpy5gwNqKmgUfIBraVwkKI+Cz0SEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}

@@ -23,6 +23,19 @@ option_settings:
   aws:elasticbeanstalk:environment:process:websocket:
       Port: '5000'
       Protocol: HTTP
+  aws:elbv2:listener:443:
+      DefaultProcess: http
+      ListenerEnabled: 'true'
+      Protocol: HTTPS
+      SSLCertificateArns: arn:aws:acm:us-west-2:381492260474:certificate/2040d073-cbae-4329-a941-41e06674e5a2
+      Rules: wss
+  aws:elbv2:listenerrule:wss:
+      PathPatterns: /ws/*
+      Process: websocket
+      Priority: 2
+  aws:elasticbeanstalk:environment:process:https:
+      Port: '443'
+      Protocol: HTTPS
 
 container_commands:
   00_make_executable:

@@ -15,11 +15,14 @@ from TutorRegister.models import (
     TutorReview,
 )
 import json
-from .views import StudentInformation, Requests, TutorFeedback
+from .views import StudentInformation, Requests, TutorFeedback, AdminDashboard
 from TutorRegister.models import ProfileS
+from .templatetags.custom_filters import remove_prefix
 from .forms.student_info import StudentForm
 from django.core import mail
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+import os
 
 
 # Create your tests here.
@@ -88,6 +91,14 @@ class TutorInformationTest(TestCase):
         self.assertTemplateUsed(response, "Dashboard/tutor_info.html")
 
     def test_post_request(self):
+        test_file_path = os.path.join(
+            os.path.dirname(__file__), "test_files", "random.pdf"
+        )
+        with open(test_file_path, "rb") as f:
+            transcript_file = SimpleUploadedFile(
+                "random.pdf", f.read(), content_type="application/pdf"
+            )
+
         post_data = {
             "fname": "Test",
             "lname": "User",
@@ -119,7 +130,10 @@ class TutorInformationTest(TestCase):
             ),
         }
 
-        response = self.client.post(self.url, post_data, follow=True)
+        # Include the transcript file in the request.FILES dictionary
+        response = self.client.post(
+            self.url, {**post_data, "transcript": transcript_file}, follow=True
+        )
 
         self.assertRedirects(
             response,
@@ -139,12 +153,13 @@ class TutorInformationTest(TestCase):
 class StudentInformationTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(pk=cache.get("student"))
-        self.client = Client()
+        self.client = Client(username="test@example.com", password="testpassword")
         self.factory = RequestFactory()
 
     def test_student_information_view(self):
-        self.client.login(username="test@example.com", password="testpassword")
         url = reverse("Dashboard:student_profile")
+        profile, created = ProfileS.objects.get_or_create(user=self.user)
+
         form_data = {
             "fname": "Test",
             "lname": "User",
@@ -156,12 +171,15 @@ class StudentInformationTestCase(TestCase):
             "intro": "Hello, this is a test.",
         }
 
-        student_form = StudentForm(data=form_data)
+        student_form = StudentForm(data=form_data, instance=profile)
         request = self.factory.post(url, data=student_form.data)
         request.user = self.user
         response = StudentInformation(request)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(self.user.usertype.has_profile_complete)
+
+    def tearDown(self):
+        self.user.delete()
 
 
 class CancelSessionTestCase(TestCase):
@@ -288,5 +306,80 @@ class TutorFeedbackTestCase(TestCase):
         request = self.factory.get(reverse("Dashboard:tutor_feedback"))
         request.user = self.tutor
         response = TutorFeedback(request)
-        print(response.status_code)
         self.assertEqual(response.status_code, 200)
+
+
+class AdminDashboardTestCase(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="admin", password="admin"
+        )
+        self.client = Client()
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
+        Expertise.objects.create(subject="Math", user=self.tutor)
+
+    def test_admin_dashboard(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse("Dashboard:admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+
+class VideoCallTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_video_call_tutor(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
+        response = self.client.get(reverse("Dashboard:video_call"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_video_call_student(self):
+        self.client.login(username="test@example.com", password="testpassword")
+        response = self.client.get(reverse("Dashboard:video_call"))
+        self.assertEqual(response.status_code, 200)
+
+
+class UpdateQualificationTestCase(TestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="admin", password="admin"
+        )
+        self.client = Client()
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
+        self.tutor_profile = ProfileT.objects.get(user=self.tutor)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_update_qualifiction_qualified(self):
+        self.tutor_profile.qualified = True
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(
+            reverse("Dashboard:update_qualification"),
+            {"tutor_id": self.tutor_profile.id, "qualification": "qualified"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_update_qualifiction_unqualified(self):
+        self.tutor_profile.qualified = False
+        self.client.login(username="admin", password="admin")
+        response = self.client.post(
+            reverse("Dashboard:update_qualification"),
+            {"tutor_id": self.tutor_profile.id, "qualification": "unqualified"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+
+
+class RemovePrefixTestCase(TestCase):
+    def test_remove_prefix_starts_with_prefix(self):
+        value = "foobar"
+        prefix = "foo"
+        expected_result = "bar"
+        self.assertEqual(remove_prefix(value, prefix), expected_result)
+
+    def test_remove_prefix_without_prefix(self):
+        value = "foo"
+        prefix = "baz"
+        expected_result = "foo"
+        self.assertEqual(remove_prefix(value, prefix), expected_result)
