@@ -26,6 +26,7 @@ before_deploy:
   - if [ "$TRAVIS_BRANCH" = "master" ]; then cp .ebextensions/django.config.master .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then cp .ebextensions/django.config.dev .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then cat .ebextensions/django.config; fi
+  - zip -r deploy_package.zip . -x "*.git*" -x "**/__pycache__/*" -x "*.pyc" -x "venv/*"
 
 deploy:
   - provider: elasticbeanstalk
@@ -35,6 +36,7 @@ deploy:
     app: "TutorNYU-dev-branch"
     env: "app-env"
     bucket_name: "elasticbeanstalk-us-west-2-381492260474"
+    zip_file: deploy_package.zip
     skip_cleanup: true
     on:
         branch: develop
