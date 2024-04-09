@@ -20,7 +20,7 @@ script:
   - coverage run manage.py test --noinput
   - if [ "$TRAVIS_BRANCH" = "master" ]; then cp .ebextensions/django.config.master .ebextensions/django.config; fi
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then cp .ebextensions/django.config.dev .ebextensions/django.config; fi
-  - cat .ebextensions/django.config
+  - if [ "$TRAVIS_BRANCH" = "develop" ]; then cat .ebextensions/django.config; fi
   
 after_script:
   - coveralls
