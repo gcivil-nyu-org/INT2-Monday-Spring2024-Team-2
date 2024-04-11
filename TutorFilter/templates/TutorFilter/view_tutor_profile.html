@@ -104,18 +104,17 @@
                             <br>
                             {% endfor %}
                             <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
-                                <span class="step-links" style = "gap: 20px; color: #600E90;">
-                                    <span class="current">
-                                        Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.
-                                    </span>
+                                <span class="step-links" style = "gap: 20px;">
                                     {% if reviews.has_previous %}
-                                        <a href="?page=1">first</a>
-                                        <a href="?page={{ reviews.previous_page_number }}">previous</a>
+                                        <a href="?page=1">&laquo; First</a>
+                                        <a href="?page={{ reviews.previous_page_number }}">Previous</a>
                                     {% endif %}
-                            
+                                    <span class="current">
+                                        <b> Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}.</b>
+                                    </span>
                                     {% if reviews.has_next %}
-                                        <a href="?page={{ reviews.next_page_number }}">next</a>
-                                        <a href="?page={{ reviews.paginator.num_pages }}">last</a>
+                                        <a href="?page={{ reviews.next_page_number }}">Next</a>
+                                        <a href="?page={{ reviews.paginator.num_pages }}">Last &raquo;</a>
                                     {% endif %}
                                 </span>
                             </div>
