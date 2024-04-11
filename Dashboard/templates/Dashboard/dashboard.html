@@ -121,17 +121,16 @@
 <!-- First part pagination -->
 <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
     <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
-        <span class="current" style="color: #600E90;">
-            Page {{ upcomingSessions.number }} of {{ upcomingSessions.paginator.num_pages }}.
-        </span>
         {% if upcomingSessions.has_previous %}
-            <a href="?upcoming_page=1&past_page={{ past_page }}">first</a>
-            <a href="?upcoming_page={{ upcomingSessions.previous_page_number }}&past_page={{ past_page }}">previous</a>
+            <a href="?upcoming_page=1&past_page={{ past_page }}">&laquo; First</a>
+            <a href="?upcoming_page={{ upcomingSessions.previous_page_number }}&past_page={{ past_page }}">Previous</a>
         {% endif %}
-        
+        <span class="current">
+            <b> Page {{ upcomingSessions.number }} of {{ upcomingSessions.paginator.num_pages }}.</b>
+        </span>
         {% if upcomingSessions.has_next %}
-            <a href="?upcoming_page={{ upcomingSessions.next_page_number }}&past_page={{ past_page }}">next</a>
-            <a href="?upcoming_page={{ upcomingSessions.paginator.num_pages }}&past_page={{ past_page }}">last</a>
+            <a href="?upcoming_page={{ upcomingSessions.next_page_number }}&past_page={{ past_page }}">Next</a>
+            <a href="?upcoming_page={{ upcomingSessions.paginator.num_pages }}&past_page={{ past_page }}">Last &raquo;</a>
         {% endif %}
     </span>
 </div>
@@ -208,17 +207,16 @@
 <!-- Second part pagination -->
 <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
     <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
-        <span class="current" style="color: #600E90;">
-            Page {{ pastSessions.number }} of {{ pastSessions.paginator.num_pages }}.
-        </span>
         {% if pastSessions.has_previous %}
-            <a href="?past_page=1&upcoming_page={{ upcoming_page }}"">first</a>
-            <a href="?past_page={{ pastSessions.previous_page_number }}&upcoming_page={{ upcoming_page }}">previous</a>
+            <a href="?past_page=1&upcoming_page={{ upcoming_page }}"">&laquo; First</a>
+            <a href="?past_page={{ pastSessions.previous_page_number }}&upcoming_page={{ upcoming_page }}">Previous</a>
         {% endif %}
-        
+        <span class="current">
+            <b> Page {{ pastSessions.number }} of {{ pastSessions.paginator.num_pages }}.</b>
+        </span>
         {% if pastSessions.has_next %}
-            <a href="?past_page={{ pastSessions.next_page_number }}&upcoming_page={{ upcoming_page }}">next</a>
-            <a href="?past_page={{ pastSessions.paginator.num_pages }}&upcoming_page={{ upcoming_page }}">last</a>
+            <a href="?past_page={{ pastSessions.next_page_number }}&upcoming_page={{ upcoming_page }}">Next</a>
+            <a href="?past_page={{ pastSessions.paginator.num_pages }}&upcoming_page={{ upcoming_page }}">Last &raquo;</a>
         {% endif %}
     </span>
 </div>

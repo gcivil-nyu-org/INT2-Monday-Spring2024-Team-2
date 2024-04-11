@@ -149,17 +149,18 @@
             {% endfor %}
             <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
                 <span class="step-links" style = "gap: 20px;">
-                    <span class="current" style="color: #600E90;">
-                        Page {{ tutorRequests.number }} of {{ tutorRequests.paginator.num_pages }}.
-                    </span>
                     {% if tutorRequests.has_previous %}
-                        <a href="?page=1">first</a>
-                        <a href="?page={{ tutorRequests.previous_page_number }}">previous</a>
+                        <a href="?page=1">&laquo; First</a>
+                        <a href="?page={{ tutorRequests.previous_page_number }}">Previous</a>
                     {% endif %}
-            
+                    
+                    <span class="current">
+                        <b> Page {{ tutorRequests.number }} of {{ tutorRequests.paginator.num_pages }}.</b>
+                    </span>
+
                     {% if tutorRequests.has_next %}
-                        <a href="?page={{ tutorRequests.next_page_number }}">next</a>
-                        <a href="?page={{ tutorRequests.paginator.num_pages }}">last</a>
+                        <a href="?page={{ tutorRequests.next_page_number }}">Next</a>
+                        <a href="?page={{ tutorRequests.paginator.num_pages }}">Last &raquo;</a>
                     {% endif %}
                     
                 </span>
