@@ -74,36 +74,36 @@
             <div class="row g-3 d-flex align-items-end"> <!-- Use align-items-end to align elements at the bottom -->
                 <!-- Add grid classes to each form group to control the width -->
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90; "> {{ form.preferred_mode.label}}: </label>
+                    <label style="color: #600E90; "> <b>{{ form.preferred_mode.label}}:</b> </label>
                     {{ form.preferred_mode}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Tutor Grade:  </label>
+                    <label style="color: #600E90; "> <b>Tutor Grade:</b>  </label>
                     {{ form.grade}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Subject:  </label>
+                    <label style="color: #600E90; "> <b>Subject:</b>  </label>
                     {{ form.expertise}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Rating: </label>
+                    <label style="color: #600E90; "> <b>Rating:</b> </label>
                     {{ form.rating}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Zip Code:  </label>
+                    <label style="color: #600E90; "> <b>Zip Code:</b>  </label>
                     {{ form.zipcode}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Max Hourly Rate: </label>
+                    <label style="color: #600E90; "> <b>Max Hourly Rate:</b> </label>
                     {{ form.salary_max}}
                 </div>
                 <!-- For the second row, adjust the grid to allocate space for the button -->
                 <div class="form-group col-md-4">
-                    <label style="color: #600E90;"> My Saved Tutors: </label>
+                    <label style="color: #600E90;"> <b>My Saved Tutors:</b> </label>
                     {{ form.category}}
                 </div>
                 <div class="form-group col-md-4">
-                    <label style="color: #600E90"> Sort by: </label>
+                    <label style="color: #600E90; "> <b>Sort by:</b> </label>
                     {{ form.sortBy}}
                 </div>
                 <div class="col-md-4 d-flex col align-self-center justify-content-end"> <!-- Adjust this to move the button to the end -->
@@ -136,7 +136,7 @@
                                 <span class="rating">
                                   {% for _ in "12345" %}
                                     {% if forloop.counter <= avg %}
-                                      <i class="fas fa-star" style="color: #600E90;"></i>
+                                      <i class="fas fa-star" style="color: gold;"></i>
                                   {% else %}
                                     <i class="fas fa-star" style="color: #ccc;"></i>
                                     {% endif %}
