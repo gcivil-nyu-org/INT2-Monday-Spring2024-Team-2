@@ -34,6 +34,8 @@ def view_all_posts(request):
         posts = posts.filter(label=label)
 
     all_topics = [item[0] for item in EXPERTISE_CHOICES]
+    all_topics.append("{}")
+    print(all_topics)
 
     # Prepare processed topics for display in the dropdown menu
     processed_topics = [{topic: get_display_topic(topic)} for topic in all_topics]
@@ -140,6 +142,6 @@ def create_post(request):
 
 def get_display_topic(topic):
     if topic == "{}":
-        return "None"
+        return "Other"
     else:
         return get_display_expertise(topic)
