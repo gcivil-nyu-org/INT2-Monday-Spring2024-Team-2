@@ -18,7 +18,7 @@ def view_all_posts(request):
         .prefetch_related(
             Prefetch(
                 "post_replies",
-                queryset=Reply.objects.order_by("reply_date").select_related(
+                queryset=Reply.objects.order_by("-reply_date").select_related(
                     "user__usertype"
                 ),
                 to_attr="ordered_replies",
@@ -35,13 +35,11 @@ def view_all_posts(request):
 
     all_topics = [item[0] for item in EXPERTISE_CHOICES]
     all_topics.append("{}")
-    print(all_topics)
 
     # Prepare processed topics for display in the dropdown menu
     processed_topics = [{topic: get_display_topic(topic)} for topic in all_topics]
 
     topic = request.GET.get("topic")
-    print(topic)
 
     if topic:
         if topic not in all_topics:
@@ -49,7 +47,6 @@ def view_all_posts(request):
                 if topic in item.values():
                     topic = list(item.keys())[0]
                     break
-        print(topic)
         posts = posts.filter(topics=topic)
 
     for post in posts:
