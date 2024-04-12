@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0022_alter_post_post_date_alter_reply_reply_date"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0018_tutoringsession_meeting_link"),
         ("TutorRegister", "0020_merge_20240408_0439"),

@@ -50,6 +50,16 @@
             padding: 6px 24px;
             border-radius: 10px;
         }
+        .post-topic {
+            position: absolute; /* Set position to absolute */
+            top: 10px; /* Adjust top position */
+            left: 900px; /* Adjust right position */
+            color: #333;
+            background-color: #edcffa;
+            margin-right: 20px;
+            padding: 6px 24px;
+            border-radius: 10px;
+        }
         .post-title {
             color: #5F0B7C;
             font-weight: bold;
@@ -64,6 +74,7 @@
             color: white;
             --bs-btn-hover-color: #5F0B7C;
             --bs-btn-hover-border-color: #5F0B7C;
+            margin-top: 22.5px;
         }
         .reply-container {
             border-top: 1px solid #ccc;
@@ -73,17 +84,11 @@
             padding-top: 10px;
             display: none;
         }
-        .reply-form {
-            margin-bottom: 10px; /* Add margin to separate from displayed replies */
-        }
         .reply {
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
-        }
-        .reply-form textarea {
-            height: 40px; /* Set height to fit one row of text */
         }
         .small-date {
             font-size: 0.8em; /* Make the date smaller */
@@ -97,6 +102,31 @@
         <div class="row align-items-center mb-3">
             <div class="col">
                 <h1 class="mb-0">All Posts</h1>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <label for="label">Filter by Label:</label>
+                <select id="label" name="label" class="form-select" style="margin-right: 20px;">
+                    <option value="">All Labels</option>
+                    {% for label in labels %}
+                        <option value="{{ label }}">{{ label|capfirst }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <label for="topic">Filter by Topic:</label>
+                <select id="topic" name="topic" class="form-select" style="margin-right: 20px;">
+                    <option value="">All Topics</option>
+                    {% for topic in topics %}
+                        {% for key, value in topic.items %}
+                            <option value="{{ key }}">{{ value|capfirst }}</option>
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <button onclick="applyFilters()" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;">Apply Filters</button>
             </div>
             <div class="col text-end">
                 <a href="{% url 'Community:create_post' %}">
@@ -125,8 +155,11 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="post-label">{{ post.label|capfirst }}</div> <!-- Move label here -->
-                <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>
+                <div class="post-label" onclick="filterByLabel('{{ post.label }}')">{{ post.label|capfirst }}</div> <!-- Move label here -->
+                <div class="post-topic" onclick="filterByTopic('{{ post.topics }}')">{{ post.topics|capfirst }}</div>
+                <a href="{% url 'Community:post_detail' post_id=post.id %}" class="post-title fs-4" style="margin-left: 30px;">
+                    {{ post.title }}
+                </a>
                 {% if post.attachment %}
                 <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
                     <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
@@ -140,13 +173,7 @@
                 <!-- New container for replies -->
                 <div class="reply-container">
                     <!-- Reply form -->
-                    <form class="reply-form" action="{% url 'Community:all_posts' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="post_id" value="{{ post.id }}">
-                        <textarea name="content" class="form-control" placeholder="Enter your reply" rows="1" style="margin-left: 10px;"></textarea>
-                        <button type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90; margin-bottom: 20px; margin-top: 20px; margin-left: 10px;">Reply</button>
-                    </form>
-                    {% for reply in post.ordered_replies %}
+                    {% for reply in post.ordered_replies|slice:3 %}
                         <div class="reply">
                             <div class="user-info" style="margin-bottom: 10px;">
                                 {% if reply.user.usertype.user_type == "tutor" %}
@@ -217,6 +244,32 @@
                     }
                 });
             }
+        }
+
+        // Function to apply filters
+        function applyFilters() {
+            var label = document.getElementById("label").value;
+            var topic = document.getElementById("topic").value;
+            // Redirect to the URL with applied filters
+            window.location.href = "{% url 'Community:all_posts' %}?label=" + label + "&topic=" + topic;
+        }
+
+        // Function to set filter by label
+        function filterByLabel(label) {
+            document.getElementById("label").value = label;
+            applyFilters();
+        }
+
+        // Function to set filter by topic
+        function filterByTopic(topic) {
+            var topics = document.querySelectorAll('#topic option');
+            for (var i = 0; i < topics.length; i++) {
+                if (topics[i].innerText.toLowerCase() === topic.toLowerCase()) {
+                    document.getElementById("topic").value = topics[i].value;
+                    break;
+                }
+            }
+            applyFilters();
         }
     </script>
 

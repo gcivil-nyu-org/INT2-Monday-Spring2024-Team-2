@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0017_alter_profilet_qualified"),
         ("TutorRegister", "0019_alter_reply_post"),

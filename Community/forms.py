@@ -14,6 +14,7 @@ class CreatePostForm(forms.ModelForm):
             "content": "Content",
             "label": "Label",
             "attachment": "Attachment",
+            "topics": "Topic",
         }
 
         widgets = {
@@ -21,7 +22,7 @@ class CreatePostForm(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "form-control"}),
             "label": forms.RadioSelect(attrs={"class": "form-check-input"}),
             "attachment": forms.FileInput(attrs={"class": "form-control-file"}),
-            "topics": forms.SelectMultiple()
+            "topics": forms.Select(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -31,8 +32,12 @@ class CreatePostForm(forms.ModelForm):
             ("resource", "Resource"),
             ("question", "Question"),
         ]
-        
-        self.fields["topics"] = forms.MultipleChoiceField(choices=EXPERTISE_CHOICES, widgets=self.Meta.widgets["topics"], required=False)
+
+        self.fields["topics"] = forms.ChoiceField(
+            choices=EXPERTISE_CHOICES,
+            widget=self.Meta.widgets["topics"],
+            required=False,
+        )
 
 
 class CreateReplyForm(forms.ModelForm):

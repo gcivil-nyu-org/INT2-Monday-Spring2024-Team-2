@@ -62,12 +62,19 @@
                             {% endif %}
                             <div class="mb-3">
                                 <label class="form-label">Label:</label>
-                                <div class="btn-group" role="group" aria-label="User Type">
+                                <div class="btn-group" role="group" aria-label="Post Type">
                                     {% for value, label in form.label.field.choices %}
                                         <input type="radio" class="btn-check" name="label" id="label_{{ forloop.counter }}" value="{{ value }}" autocomplete="off">
                                         <label class="btn btn-purple" style="margin-right: 5px;" onclick="selectLabel(this)" for="label_{{ forloop.counter }}">{{ label }}</label>
                                     {% endfor %}
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Topic:</label>
+                                {{ form.topics }}
+                                {% for error in form.topics.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
                             <div class="mb-3">
                                 <label for="title" class="form-label">Title</label>
