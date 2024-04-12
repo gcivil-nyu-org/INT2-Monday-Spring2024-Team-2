@@ -27,7 +27,7 @@ class ViewAllPostsTest(TestCase):
         self.assertTemplateUsed(response, "posts.html")
 
     def test_create_reply(self):
-        url = reverse("Community:post_details")
+        url = reverse("Community:post_detail")
         reply_data = {
             "content": "Test reply.",
             "post_id": self.post.id,
