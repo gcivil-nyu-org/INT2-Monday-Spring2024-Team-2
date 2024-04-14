@@ -1,18 +1,20 @@
 from django import forms
 from TutorRegister.models import Post, Reply
+from TutorRegister.presets import EXPERTISE_CHOICES
 
 
 class CreatePostForm(forms.ModelForm):
     class Meta:
         model = Post
 
-        fields = ["title", "content", "label", "attachment"]
+        fields = ["title", "content", "label", "attachment", "topics"]
 
         labels = {
             "title": "Title",
             "content": "Content",
             "label": "Label",
             "attachment": "Attachment",
+            "topics": "Topic",
         }
 
         widgets = {
@@ -20,6 +22,7 @@ class CreatePostForm(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "form-control"}),
             "label": forms.RadioSelect(attrs={"class": "form-check-input"}),
             "attachment": forms.FileInput(attrs={"class": "form-control-file"}),
+            "topics": forms.Select(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +32,12 @@ class CreatePostForm(forms.ModelForm):
             ("resource", "Resource"),
             ("question", "Question"),
         ]
+
+        self.fields["topics"] = forms.ChoiceField(
+            choices=EXPERTISE_CHOICES,
+            widget=self.Meta.widgets["topics"],
+            required=False,
+        )
 
 
 class CreateReplyForm(forms.ModelForm):
@@ -40,3 +49,6 @@ class CreateReplyForm(forms.ModelForm):
         labels = {"content": "Content"}
 
         widgets = {"content": forms.Textarea(attrs={"class": "form-control"})}
+
+
+# class SearchFilterForm(forms.Form):

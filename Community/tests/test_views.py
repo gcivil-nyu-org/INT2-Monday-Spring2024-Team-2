@@ -26,8 +26,41 @@ class ViewAllPostsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "posts.html")
 
-    def test_create_reply(self):
-        url = reverse("Community:all_posts")
+    # def test_create_reply(self):
+    #     url = reverse("Community:post_detail")
+    #     reply_data = {
+    #         "content": "Test reply.",
+    #         "post_id": self.post.id,
+    #     }
+    #     response = self.client.post(url, reply_data, follow=True)
+
+    #     self.assertRedirects(
+    #         response,
+    #         url,
+    #         status_code=302,
+    #         target_status_code=200,
+    #     )
+    #     self.assertTrue(
+    #         Reply.objects.filter(post=self.post, user=self.student).exists()
+    #     )
+
+
+class ViewPostDetailTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.tutor = User.objects.get(pk=cache.get("tutor"))
+        self.student = User.objects.get(pk=cache.get("student"))
+        self.client.login(username="test@example.com", password="testpassword")
+        self.post = Post.objects.create(
+            user=self.tutor,
+            label="resource",
+            title="Test title",
+            content="Test content",
+        )
+
+    def test_view_post_detail(self):
+        url = reverse("Community:post_detail", args=[self.post.id])
+
         reply_data = {
             "content": "Test reply.",
             "post_id": self.post.id,
