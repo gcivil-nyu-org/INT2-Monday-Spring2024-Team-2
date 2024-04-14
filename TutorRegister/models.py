@@ -145,6 +145,11 @@ class Post(models.Model):
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
     topics = models.CharField(models.CharField(), blank=True)
 
+    def get_rating(self):
+        upvotes = Vote.objects.filter(post=self, value=1).count()
+        downvotes = Vote.objects.filter(post=self, value=-1).count()
+        return upvotes - downvotes
+
 
 class Reply(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_reply")
@@ -155,10 +160,15 @@ class Reply(models.Model):
     reply_date = models.DateTimeField(auto_now_add=True)
 
 
-class React(models.Model):
+class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_react")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_react")
-    like = models.BooleanField()  # True if like, False if dislike
+    value = models.IntegerField(
+        default=0
+    )  # 1 for upvote, -1 for downvote, 0 for neutral
+
+    class Meta:
+        unique_together = ("user", "post")
 
 
 # Two blank lines before the new function definition
