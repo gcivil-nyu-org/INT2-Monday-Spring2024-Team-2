@@ -414,33 +414,6 @@ class DownloadAttachmentTestCase(TestCase):
         )
         self.session = TutoringSession.objects.create(
             attachment=self.attachment,
-            date=datetime.now().date(),  # Assuming 'date' is a required field
-            offering_rate=55,
-            student_id_id=1,
-            tutor_id_id=10,
-            start_time=time(12, 0),  # Example placeholder time
-            end_time=time(14, 0),  # Example placeholder time
-            status="Pending",  # Assuming 'status' is required and has valid choices
-            # Include other necessary fields as required by your model
-        )
-        self.session.save()
-
-
-class DownloadAttachmentTestCase(TestCase):
-    def setUp(self):
-        # Set up a user and log in
-        self.user = User.objects.create_user(username="testuser", password="12345")
-        self.client = Client()
-        self.client.login(username="testuser", password="12345")
-
-        # Ensure to include all required fields for the TutoringSession
-        self.attachment = SimpleUploadedFile(
-            "attachment.txt",
-            b"Dummy file content of the attachment.",
-            content_type="text/plain",
-        )
-        self.session = TutoringSession.objects.create(
-            attachment=self.attachment,
             date=datetime.now().date(),
             offering_rate=55,
             student_id_id=1,
