@@ -168,10 +168,15 @@
                 <div style="margin-left: 30px;">{{ post.content }}</div>
                 <div class="small-date" style="margin-left: 30px;">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
                 <div class="comments-count" onclick="toggleReplies(this)" style="margin-left: 30px;">
-                    {{ post.reply_count }} Comments
+                    {% if post.reply_count == 0 or post.reply_count == 1 %}
+                        {{ post.reply_count }} Comment
+                    {% else %}
+                        {{ post.reply_count }} Comments
+                    {% endif %}
                 </div> 
                 <!-- New container for replies -->
                 <div class="reply-container">
+                    <label style="margin-bottom: 10px;">Recent Replies</label>
                     <!-- Reply form -->
                     {% for reply in post.ordered_replies|slice:3 %}
                         <div class="reply">
