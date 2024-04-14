@@ -9,4 +9,4 @@ exclude =
     settings,
     migrations,
     TutorNYU/asgi.py
-ignore = F401, W503, E203
+ignore = F401, W503, E203, F811
