@@ -15,14 +15,28 @@ from TutorRegister.models import (
     TutorReview,
 )
 import json
-from .views import StudentInformation, Requests, TutorFeedback, AdminDashboard
+from .views import (
+    StudentInformation,
+    Requests,
+    TutorFeedback,
+    AdminDashboard,
+    download_attachment,
+)
 from TutorRegister.models import ProfileS
 from .templatetags.custom_filters import remove_prefix
 from .forms.student_info import StudentForm
+from .forms.tutor_info import TutorForm
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 import os
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.storage import default_storage
+from django.contrib.auth.decorators import login_required
+from datetime import datetime, time
+import mimetypes
 
 
 # Create your tests here.
@@ -383,3 +397,132 @@ class RemovePrefixTestCase(TestCase):
         prefix = "baz"
         expected_result = "foo"
         self.assertEqual(remove_prefix(value, prefix), expected_result)
+
+
+class DownloadAttachmentTestCase(TestCase):
+    def setUp(self):
+        # Set up a user and log in
+        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.client = Client()
+        self.client.login(username="testuser", password="12345")
+
+        # Ensure to include all required fields for the TutoringSession
+        self.attachment = SimpleUploadedFile(
+            "attachment.txt",
+            b"Dummy file content of the attachment.",
+            content_type="text/plain",
+        )
+        self.session = TutoringSession.objects.create(
+            attachment=self.attachment,
+            date=datetime.now().date(),  # Assuming 'date' is a required field
+            offering_rate=55,
+            student_id_id=1,
+            tutor_id_id=10,
+            start_time=time(12, 0),  # Example placeholder time
+            end_time=time(14, 0),  # Example placeholder time
+            status="Pending",  # Assuming 'status' is required and has valid choices
+            # Include other necessary fields as required by your model
+        )
+        self.session.save()
+
+
+class DownloadAttachmentTestCase(TestCase):
+    def setUp(self):
+        # Set up a user and log in
+        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.client = Client()
+        self.client.login(username="testuser", password="12345")
+
+        # Ensure to include all required fields for the TutoringSession
+        self.attachment = SimpleUploadedFile(
+            "attachment.txt",
+            b"Dummy file content of the attachment.",
+            content_type="text/plain",
+        )
+        self.session = TutoringSession.objects.create(
+            attachment=self.attachment,
+            date=datetime.now().date(),
+            offering_rate=55,
+            student_id_id=1,
+            tutor_id_id=10,
+            start_time=time(12, 0),
+            end_time=time(14, 0),
+            status="Pending",
+        )
+        self.session.save()
+
+    def test_download_attachment(self):
+        # Build the URL and make the request
+        url = reverse(
+            "Dashboard:download_attachment", kwargs={"session_id": self.session.pk}
+        )
+        response = self.client.get(url)
+
+        # Check response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check the content-type header
+        self.assertEqual(response["Content-Type"], "text/plain")
+
+        # Check the content-disposition header for correct filename
+        self.assertIn(
+            f'attachment; filename="{self.attachment.name}"',
+            response["Content-Disposition"],
+        )
+
+        # Gather the streamed content and assert its content
+        content = b"".join(response.streaming_content)
+        self.assertEqual(content, b"Dummy file content of the attachment.")
+
+    def tearDown(self):
+        # Clean up after each test
+        self.user.delete()
+        self.session.delete()
+
+
+class DownloadTranscriptTestCase(TestCase):
+    def setUp(self):
+        # Set up a user and log in
+        self.user = User.objects.create_user(username="testuser", password="12345")
+        self.client = Client()
+        self.client.login(username="testuser", password="12345")
+
+        # Set up a ProfileT with a transcript
+        self.transcript = SimpleUploadedFile(
+            "transcript.pdf",
+            b"PDF file content for testing",
+            content_type="application/pdf",
+        )
+        self.tutor_profile = ProfileT.objects.create(
+            user=self.user,
+            transcript=self.transcript,
+        )
+
+    def test_download_transcript(self):
+        # Build the URL and make the request
+        url = reverse(
+            "Dashboard:download_transcript", kwargs={"tutor_id": self.tutor_profile.pk}
+        )
+        response = self.client.get(url)
+
+        # Check response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check the content-type header
+        content_type, _ = mimetypes.guess_type(self.transcript.name)
+        self.assertEqual(response["Content-Type"], content_type)
+
+        # Check the content-disposition header for correct filename
+        self.assertIn(
+            f'attachment; filename="{self.transcript.name}"',
+            response["Content-Disposition"],
+        )
+
+        # Gather the streamed content and assert its content
+        content = b"".join(response.streaming_content)
+        self.assertEqual(content, b"PDF file content for testing")
+
+    def tearDown(self):
+        # Clean up after each test
+        self.user.delete()
+        self.tutor_profile.delete()
