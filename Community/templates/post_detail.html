@@ -4,6 +4,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://kit.fontawesome.com/000661c1ee.js" crossorigin="anonymous"></script>
     <style>
         /* Define your custom styles here */
         .post-container {
@@ -138,6 +139,11 @@
             </a>
             {% endif %}
             <div style="margin-left: 30px;">{{ post.content }}</div>
+            <div class="vote-button-group" style="margin-left: 30px;">
+                <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fa-solid fa-arrow-up"></i></button>
+                <span id="rating-{{ post.id }}" style="margin: 0px 5px;">{{ post.get_rating }}</span>
+                <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fa-solid fa-arrow-down"></i></button>
+            </div>
             <div class="small-date" style="margin-left: 30px;">Replied on {{ post.post_date }}</div> <!-- Make the post date smaller -->
             <div class="comments-count" style="margin-left: 30px;">
                 {{ num_r }} Comments
@@ -200,6 +206,41 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function vote(postId, type) {
+            fetch(`/community/${postId}/vote/${type}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken':  getCookie('csrftoken'),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById(`rating-${postId}`).innerText = data.rating;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js" integrity="sha512-Ixzuzfxv1EqafeQlTCufWfaC6ful6WFqIz4G+dWvK0beHw0NVJwvCKSgafpy5gwNqKmgUfIBraVwkKI+Cz0SEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {% endblock %}

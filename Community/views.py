@@ -1,10 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import CreatePostForm, CreateReplyForm
-from django.db import IntegrityError, DatabaseError
 from django.core.paginator import Paginator
-from django.contrib import messages
 from django.db.models import Count, Prefetch
-from TutorRegister.models import Post, Reply, ProfileT, ProfileS
+from django.http import JsonResponse
+from TutorRegister.models import Post, Reply, Vote
 from TutorFilter.views import get_display_expertise
 from TutorRegister.presets import EXPERTISE_CHOICES
 
@@ -93,7 +92,6 @@ def view_post_detail(request, post_id):
             reply.save()
 
         return redirect("Community:post_detail", post_id=post.id)
-        # return redirect to post detail page
     else:
         form = CreateReplyForm()
 
@@ -110,7 +108,6 @@ def view_post_detail(request, post_id):
     }
 
     return render(request, "post_detail.html", context)
-    # render post detail page
 
 
 def create_post(request):
@@ -135,6 +132,23 @@ def create_post(request):
     }
 
     return render(request, "create_post.html", context)
+
+
+def vote(request, post_id, vote_type):
+    post = get_object_or_404(Post, pk=post_id)
+    user_react, created = Vote.objects.get_or_create(user=request.user, post=post)
+
+    if vote_type == "upvote":
+        new_value = 1 if user_react.value != 1 else 0
+    elif vote_type == "downvote":
+        new_value = -1 if user_react.value != -1 else 0
+
+    user_react.value = new_value
+    user_react.save()
+
+    rating = post.get_rating()
+
+    return JsonResponse({"rating": rating})
 
 
 def get_display_topic(topic):

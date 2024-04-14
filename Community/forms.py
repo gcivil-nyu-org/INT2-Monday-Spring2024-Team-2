@@ -49,3 +49,6 @@ class CreateReplyForm(forms.ModelForm):
         labels = {"content": "Content"}
 
         widgets = {"content": forms.Textarea(attrs={"class": "form-control"})}
+
+
+# class SearchFilterForm(forms.Form):
