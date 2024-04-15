@@ -8,7 +8,7 @@ class LoginRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        LOGIN_EXEMPT_URLS = ("auth/", "admin/", "verification/")
+        LOGIN_EXEMPT_URLS = ("auth/", "admin/", "verification/", "contact/")
 
         # Allow homepage access
         if request.path_info == "/":

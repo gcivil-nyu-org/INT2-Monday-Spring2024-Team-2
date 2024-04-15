@@ -74,36 +74,36 @@
             <div class="row g-3 d-flex align-items-end"> <!-- Use align-items-end to align elements at the bottom -->
                 <!-- Add grid classes to each form group to control the width -->
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> {{ form.preferred_mode.label}}: </label>
+                    <label style="color: #600E90; "> <b>{{ form.preferred_mode.label}}:</b> </label>
                     {{ form.preferred_mode}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Tutor Grade:  </label>
+                    <label style="color: #600E90; "> <b>Tutor Grade:</b>  </label>
                     {{ form.grade}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Subject:  </label>
+                    <label style="color: #600E90; "> <b>Subject:</b>  </label>
                     {{ form.expertise}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Rating: </label>
+                    <label style="color: #600E90; "> <b>Rating:</b> </label>
                     {{ form.rating}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Zip Code:  </label>
+                    <label style="color: #600E90; "> <b>Zip Code:</b>  </label>
                     {{ form.zipcode}}
                 </div>
                 <div class="form-group col-md-2">
-                    <label style="color: #600E90"> Max Hourly Rate: </label>
+                    <label style="color: #600E90; "> <b>Max Hourly Rate:</b> </label>
                     {{ form.salary_max}}
                 </div>
                 <!-- For the second row, adjust the grid to allocate space for the button -->
                 <div class="form-group col-md-4">
-                    <label style="color: #600E90;"> My Saved Tutors: </label>
+                    <label style="color: #600E90;"> <b>My Saved Tutors:</b> </label>
                     {{ form.category}}
                 </div>
                 <div class="form-group col-md-4">
-                    <label style="color: #600E90"> Sort by: </label>
+                    <label style="color: #600E90; "> <b>Sort by:</b> </label>
                     {{ form.sortBy}}
                 </div>
                 <div class="col-md-4 d-flex col align-self-center justify-content-end"> <!-- Adjust this to move the button to the end -->
@@ -117,24 +117,37 @@
         <!-- Repeat this block for each tutor result -->
         {% for user in users %}
         <div class="col">
-            <div class="card h-80">
+            <div class="card h-80  shadow">
                 <img src="{{ user.image.url }}" alt="Tutor" class="card-img-top" style="padding-top:10px; padding-left:50px; padding-right:50px">
                 <div style="padding-top:10px">
                     <div style="text-align:center; margin-bottom:10px">
                         <h5>{{ user.fname }} {{user.lname}}</h5>
                     </div>
                     <div style="padding-left:40px">
-                    <p class="lh-sm">Major: {{user.major}}</p>
-                    <p class="lh-sm">Grade: {{user.grade}}</p>
-                    <p class="lh-sm">Preferred Mode: {{user.preferred_mode}}</p>
-                    <p class="lh-sm">Zipcode: {{ user.zip }}</p>
-
+                    <p class="lh-sm"><b>Major:</b> {{user.major}}</p>
+                    <p class="lh-sm"><b>Grade:</b> {{user.grade|capfirst}}</p>
+                    <p class="lh-sm"><b>Preferred Mode:</b> {{user.preferred_mode|capfirst}}</p>
+                    <p class="lh-sm"><b>Zipcode:</b> {{ user.zip }}</p>
+                    <p class="lh-sm"><b>Salary:</b> ${{ user.salary_min }}-{{ user.salary_max }} /Hour</p>
                     {% for tutor_id, avg in average_ratings %}
                         {% if tutor_id == user.user_id %}
-                        <p class="lh-sm">Rating: {{ avg }}</p>
-                        {% endif %}
-                    {% endfor %}
-                    
+                            <div class="lh-sm">
+                              <span><b>Rating:</b></span>
+                                <span class="rating">
+                                  {% for _ in "12345" %}
+                                    {% if forloop.counter <= avg %}
+                                      <i class="fas fa-star" style="color: gold;"></i>
+                                  {% else %}
+                                    <i class="fas fa-star" style="color: #ccc;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                          ({{ avg }})
+                          </span>
+                          
+        </div>
+    {% endif %}
+{% endfor %}
+<br>
                     </div>
                 <!-- More info as necessary -->
                 </div>
@@ -156,6 +169,7 @@
                         </div>
                     </div>
                 </div>
+                <br>
             <!-- Add interactive elements like buttons if needed -->
             </div>
         </div>
@@ -165,19 +179,21 @@
     </div>
 </div>
 
-<div class="pagination" style="font-size: larger; display: flex; justify-content: center; align-items: center;">
+<br>
+<div class="pagination" style="display: flex; justify-content: center; align-items: center;">
     <span class="step-links" style = "gap: 20px;">
-        <span class="current" style="color: #600E90;">
-            Page {{ users.number }} of {{ users.paginator.num_pages }}.
-        </span>
         {% if users.has_previous %}
-            <a href="?page=1&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">first</a>
-            <a href="?page={{ users.previous_page_number }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">previous</a>
+            <a href="?page=1&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">&laquo; First</a>
+            <a href="?page={{ users.previous_page_number }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">Previous</a>
         {% endif %}
 
+        <span class="current">
+          <b> Page {{ users.number }} of {{ users.paginator.num_pages }}. </b>
+      </span>
+
         {% if users.has_next %}
-            <a href="?page={{ users.next_page_number }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">next</a>
-            <a href="?page={{ users.paginator.num_pages }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">last</a>
+            <a href="?page={{ users.next_page_number }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">Next</a>
+            <a href="?page={{ users.paginator.num_pages }}&preferred_mode={{ preferred_mode }}&grade={{ grade }}&expertise={{ expertise }}&rating={{ rating }}&zipcode={{ zipcode }}&salary_max={{ salary_max }}&category={{ category }}&sortBy={{ sort_By }}">Last &raquo;</a>
         {% endif %}
         
     </span>
@@ -206,6 +222,7 @@
                 {% endfor %}
                 <!-- Add other lists as options -->
               </select>
+              <div id="LikeError" class="text-danger" style="display: none; color: red">Please select or create a list.</div>
             </div>
           </form>
         </div>
@@ -234,6 +251,7 @@
             <div class="form-group">
                 <p>New List Name:</p>
                 <input type="text" class="form-control" id="newListName" placeholder="List Name">
+                <div id="newListError" class="text-danger" style="display: none; color: red">Please enter a list name.</div>
             </div>
           </form>
         </div>
@@ -296,7 +314,13 @@ $(document).ready(function(){
   $('#confirmLike').click(function() {
     // Get the value from the input
     var categoryName = $('#listSelect').val();
-
+    // Check if the input is empty
+    if (!categoryName) {
+        $('#LikeError').show(); // Show the error message
+        return; // Stop further execution
+    } else {
+        $('#LikeError').hide(); // Ensure the error message is hidden if input is filled
+    }
     $.ajax({
             url: "{% url 'TutorFilter:add_favorite' %}", // The URL to your Django view
             type: "POST",
@@ -331,35 +355,42 @@ $(document).ready(function(){
 
   // When the user clicks on "Confirm" in the new list modal
   $('#confirmNewList').click(function() {
-    // Get the value from the input
-    var categoryName = $('#newListName').val();
+    var categoryName = $('#newListName').val().trim(); // Get the trimmed value from the input
+
+    // Check if the input is empty
+    if (!categoryName) {
+        $('#newListError').show(); // Show the error message
+        return; // Stop further execution
+    } else {
+        $('#newListError').hide(); // Ensure the error message is hidden if input is filled
+    }
 
     $.ajax({
-            url: "{% url 'TutorFilter:add_favorite' %}", // The URL to your Django view
-            type: "POST",
-            data: {
-                'category_name': categoryName,
-                'tutor_id': tutorId,
-                'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token for security
-            },
-            success: function(data) {
-                if (data.status === 'success') {
-                // Refresh the page
-                 window.location.reload();
-                } else {
+        url: "{% url 'TutorFilter:add_favorite' %}", // The URL to your Django view
+        type: "POST",
+        data: {
+            'category_name': categoryName,
+            'tutor_id': tutorId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token for security
+        },
+        success: function(data) {
+            if (data.status === 'success') {
+                // Notify user of success, e.g., using an alert or updating the DOM
+                window.location.reload();
+            } else {
                 // Handle case where save was not successful
                 alert(data.message); // Simple alert for error
-                }
-            },
-            error: function(xhr, errmsg, err) {
-                // Handle error
-                console.log("Error adding category: " + errmsg);
             }
-        });
-    // Here you'd typically make an AJAX call to your Django view to process the new list creation
-    // After the AJAX call's success callback, you can hide the modal
-    newListModal.hide();
-  });
+        },
+        error: function(xhr, errmsg, err) {
+            // Handle error
+            console.log("Error adding category: " + errmsg);
+        }
+    });
+    // Hide the modal after successful AJAX call
+    $('#newListModal').modal('hide');
+});
+
 
   $('#confirmUnlike').click(function() {
     // Get the value from the input

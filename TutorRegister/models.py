@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.postgres.fields import ArrayField
 
 
 class Expertise(models.Model):
@@ -142,6 +143,12 @@ class Post(models.Model):
     label = models.CharField(max_length=100)
     post_date = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
+    topics = models.CharField(models.CharField(), blank=True)
+
+    def get_rating(self):
+        upvotes = Vote.objects.filter(post=self, value=1).count()
+        downvotes = Vote.objects.filter(post=self, value=-1).count()
+        return upvotes - downvotes
 
 
 class Reply(models.Model):
@@ -151,6 +158,17 @@ class Reply(models.Model):
     )
     content = models.TextField()
     reply_date = models.DateTimeField(auto_now_add=True)
+
+
+class Vote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_react")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_react")
+    value = models.IntegerField(
+        default=0
+    )  # 1 for upvote, -1 for downvote, 0 for neutral
+
+    class Meta:
+        unique_together = ("user", "post")
 
 
 # Two blank lines before the new function definition

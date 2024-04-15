@@ -89,7 +89,7 @@ class TutorFilterForm(forms.Form):
             choices=self.get_user_category_choices(user),
             required=False,
             widget=forms.Select(
-                attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+                attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
             ),
             label="Select a category..",
         )
@@ -97,14 +97,14 @@ class TutorFilterForm(forms.Form):
     preferred_mode = forms.ChoiceField(
         choices=MODE_CHOICES,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
     grade = forms.ChoiceField(
         choices=GRADE_CHOICE,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
@@ -112,7 +112,7 @@ class TutorFilterForm(forms.Form):
     expertise = forms.ChoiceField(
         choices=EXPERTISE_CHOICES,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
@@ -120,34 +120,34 @@ class TutorFilterForm(forms.Form):
     zipcode = forms.CharField(
         max_length=255,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-control border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
     salary_max = forms.IntegerField(
         widget=forms.NumberInput(
-            attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-control border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
     rating = forms.ChoiceField(
         choices=RATE_CHOICE,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
     saved = forms.ChoiceField(
         choices=SORT_CHOICE,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
     sortBy = forms.ChoiceField(
         choices=SORT_CHOICE,
         widget=forms.Select(
-            attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
+            attrs={"class": "form-select border-2", "style": "margin-bottom: 10px;"}
         ),
         required=False,
     )
