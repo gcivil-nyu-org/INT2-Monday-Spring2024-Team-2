@@ -14,6 +14,7 @@ from TutorRegister.models import (
     TutoringSession,
     TutorReview,
 )
+from TutorNYU.form import ContactForm
 import json
 from .views import (
     StudentInformation,
@@ -89,23 +90,24 @@ class HomepageTestCase(TestCase):
 
 class ContactTestCase(TestCase):
     def setUp(self):
-        self.client = Client()
-
-    def test_contact_get(self):
-        response = self.client.get(reverse("contact_us"))
-        self.assertEqual(response.status_code, 302)
+        self.factory = RequestFactory()
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_contact_post(self):
-        data = {
+        url = reverse("contact_us")
+        form_data = {
             "full_name": "John Doe",
             "email": "john@example.com",
-            "phone": "123456789",
+            "phone": "1234567890",
             "message": "Test message",
         }
-        response = self.client.post(reverse("contact_us"), data)
-        self.assertEqual(response.status_code, 302)
-        # self.assertEqual(len(mail.outbox), 1)
+        form = ContactForm(data=form_data)
+        print("Valid:", form.is_valid())
+        print("Errors:", form.errors)
+        request = self.factory.post(url, data=form.data)
+        response = contact(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
 
 
 class TutorInformationTest(TestCase):
