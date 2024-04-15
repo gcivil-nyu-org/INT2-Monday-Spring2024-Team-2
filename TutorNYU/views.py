@@ -29,7 +29,9 @@ def contact(request):
             recipient_email = "vickyhuang9311@gmail.com"
 
             send_mail(subject, body, sender_email, [recipient_email])
-            return HttpResponseRedirect(reverse("home"))
+            form = ContactForm()
+            return render(request, "contact_us.html", {"form": form, "success": True})
+
     else:
         form = ContactForm()
-    return render(request, "contact_us.html", {"form": form, "success": True})
+    return render(request, "contact_us.html", {"form": form, "success": False})

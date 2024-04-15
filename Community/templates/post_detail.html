@@ -4,6 +4,8 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <script src="https://kit.fontawesome.com/000661c1ee.js" crossorigin="anonymous"></script>
     <style>
         /* Define your custom styles here */
@@ -19,6 +21,7 @@
             display: flex;
             align-items: center;
             margin-left: 20px;
+            margin-top: 10px;
         }
         .user-icon {
             max-width: 40px;
@@ -111,6 +114,8 @@
             </div>
         </div>
         <div class="post-container">
+            <div class="row mb-3">
+            <div class="col">
             <div class="user-info">
                 {% if post.user.usertype.user_type == "tutor" %}
                 <img src="{{ post.user.profilet.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
@@ -130,21 +135,25 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="post-label">{{ post.label|capfirst }}</div> <!-- Move label here -->
-            <div class="post-topic">{{ post.topics|capfirst }}</div>
-            <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>
+            </div>
+            <div class="col text-end">
+                <button class="btn btn-primary btn-sm" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button>
+                <button class="btn btn-primary btn-sm" style="margin-top:10px;margin-left:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ post.topics|capfirst }}</button>
+            </div>
+        </div>
+                <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>
             {% if post.attachment %}
             <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
                 <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
             </a>
             {% endif %}
-            <div style="margin-left: 30px;">{{ post.content }}</div>
-            <div class="vote-button-group" style="margin-left: 30px;">
+            <div style="margin-left: 30px;margin-bottom:10px">{{ post.content }}</div>
+            <div class="vote-button-group" style="margin-left: 30px;margin-bottom:10px">
                 <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fa-solid fa-arrow-up"></i></button>
                 <span id="rating-{{ post.id }}" style="margin: 0px 5px;">{{ post.get_rating }}</span>
                 <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fa-solid fa-arrow-down"></i></button>
             </div>
-            <div class="small-date" style="margin-left: 30px;">Replied on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+            <div class="small-date" style="margin-left: 30px;margin-bottom:10px">Replied on {{ post.post_date }}</div> <!-- Make the post date smaller -->
             <div class="comments-count" style="margin-left: 30px;">
                 {{ num_r }} Comments
             </div> 
