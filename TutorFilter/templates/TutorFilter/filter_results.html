@@ -222,6 +222,7 @@
                 {% endfor %}
                 <!-- Add other lists as options -->
               </select>
+              <div id="LikeError" class="text-danger" style="display: none; color: red">Please select or create a list.</div>
             </div>
           </form>
         </div>
@@ -313,7 +314,13 @@ $(document).ready(function(){
   $('#confirmLike').click(function() {
     // Get the value from the input
     var categoryName = $('#listSelect').val();
-
+    // Check if the input is empty
+    if (!categoryName) {
+        $('#LikeError').show(); // Show the error message
+        return; // Stop further execution
+    } else {
+        $('#LikeError').hide(); // Ensure the error message is hidden if input is filled
+    }
     $.ajax({
             url: "{% url 'TutorFilter:add_favorite' %}", // The URL to your Django view
             type: "POST",
