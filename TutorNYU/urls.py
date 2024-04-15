@@ -30,6 +30,7 @@ urlpatterns = [
     path("find/", include("TutorFilter.urls")),
     path("chat/", include("chat.urls")),
     path("community/", include("Community.urls")),
+    path("contact/", views.contact, name="contact_us"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
