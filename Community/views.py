@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from .forms import CreatePostForm, CreateReplyForm
 from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch
@@ -110,6 +111,7 @@ def view_post_detail(request, post_id):
     return render(request, "post_detail.html", context)
 
 
+@login_required
 def create_post(request):
     userType = request.user.usertype.user_type
     if request.method == "POST":
@@ -123,6 +125,11 @@ def create_post(request):
         form = CreatePostForm()
 
     context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
         "form": form,
         "baseTemplate": (
             "Dashboard/base_student.html"
@@ -132,6 +139,52 @@ def create_post(request):
     }
 
     return render(request, "create_post.html", context)
+
+
+@login_required
+def edit(request, post_id):
+    userType = request.user.usertype.user_type
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.user != post.user:
+        return redirect("Community:post_detail", post_id=post_id)
+
+    if request.method == "POST":
+        form = CreatePostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect("Community:post_detail", post_id=post_id)
+    else:
+        form = CreatePostForm(instance=post)
+
+    context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
+        "form": form,
+    }
+
+    return render(request, "edit_post.html", context)
+
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Check if the current user is the author of the post
+    if request.user == post.user:
+        # If the request method is POST, delete the post
+        if request.method == "POST":
+            post.delete()
+            return JsonResponse({"success": True})
+        else:
+            # If the request method is not POST, return a JSON response indicating authorization
+            return JsonResponse({"authorized": True})
+    else:
+        # If the current user is not the author, return a JSON response indicating lack of authorization
+        return JsonResponse({"authorized": False}, status=403)
 
 
 def vote(request, post_id, vote_type):

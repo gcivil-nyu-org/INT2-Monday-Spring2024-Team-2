@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+    <script src="https://kit.fontawesome.com/000661c1ee.js" crossorigin="anonymous"></script>
     <style>
         /* Define your custom styles here */
         .post-container {
@@ -104,6 +105,11 @@
             font-size: 0.8em; /* Make the date smaller */
             color: #777777; /* Set color to a muted gray */
         }
+        .function-link {
+            position: absolute;
+            right: -1100px;
+            bottom: 20px;
+        }
     </style>
 {% endblock %}
 
@@ -171,17 +177,29 @@
                 <button class="btn btn-primary btn-sm" onclick="filterByLabel('{{ post.label }}')" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button> <!-- Move label here -->
                 <button class="btn btn-primary btn-sm" onclick="filterByTopic('{{ post.topics }}')" style="margin-top:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ post.topics|capfirst }}</button>
                 </div>
-
-                <a href="{% url 'Community:post_detail' post_id=post.id %}" class="post-title fs-4" style="margin-left: 30px; margin-bottom: 10px">
-                    {{ post.title }}
-                </a>
+                <div class="post-title">
+                    <a href="{% url 'Community:post_detail' post_id=post.id %}" class="post-title fs-4" style="margin-left: 30px; margin-bottom: 10px">
+                        {{ post.title }}
+                    </a>
+                </div>
                 {% if post.attachment %}
                 <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
                     <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
                 </a>
                 {% endif %}
                 <div style="margin-left: 30px; margin-bottom:5px">{{ post.content }}</div>
+                <div class="vote-button-group" style="margin-left: 30px;margin-bottom:10px">
+                    <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fa-solid fa-arrow-up"></i></button>
+                    <span id="rating-{{ post.id }}" style="margin: 0px 5px;">{{ post.get_rating }}</span>
+                    <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fa-solid fa-arrow-down"></i></button>
+                </div>
                 <div class="small-date" style="margin-left: 30px; margin-bottom:5px">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+                <div class="function-link">
+                    {% if request.user == post.user %}
+                        <a href="{% url 'Community:edit' post_id=post.id %}">Edit Post</a>
+                        <span class="delete-link" onclick="confirmDelete({{ post.id }})" style="color: red; cursor: pointer; margin-left: 10px;">Delete</span>
+                    {% endif %}
+                </div>
                 <div class="comments-count" onclick="toggleReplies(this)" style="margin-left: 30px;">
                     {% if post.reply_count == 0 or post.reply_count == 1 %}
                         {{ post.reply_count }} Comment
@@ -290,6 +308,65 @@
                 }
             }
             applyFilters();
+        }
+
+        function vote(postId, type) {
+            fetch(`/community/${postId}/vote/${type}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken':  getCookie('csrftoken'),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById(`rating-${postId}`).innerText = data.rating;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function confirmDelete(postId) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                // If confirmed, send the delete request
+                fetch(`/community/${postId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Redirect to the current page after deletion or handle success as needed
+                    if (data.success) {
+                        window.location.reload(); // Reload the page
+                    } else {
+                        alert("Failed to delete post.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Failed to delete post.");
+                });
+            }
         }
     </script>
 
