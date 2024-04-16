@@ -183,7 +183,8 @@ def delete_post(request, post_id):
             # If the request method is not POST, return a JSON response indicating authorization
             return JsonResponse({"authorized": True})
     else:
-        # If the current user is not the author, return a JSON response indicating lack of authorization
+        # If the current user is not the author, 
+        # return a JSON response indicating lack of authorization
         return JsonResponse({"authorized": False}, status=403)
 
 
