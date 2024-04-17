@@ -169,6 +169,16 @@ class Vote(models.Model):
 
     class Meta:
         unique_together = ("user", "post")
+        
+        
+class Survey(models.Model):
+    session = models.ForeignKey(TutoringSession, on_delete=models.CASCADE, related_name="session_survey")
+    reviewer = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user_reviewer")
+    reviewee = models.ForeignKey(User,on_delete=models.CASCADE, related_name="user_reviewee")
+    q1 = models.BooleanField(null=True, blank=True)
+    q2 = models.BooleanField(null=True, blank=True) 
+    q3 = models.BooleanField(null=True, blank=True)   
+    completed = models.BooleanField(default=False, null=True, blank=True)
 
 
 # Two blank lines before the new function definition

@@ -287,6 +287,20 @@ def UserDashboard(request):
 
 
 @login_required
+def Survey(request, session_id):
+    userType = request.user.usertype.user_type
+    context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
+        "userType": userType,
+    }
+    return render(request, "Dashboard/survey.html", context)
+
+
+@login_required
 def ProvideFeedback(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
 
