@@ -31,8 +31,21 @@
             {% endif %}
             {{ student_image_form.image }}
           </div>
-          <div class="mb-3">
-            {{ student_form.as_p }}
+          <div class="form-group">
+            {% for field in student_form %}
+                <div class="mb-3">
+                      <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}: </label>
+                        {{ field }}           
+                     {% if field.help_text and field.name == 'password' %}
+                         <div class="form-text" style="color: #6c757d; font-size: 0.9em; list-style: none; padding-left: 1.2em;">&bull; {{ field.help_text }}</div>
+                    {% elif field.help_text %}
+                        <div class="form-text" style="color: #6c757d;">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                    {% endfor %}
+                </div>    
+            {% endfor %}
           </div>
           <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
         </form>
