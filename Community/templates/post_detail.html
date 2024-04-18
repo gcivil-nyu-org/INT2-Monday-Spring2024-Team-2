@@ -99,7 +99,7 @@
         .function-link {
             position: absolute;
             right: 30px;
-            bottom: 300px;
+            bottom: 150px;
         }
     </style>
 {% endblock %}
@@ -158,7 +158,7 @@
                 <span id="rating-{{ post.id }}" style="margin: 0px 5px;">{{ post.get_rating }}</span>
                 <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fa-solid fa-arrow-down"></i></button>
             </div>
-            <div class="small-date" style="margin-left: 30px;margin-bottom:10px">Replied on {{ post.post_date }}</div> <!-- Make the post date smaller -->
+            <div class="small-date" style="margin-left: 30px;margin-bottom:10px">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
             <div class="function-link">
                 {% if request.user == post.user %}
                     <a href="{% url 'Community:edit' post_id=post.id %}">Edit Post</a>
