@@ -9,6 +9,7 @@ from .forms.tutor_info import (
 )
 from .forms.student_info import StudentForm, StudentImageForm
 from .forms.review_form import TutorReviewForm
+from .forms.survey_form import SurveyForm
 from TutorRegister.models import (
     Expertise,
     Availability,
@@ -288,6 +289,23 @@ def UserDashboard(request):
 
 @login_required
 def Survey(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    if request.method == "POST":
+        form = SurveyForm(request.POST)
+        print(form.errors)
+        if form.is_valid():
+            survey = form.save(commit=False)
+            survey.session = session
+            survey.reviewer = request.user
+            survey.reviewee = session.student_id
+            survey.save()
+
+            session.survey_completed = True
+            session.save()
+            return redirect("Dashboard:dashboard")
+
+    else:
+        form = SurveyForm()
     userType = request.user.usertype.user_type
     context = {
         "baseTemplate": (
@@ -296,6 +314,8 @@ def Survey(request, session_id):
             else "Dashboard/base_tutor.html"
         ),
         "userType": userType,
+        "form": form,
+        "session_id": session_id,
     }
     return render(request, "Dashboard/survey.html", context)
 

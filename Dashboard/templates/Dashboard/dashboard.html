@@ -186,16 +186,24 @@
                 <p><strong>Message: </strong>{{ session.message }}</p>
                 {% endif %}
             </div>
-
+            <div class="col-md-2"></div>
+            <div class="col-md-8"></div>
             <div class="col-md-2 d-flex align-items-end">
                 {% if userType == "student" %}
                 {% if not session.reviewed_by_student %}
                 <a href="{% url 'Dashboard:feedback' session.id %}" class="btn btn-outline-primary btn-sm"
                     style="white-space: nowrap;">Provide Feedback</a>
                 {% else %}
-                <p style="color: #359AF7; white-space: nowrap;"> Review Submitted </p>
-                {% comment %} <a class="btn btn-outline-primary btn-sm" style="white-space: nowrap;"> Reviewed Submitted
-                </a> {% endcomment %}
+                <a style="color: #359AF7; white-space: nowrap;"> Review Submitted </a>
+                {% endif %}
+                {% endif %}
+                
+                {% if userType == "student" %}
+                {% if not session.survey_completed %}
+                <a href="{% url 'Dashboard:survey' session.id %}" class="btn btn-outline-success btn-sm"
+                    style="white-space: nowrap;margin-left:10px">Fill Out Survey</a>
+                {% else %}
+                <a style="color: green; white-space: nowrap;margin-left:10px"> Survey Submitted </a>
                 {% endif %}
                 {% endif %}
             </div>
@@ -208,7 +216,7 @@
 <div class="pagination" style="display: flex; justify-content: center; align-items: center;">
     <span class="step-links" style="display: flex; gap: 10px; align-items: center;">
         {% if pastSessions.has_previous %}
-            <a href="?past_page=1&upcoming_page={{ upcoming_page }}"">&laquo; First</a>
+            <a href="?past_page=1&upcoming_page={{ upcoming_page }}">&laquo; First</a>
             <a href="?past_page={{ pastSessions.previous_page_number }}&upcoming_page={{ upcoming_page }}">Previous</a>
         {% endif %}
         <span class="current">
