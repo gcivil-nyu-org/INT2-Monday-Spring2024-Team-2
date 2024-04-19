@@ -34,6 +34,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 
 import mimetypes
 
@@ -430,15 +431,31 @@ def Requests(request):
 
 def AcceptRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
-    session.status = "Accepted"
-    session.save()
+
+    if session.status == "Pending":
+        session.status = "Accepted"
+        session.save()
+    else:
+        # If status is not 'Pending', raise an error message
+        messages.error(
+            request, "This request has been cancelled and cannot be accepted."
+        )
+
     return redirect("Dashboard:requests")
 
 
 def DeclineRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
-    session.status = "Declined"
-    session.save()
+
+    if session.status == "Pending":
+        session.status = "Declined"
+        session.save()
+    else:
+        # If status is not 'Pending', raise an error message
+        messages.error(
+            request, "This request has been cancelled and cannot be declined."
+        )
+
     return redirect("Dashboard:requests")
 
 
