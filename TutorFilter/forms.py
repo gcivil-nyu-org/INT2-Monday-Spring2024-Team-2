@@ -218,13 +218,17 @@ class TutoringSessionRequestForm(forms.ModelForm):
             "attachment",
         ]
         tomorrow = timezone.localdate() + timedelta(days=1)
+        next_month = timezone.localdate() + timedelta(days=90)
         widgets = {
             "date": forms.DateInput(
                 attrs={
                     "type": "date",
                     "min": tomorrow.isoformat(),
+                    "max": next_month.isoformat(),
                     "class": "form-control",
                     "id": "date_selector",
+                    "onkeydown": "return false;",  #
+                    "onpaste": "return false;",
                 }
             ),
             "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
