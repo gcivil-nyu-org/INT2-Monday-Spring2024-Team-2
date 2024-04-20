@@ -11,6 +11,7 @@ from .models import (
     TutoringSession,
     TutorReview,
     Favorite,
+    Survey,
 )
 
 admin.site.register(UserType)
@@ -21,3 +22,4 @@ admin.site.register(ProfileT)
 admin.site.register(TutoringSession)
 admin.site.register(TutorReview)
 admin.site.register(Favorite)
+admin.site.register(Survey)
