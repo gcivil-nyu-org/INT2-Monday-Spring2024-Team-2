@@ -8,8 +8,6 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 
 
-
-
 class TutorFilterForm(forms.Form):
     # username = forms.CharField(required=False)
     # email = forms.EmailField(required=False)
@@ -179,21 +177,23 @@ class TutoringSessionRequestForm(forms.ModelForm):
     tutoring_mode = forms.ChoiceField(
         choices=[], widget=forms.Select(attrs={"class": "form-select"})
     )
-    
+
     offering_rate = forms.DecimalField(
-        validators=[MinValueValidator(0.01)], 
-        widget=forms.NumberInput(attrs={"class": "form-control", "min": "0.01"})
+        validators=[MinValueValidator(0.01)],
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": "0.01"}),
     )
 
-    date = forms.DateField(widget=forms.DateInput(attrs={
-        "type": "date",
-        "class": "form-control",
-        "id": "date_selector"
-    }))
-    
+    date = forms.DateField(
+        widget=forms.DateInput(
+            attrs={"type": "date", "class": "form-control", "id": "date_selector"}
+        )
+    )
+
     def __init__(self, *args, tutor_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['date'].widget.attrs['min'] = (timezone.localdate() + timedelta(days=1)).isoformat()
+        self.fields["date"].widget.attrs["min"] = (
+            timezone.localdate() + timedelta(days=1)
+        ).isoformat()
         available_subject_choices = []
         if tutor_user:
             tutor_profile = ProfileT.objects.filter(user=tutor_user).first()
@@ -221,9 +221,9 @@ class TutoringSessionRequestForm(forms.ModelForm):
                     ]
 
                 self.fields["tutoring_mode"].choices = mode_choices
-                
+
     def clean_date(self):
-        date = self.cleaned_data['date']
+        date = self.cleaned_data["date"]
         if date < timezone.localdate() + timedelta(days=1):
             raise ValidationError("Date cannot be in the past.")
         return date
