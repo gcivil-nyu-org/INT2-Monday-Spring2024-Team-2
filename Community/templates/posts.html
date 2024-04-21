@@ -120,7 +120,7 @@
                 <h1 class="mb-0">All Posts</h1>
             </div>
         </div>
-        <div class="row g-3">
+        <div class="row mb-3">
             <!-- <div class="col">
                 <label for="label">Filter by Label:</label>
                 <select id="label" name="label" class="form-select" style="margin-right: 20px;">
@@ -128,7 +128,7 @@
                     {% for label in labels %}
                         <option value="{{ label }}">{{ label|capfirst }}</option>
                     {% endfor %}
-                </select>
+                </select>   
             </div>
             <div class="col">
                 <label for="topic">Filter by Topic:</label>
@@ -145,31 +145,33 @@
                 <button onclick="applyFilters()" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;border-color:#5F0B7C">Apply Filters</button>
             </div> -->
             <form method="get" action="{% url 'Community:all_posts' %}">
-                <div class="col-md-6">
-                    <label for="{{ form.search.id_for_label }}">{{ form.search.label}}</label>
-                    {{ form.search }}
-                </div>
-                <div class="col-md-2">
-                    <label for="{{ form.label.id_for_label }}">{{ form.label.label }}</label>
-                    {{form.label}}
-                </div>
-                <div class="col-md-4">
-                    <label for="{{ form.topic.id_for_label }}">{{ form.topic.label }}</label>
-                    {{ form.topic }}
-                </div>
-                <div class="col-md-4">
-                    <label for="{{ form.sort.id_for_label }}">{{ form.sort.label }}</label>
-                    {{ form.sort }}
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;border-color:#5F0B7C">Search</button>
+                <div class="row align-items-end" >
+                    <div class="col-md-2">
+                        <label for="{{ form.search.id_for_label }}">Search:</label>
+                        {{ form.search }}
+                    </div>
+                    <div class="col-md-2">
+                        <br for="{{ form.label.id_for_label }}">Label:</br></label>
+                        {{ form.label }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ form.topic.id_for_label }}">Topic:</label>
+                        {{ form.topic }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ form.sort.id_for_label }}">Sort By:</label>
+                        {{ form.sort }}
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;border-color:#5F0B7C">Search</button>
+                    </div>
+                    <div class="col text-end">
+                        <a href="{% url 'Community:create_post' %}">
+                            <button class="btn create-post-btn">Create New Post</button>
+                        </a>
+                    </div>
                 </div>
             </form>
-            <div class="col text-end">
-                <a href="{% url 'Community:create_post' %}">
-                    <button class="btn create-post-btn">Create New Post</button>
-                </a>
-            </div>
         </div>
         {% for post in posts %}     
             <div class="row mb-3 post-container">
