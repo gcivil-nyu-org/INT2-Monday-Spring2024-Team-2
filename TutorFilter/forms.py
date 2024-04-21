@@ -4,6 +4,10 @@ from TutorRegister.models import ProfileT, Expertise, TutoringSession, Favorite
 from Dashboard.choices import EXPERTISE_CHOICES
 from django.utils import timezone
 from datetime import timedelta
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+
+
 
 
 class TutorFilterForm(forms.Form):
@@ -175,10 +179,21 @@ class TutoringSessionRequestForm(forms.ModelForm):
     tutoring_mode = forms.ChoiceField(
         choices=[], widget=forms.Select(attrs={"class": "form-select"})
     )
+    
+    offering_rate = forms.DecimalField(
+        validators=[MinValueValidator(0.01)], 
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": "0.01"})
+    )
 
+    date = forms.DateField(widget=forms.DateInput(attrs={
+        "type": "date",
+        "class": "form-control",
+        "id": "date_selector"
+    }))
+    
     def __init__(self, *args, tutor_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.fields['date'].widget.attrs['min'] = (timezone.localdate() + timedelta(days=1)).isoformat()
         available_subject_choices = []
         if tutor_user:
             tutor_profile = ProfileT.objects.filter(user=tutor_user).first()
@@ -206,6 +221,12 @@ class TutoringSessionRequestForm(forms.ModelForm):
                     ]
 
                 self.fields["tutoring_mode"].choices = mode_choices
+                
+    def clean_date(self):
+        date = self.cleaned_data['date']
+        if date < timezone.localdate() + timedelta(days=1):
+            raise ValidationError("Date cannot be in the past.")
+        return date
 
     class Meta:
         model = TutoringSession
@@ -219,15 +240,15 @@ class TutoringSessionRequestForm(forms.ModelForm):
         ]
         tomorrow = timezone.localdate() + timedelta(days=1)
         widgets = {
-            "date": forms.DateInput(
-                attrs={
-                    "type": "date",
-                    "min": tomorrow.isoformat(),
-                    "class": "form-control",
-                    "id": "date_selector",
-                }
-            ),
-            "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
+            # "date": forms.DateInput(
+            #     attrs={
+            #         "type": "date",
+            #         "min": tomorrow.isoformat(),
+            #         "class": "form-control",
+            #         "id": "date_selector",
+            #     }
+            # ),
+            # "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
             "message": forms.Textarea(
                 attrs={"class": "form-control", "rows": 3, "placeholder": "Message"}
             ),

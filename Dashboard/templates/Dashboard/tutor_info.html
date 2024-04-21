@@ -83,10 +83,14 @@
                 {{ tutor_form.salary_max }}
               </div>
             </div>
+            <div id="timeslot-error-message" class="alert alert-danger" style="display: none;">
+              Minimum Hourly Rate must be less than Maximum Hourly Rate
+            </div>
             <div class="mb-3">
               {{ tutor_transcript_form.transcript.label_tag }}
               {% if tutor_form.instance.transcript %}
-              <p> <a href="{% url 'Dashboard:download_transcript' tutor_form.instance.id %}" download>{{tutor_form.instance.transcript.name|cut:'transcripts/' }}</a></p>
+              <p> <a href="{% url 'Dashboard:download_transcript' tutor_form.instance.id %}"
+                  download>{{tutor_form.instance.transcript.name|cut:'transcripts/' }}</a></p>
               {% endif %}
               {{ tutor_transcript_form.transcript }}
 
@@ -142,9 +146,28 @@
       $("#id_availabilities").val(JSON.stringify(availabilities));
 
     }
-
     prepopulateAvailabilities();
   });
+
+  $(document).ready(function () {
+  console.log("Script loaded successfully");
+  $('form').submit(function (event) {
+    var minSalary = parseFloat($('#id_salary_min').val());
+    var maxSalary = parseFloat($('#id_salary_max').val());
+
+    if (minSalary >= maxSalary) {
+      event.preventDefault();
+      const errorMessageDiv = document.getElementById('timeslot-error-message');
+      errorMessageDiv.style.display = 'block';
+    }
+  });
+
+  $('#id_salary_min, #id_salary_max').change(function () {
+    const errorMessageDiv = document.getElementById('timeslot-error-message');
+    errorMessageDiv.style.display = 'none';
+  });
+});
+
 
 
   function addAvailability() {
@@ -203,12 +226,12 @@
   function displayError(message) {
     var errorDiv = $("#availability-error");
     errorDiv.text(message);
-    errorDiv.show(); 
+    errorDiv.show();
   }
 
   function clearError() {
     var errorDiv = $("#availability-error");
-    errorDiv.hide(); 
+    errorDiv.hide();
   }
 
 
