@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import CreatePostForm, CreateReplyForm
+from .forms import CreatePostForm, CreateReplyForm, SearchFilterForm
 from django.core.paginator import Paginator
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Q, F
 from django.http import JsonResponse
 from TutorRegister.models import Post, Reply, Vote
 from TutorFilter.views import get_display_expertise
@@ -11,6 +11,7 @@ from TutorRegister.presets import EXPERTISE_CHOICES
 
 def view_all_posts(request):
     userType = request.user.usertype.user_type
+    sortList = ["-post_date"]
     labels = ["resource", "question"]
 
     posts = (
@@ -25,29 +26,45 @@ def view_all_posts(request):
             )
         )
         .annotate(reply_count=Count("post_replies"))
-        .order_by("-post_date")
+        .annotate(
+            upvotes_count=Count("post_react", filter=Q(post_react__value=1)),
+            downvotes_count=Count("post_react", filter=Q(post_react__value=-1)),
+        )
+        .annotate(rating=F("upvotes_count") - F("downvotes_count"))
+        .annotate(views=F("upvotes_count") + F("downvotes_count"))
     )
 
-    label = request.GET.get("label")
+    form = SearchFilterForm(request.GET)
+    if form.is_valid():
+        search = form.cleaned_data.get("search")
+        label = form.cleaned_data.get("label")
+        topic = form.cleaned_data.get("topic")
+        sort = form.cleaned_data.get("sort")
 
-    if label:
-        posts = posts.filter(label=label)
+        if search:
+            searchTokens = search.split()
+            searchFilter = Q(title__icontains=search) | Q(content__icontains=search)
 
-    all_topics = [item[0] for item in EXPERTISE_CHOICES]
-    all_topics.append("{}")
+            for token in searchTokens:
+                searchFilter |= Q(title__icontains=token) | Q(content__icontains=token)
 
-    # Prepare processed topics for display in the dropdown menu
-    processed_topics = [{topic: get_display_topic(topic)} for topic in all_topics]
+            posts = posts.filter(searchFilter)
 
-    topic = request.GET.get("topic")
+        if label:
+            posts = posts.filter(label=label)
 
-    if topic:
-        if topic not in all_topics:
-            for item in processed_topics:
-                if topic in item.values():
-                    topic = list(item.keys())[0]
-                    break
-        posts = posts.filter(topics=topic)
+        if topic:
+            posts = posts.filter(topics=topic)
+
+        if sort:
+            if sort == "highest_rating":
+                sortList = ["-rating", "-post_date"]
+            elif sort == "most_viewed":
+                sortList = ["-views", "-post_date"]
+            elif sort == "earliest_post":
+                sortList = ["post_date"]
+
+    posts = posts.order_by(*sortList)
 
     for post in posts:
         post.topics = get_display_topic(post.topics)
@@ -57,6 +74,15 @@ def view_all_posts(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # Generating clean URL parameters for pagination links
+    query_params = request.GET.copy()
+    if "page" in query_params:
+        del query_params["page"]
+
+    clean_params = "&".join(
+        f"{key}={value}" for key, value in query_params.items() if value
+    )
+
     context = {
         "baseTemplate": (
             "Dashboard/base_student.html"
@@ -65,14 +91,21 @@ def view_all_posts(request):
         ),
         "posts": page_obj,
         "labels": labels,
-        "topics": processed_topics,
+        "form": form,
+        "clean_params": clean_params,
     }
-    # return render all posts
+
     return render(request, "posts.html", context)
 
 
 def view_post_detail(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+    post = get_object_or_404(
+        Post.objects.annotate(
+            upvotes_count=Count("post_react", filter=Q(post_react__value=1)),
+            downvotes_count=Count("post_react", filter=Q(post_react__value=-1)),
+        ),
+        pk=post_id,
+    )
     replies = Reply.objects.filter(post=post).order_by("-reply_date")
     userType = request.user.usertype.user_type
     num_r = replies.count()
@@ -131,11 +164,6 @@ def create_post(request):
             else "Dashboard/base_tutor.html"
         ),
         "form": form,
-        "baseTemplate": (
-            "Dashboard/base_student.html"
-            if userType == "student"
-            else "Dashboard/base_tutor.html"
-        ),
     }
 
     return render(request, "create_post.html", context)
@@ -198,9 +226,12 @@ def vote(request, post_id, vote_type):
     user_react.value = new_value
     user_react.save()
 
-    rating = post.get_rating()
-
-    return JsonResponse({"rating": rating})
+    return JsonResponse(
+        {
+            "upvotes_count": post.post_react.filter(value=1).count(),
+            "downvotes_count": post.post_react.filter(value=-1).count(),
+        }
+    )
 
 
 def get_display_topic(topic):

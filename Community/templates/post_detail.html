@@ -5,8 +5,8 @@
 {% block extra_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.css" integrity="sha512-Woz+DqWYJ51bpVk5Fv0yES/edIMXjj3Ynda+KWTIkGoynAMHrqTcDUQltbipuiaD5ymEo9520lyoVOo9jCQOCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.3.0/uicons-solid-straight/css/uicons-solid-straight.css'>
 
-    <script src="https://kit.fontawesome.com/000661c1ee.js" crossorigin="anonymous"></script>
     <style>
         /* Define your custom styles here */
         .post-container {
@@ -101,6 +101,15 @@
             right: 30px;
             bottom: 150px;
         }
+        .btn-upvote-active {
+            background-color: #28a745; /* Bootstrap success color */
+            color: white;
+        }
+
+        .btn-downvote-active {
+            background-color: #dc3545; /* Bootstrap danger color */
+            color: white;
+        }
     </style>
 {% endblock %}
 
@@ -154,9 +163,10 @@
             {% endif %}
             <div style="margin-left: 30px;margin-bottom:10px">{{ post.content }}</div>
             <div class="vote-button-group" style="margin-left: 30px;margin-bottom:10px">
-                <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fa-solid fa-arrow-up"></i></button>
-                <span id="rating-{{ post.id }}" style="margin: 0px 5px;">{{ post.get_rating }}</span>
-                <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fa-solid fa-arrow-down"></i></button>
+                <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fi fi-ss-up"></i></button>
+                <span id="upvotes-{{ post.id }}" style="margin: 0px 5px;">{{ post.upvotes_count }}</span>
+                <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fi fi-ss-down"></i></i></button>
+                <span id="downvotes-{{ post.id }}" style="margin: 0px 5px;">{{ post.downvotes_count }}</span>
             </div>
             <div class="small-date" style="margin-left: 30px;margin-bottom:10px">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
             <div class="function-link">
@@ -244,7 +254,27 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    document.getElementById(`rating-${postId}`).innerText = data.rating;
+                    document.getElementById(`upvotes-${postId}`).innerText = data.upvotes_count;
+                    document.getElementById(`downvotes-${postId}`).innerText = data.downvotes_count;
+
+                    // Handle button states
+                    const upvoteBtn = document.getElementById(`upvote-btn-${postId}`);
+                    const downvoteBtn = document.getElementById(`downvote-btn-${postId}`);
+                    
+                    // Reset classes first
+                    upvoteBtn.classList.add('btn-outline-success');
+                    upvoteBtn.classList.remove('btn-upvote-active');
+                    upvoteBtn.classList.add('btn-outline-danger');
+                    downvoteBtn.classList.remove('btn-downvote-active');
+
+                    // Add active class based on the vote type and new value
+                    if (type === 'upvote') {
+                        upvoteBtn.classList.add('btn-upvote-active');
+                        upvoteBtn.classList.remove('btn-outline-success');
+                    } else if (type === 'downvote') {
+                        downvoteBtn.classList.add('btn-downvote-active');
+                        upvoteBtn.classList.remove('btn-outline-danger');
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));

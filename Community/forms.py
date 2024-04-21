@@ -1,3 +1,4 @@
+from typing import Any
 from django import forms
 from TutorRegister.models import Post, Reply
 from TutorRegister.presets import EXPERTISE_CHOICES
@@ -51,4 +52,39 @@ class CreateReplyForm(forms.ModelForm):
         widgets = {"content": forms.Textarea(attrs={"class": "form-control"})}
 
 
-# class SearchFilterForm(forms.Form):
+class SearchFilterForm(forms.Form):
+    search = forms.CharField(
+        required=False,
+        max_length=320,
+        widget=forms.TextInput(attrs={"placeholder": "Search posts..."}),
+    )
+    label = forms.ChoiceField(
+        required=False,
+        choices=[("", "None"), ("resource", "Resource"), ("question", "Question")],
+        label="Label",
+    )
+    topic = forms.ChoiceField(
+        required=False, choices=[("", "None")] + EXPERTISE_CHOICES, label="Topic"
+    )
+    sort = forms.ChoiceField(
+        required=False,
+        choices=[
+            ("", "None"),
+            ("highest_rating", "Highest Rating"),
+            ("most_viewed", "Most Viewed"),
+            ("earliest_post", "Earliest Post"),
+        ],
+        label="Sort",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        for key in cleaned_data:
+            value = cleaned_data[key]
+            if isinstance(value, str):
+                cleaned_data[key] = value.strip()
+            if not value:
+                cleaned_data[key] = None
+
+        return cleaned_data
