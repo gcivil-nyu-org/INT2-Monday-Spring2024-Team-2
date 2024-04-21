@@ -297,7 +297,7 @@ def Survey(request, session_id):
             survey = form.save(commit=False)
             survey.session = session
             survey.reviewer = request.user
-            survey.reviewee = session.student_id
+            survey.reviewee = session.tutor_id
             survey.save()
 
             session.survey_completed = True
