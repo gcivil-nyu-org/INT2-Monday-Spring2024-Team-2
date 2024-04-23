@@ -337,8 +337,8 @@ class SurveyTestCase(TestCase):
         response = self.client.post(
             reverse("Dashboard:survey", args=[self.session.pk]),
             {"q1": "True", "q2": "True", "q3": "True"},
-        )    
-        self.assertEqual(response.status_code, 302)  
+        )
+        self.assertEqual(response.status_code, 302)
         self.assertTrue(
             TutoringSession.objects.get(pk=self.session.pk).survey_completed
         )
