@@ -13,7 +13,7 @@
     <br>
     <form id="surveyForm" style="margin:20px" action="{% url 'Dashboard:survey' session_id=session_id %}"  method="post">
       {% csrf_token %}
-      <p class="fw-bold mt-3">1. Did the tutor start the session promptly at the scheduled time?</p>
+      <p class="fw-bold mt-3">1. Did the tutor start the session promptly at the scheduled time? <span class="text-danger">*</span></p>
       <div id="AnswerError1" class="text-danger" style="display: none; color: red">Please select an answer.</div>
       <div class="form-check mb-2" style="margin-left:20px">
         <input class="form-check-input" type="radio" name="q1" id="q1_yes" value="True" />
@@ -30,7 +30,7 @@
 
       <br>
 
-      <p class="fw-bold mt-3">2. Was the tutor engaged in teaching throughout the entire session?</p>
+      <p class="fw-bold mt-3">2. Was the tutor engaged in teaching throughout the entire session? <span class="text-danger">*</span></p>
       <div id="AnswerError2" class="text-danger" style="display: none; color: red">Please select an answer.</div>
       <div class="form-check mb-2" style="margin-left:20px">
         <input class="form-check-input" type="radio" name="q2" id="q2_yes" value="True" />
@@ -47,7 +47,7 @@
 
       <br> 
 
-      <p class="fw-bold">3. Did the tutor conclude the session on time, without leaving early?</p>
+      <p class="fw-bold">3. Did the tutor conclude the session on time, without leaving early? <span class="text-danger">*</span></p>
       <div id="AnswerError3" class="text-danger" style="display: none; color: red">Please select an answer.</div>
       <div class="form-check mb-2" style="margin-left:20px">
         <input class="form-check-input" type="radio" name="q3" id="q3_yes" value="True"/>
@@ -77,6 +77,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="successModalLabel">Success</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 You have successfully submitted the survey.

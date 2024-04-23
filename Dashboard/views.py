@@ -290,14 +290,16 @@ def UserDashboard(request):
 @login_required
 def Survey(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
+    s_id = session.student_id
+    t_id = session.tutor_id
     if request.method == "POST":
         form = SurveyForm(request.POST)
         print(form.errors)
         if form.is_valid():
             survey = form.save(commit=False)
             survey.session = session
-            survey.reviewer = request.user
-            survey.reviewee = session.tutor_id
+            survey.reviewer = s_id
+            survey.reviewee = t_id
             survey.save()
 
             session.survey_completed = True

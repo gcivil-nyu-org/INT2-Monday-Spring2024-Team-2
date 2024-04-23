@@ -22,12 +22,14 @@ from .views import (
     TutorFeedback,
     AdminDashboard,
     download_attachment,
+    Survey,
 )
 from TutorNYU.views import contact
 from TutorRegister.models import ProfileS
 from .templatetags.custom_filters import remove_prefix
 from .forms.student_info import StudentForm
 from .forms.tutor_info import TutorForm
+from .forms.survey_form import SurveyForm
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -322,6 +324,23 @@ class ProvideFeedbackTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             TutoringSession.objects.get(pk=self.session.pk).reviewed_by_student
+        )
+
+
+class SurveyTestCase(TestCase):
+    def setUp(self):
+        self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
+        self.client = Client()
+        self.client.login(username="test@example.com", password="testpassword")
+
+    def test_submit_survey(self):
+        response = self.client.post(
+            reverse("Dashboard:survey", args=[self.session.pk]),
+            {"q1": "True", "q2": "True", "q3": "True"},
+        )    
+        self.assertEqual(response.status_code, 302)  
+        self.assertTrue(
+            TutoringSession.objects.get(pk=self.session.pk).survey_completed
         )
 
 
