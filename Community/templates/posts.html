@@ -120,37 +120,14 @@
                 <h1 class="mb-0">All Posts</h1>
             </div>
         </div>
-        <div class="row mb-3">
-            <!-- <div class="col">
-                <label for="label">Filter by Label:</label>
-                <select id="label" name="label" class="form-select" style="margin-right: 20px;">
-                    <option value="">All Labels</option>
-                    {% for label in labels %}
-                        <option value="{{ label }}">{{ label|capfirst }}</option>
-                    {% endfor %}
-                </select>   
-            </div>
-            <div class="col">
-                <label for="topic">Filter by Topic:</label>
-                <select id="topic" name="topic" class="form-select" style="margin-right: 20px;">
-                    <option value="">All Topics</option>
-                    {% for topic in topics %}
-                        {% for key, value in topic.items %}
-                            <option value="{{ key }}">{{ value|capfirst }}</option>
-                        {% endfor %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col">
-                <button onclick="applyFilters()" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;border-color:#5F0B7C">Apply Filters</button>
-            </div> -->
-            <form method="get" action="{% url 'Community:all_posts' %}">
-                <div class="row align-items-end" >
-                    <div class="col-md-2">
+        <div class="row align-items-end">
+            <form class="col-md-10" method="get" action="{% url 'Community:all_posts' %}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
                         <label for="{{ form.search.id_for_label }}">Search:</label>
                         {{ form.search }}
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-2">
                         <br for="{{ form.label.id_for_label }}">Label:</br></label>
                         {{ form.label }}
                     </div>
@@ -162,16 +139,16 @@
                         <label for="{{ form.sort.id_for_label }}">Sort By:</label>
                         {{ form.sort }}
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button type="submit" class="btn btn-primary" style="margin-top: 22.5px; background-color: #5F0B7C; color: white;border-color:#5F0B7C">Search</button>
-                    </div>
-                    <div class="col text-end">
-                        <a href="{% url 'Community:create_post' %}">
-                            <button class="btn create-post-btn">Create New Post</button>
-                        </a>
                     </div>
                 </div>
             </form>
+            <div class="col-md-2">
+            <a href="{% url 'Community:create_post' %}">
+                <button class="btn create-post-btn">Create New Post</button>
+            </a>
+            </div>
         </div>
         {% for post in posts %}     
             <div class="row mb-3 post-container">
