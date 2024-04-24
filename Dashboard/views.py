@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db.models.functions import Coalesce
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import (
@@ -7,6 +8,7 @@ from .forms.tutor_info import (
     TutorImageForm,
     TutorTranscriptForm,
 )
+from django.db.models import Count, F, ExpressionWrapper, FloatField, Value, Case, When
 from .forms.student_info import StudentForm, StudentImageForm
 from .forms.review_form import TutorReviewForm
 from .forms.survey_form import SurveyForm
@@ -581,7 +583,34 @@ def VideoCall(request):
 
 @login_required
 def AdminDashboard(request):
-    tutors = ProfileT.objects.order_by("id")
+    tutors = ProfileT.objects.annotate(
+        total_reviewee_count=Count("user__user_reviewee", distinct=True),
+        total_true=ExpressionWrapper(
+            Case(
+                When(
+                    total_reviewee_count__gt=0,
+                    then=100
+                    * (
+                        Count(
+                            "user__user_reviewee__q1",
+                            filter=F("user__user_reviewee__q1"),
+                        )
+                        + Count(
+                            "user__user_reviewee__q2",
+                            filter=F("user__user_reviewee__q2"),
+                        )
+                        + Count(
+                            "user__user_reviewee__q3",
+                            filter=F("user__user_reviewee__q3"),
+                        )
+                    )
+                    / (3 * Count("user__user_reviewee", distinct=True)),
+                ),
+                default=Value(0),
+            ),
+            output_field=FloatField(),
+        ),
+    ).order_by("id")
     expertise = Expertise.objects.all()
     return render(
         request,
