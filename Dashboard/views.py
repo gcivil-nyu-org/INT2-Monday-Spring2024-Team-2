@@ -606,7 +606,7 @@ def AdminDashboard(request):
                     )
                     / (3 * Count("user__user_reviewee", distinct=True)),
                 ),
-                default=Value(0),
+                default=None,
             ),
             output_field=FloatField(),
         ),
