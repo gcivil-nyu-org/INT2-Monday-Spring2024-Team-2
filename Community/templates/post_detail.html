@@ -1,5 +1,7 @@
 {% extends baseTemplate %}
 
+{% load custom_tags %}
+
 {% block title %}Post Detail{% endblock %}
 
 {% block extra_css %}
@@ -152,7 +154,7 @@
             </div>
             <div class="col text-end">
                 <button class="btn btn-primary btn-sm" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button>
-                <button class="btn btn-primary btn-sm" style="margin-top:10px;margin-left:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ post.topics|capfirst }}</button>
+                <button class="btn btn-primary btn-sm" style="margin-top:10px;margin-left:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ topic_dict|get_topic:post.topics }}</button>
             </div>
         </div>
                 <div class="post-title fs-4" style="margin-left: 30px;">{{ post.title }}</div>

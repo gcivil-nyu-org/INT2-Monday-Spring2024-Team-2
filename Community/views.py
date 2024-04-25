@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CreatePostForm, CreateReplyForm, SearchFilterForm
 from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch, Q, F
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from TutorRegister.models import Post, Reply, Vote
 from TutorFilter.views import get_display_expertise
 from TutorRegister.presets import EXPERTISE_CHOICES
@@ -12,7 +12,6 @@ from TutorRegister.presets import EXPERTISE_CHOICES
 def view_all_posts(request):
     userType = request.user.usertype.user_type
     sortList = ["-post_date"]
-    labels = ["resource", "question"]
 
     posts = (
         Post.objects.select_related("user__usertype")
@@ -66,9 +65,6 @@ def view_all_posts(request):
 
     posts = posts.order_by(*sortList)
 
-    for post in posts:
-        post.topics = get_display_topic(post.topics)
-
     paginator = Paginator(posts, 5)
 
     page_number = request.GET.get("page")
@@ -90,7 +86,7 @@ def view_all_posts(request):
             else "Dashboard/base_tutor.html"
         ),
         "posts": page_obj,
-        "labels": labels,
+        "topic_dict": EXPERTISE_CHOICES,
         "form": form,
         "clean_params": clean_params,
     }
@@ -110,7 +106,7 @@ def view_post_detail(request, post_id):
     userType = request.user.usertype.user_type
     num_r = replies.count()
 
-    post.topics = get_display_topic(post.topics)
+    # post.topics = get_display_topic(post.topics)
 
     paginator = Paginator(replies, 5)
 
@@ -139,6 +135,7 @@ def view_post_detail(request, post_id):
         "r_form": form,
         "post": post,
         "num_r": num_r,
+        "topic_dict": EXPERTISE_CHOICES
     }
 
     return render(request, "post_detail.html", context)

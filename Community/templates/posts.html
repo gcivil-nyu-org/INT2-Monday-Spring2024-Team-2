@@ -1,5 +1,8 @@
 {% extends baseTemplate %}
 
+{% load custom_tags %}
+{% load custom_filters %}
+
 {% block title %}All Posts{% endblock %}
 
 {% block extra_css %}
@@ -174,8 +177,8 @@
                 </div>
                 </div>
                 <div class="col text-end">
-                <button class="btn btn-primary btn-sm" onclick="filterByLabel('{{ post.label }}')" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button> <!-- Move label here -->
-                <button class="btn btn-primary btn-sm" onclick="filterByTopic('{{ post.topics }}')" style="margin-top:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ post.topics|capfirst }}</button>
+                    <button class="btn btn-primary btn-sm" onclick="updateFilter('label', '{{ post.label }}')" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button> <!-- Move label here -->
+                    <button class="btn btn-primary btn-sm" onclick="updateFilter('topic', '{{ post.topics }}')" style="margin-top:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ topic_dict|get_topic:post.topics }}</button>
                 </div>
                 <div class="post-title">
                     <a href="{% url 'Community:post_detail' post_id=post.id %}" class="post-title fs-4" style="margin-left: 30px; margin-bottom: 10px">
@@ -304,30 +307,16 @@
             }
         }
 
-        // Function to apply filters
-        function applyFilters() {
-            var label = document.getElementById("label").value;
-            var topic = document.getElementById("topic").value;
-            // Redirect to the URL with applied filters
-            window.location.href = "{% url 'Community:all_posts' %}?label=" + label + "&topic=" + topic;
-        }
+        function updateFilter(param, value) {
+            const baseUrl = window.location.href.split('?')[0];
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
 
-        // Function to set filter by label
-        function filterByLabel(label) {
-            document.getElementById("label").value = label;
-            applyFilters();
-        }
+            // Set or update the parameter
+            urlParams.set(param, value);
 
-        // Function to set filter by topic
-        function filterByTopic(topic) {
-            var topics = document.querySelectorAll('#topic option');
-            for (var i = 0; i < topics.length; i++) {
-                if (topics[i].innerText.toLowerCase() === topic.toLowerCase()) {
-                    document.getElementById("topic").value = topics[i].value;
-                    break;
-                }
-            }
-            applyFilters();
+            // Rebuild the full URL with the updated query string
+            window.location.href = `${baseUrl}?${urlParams.toString()}`;
         }
 
         function vote(postId, type) {
