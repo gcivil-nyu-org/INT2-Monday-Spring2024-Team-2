@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import CreatePostForm, CreateReplyForm, SearchFilterForm
 from django.core.paginator import Paginator
-from django.db.models import Count, Prefetch, Q, F
-from django.http import JsonResponse, QueryDict
+from django.db.models import Count, Prefetch, Q, F, IntegerField, OuterRef, Subquery
+from django.http import JsonResponse
 from TutorRegister.models import Post, Reply, Vote
 from TutorFilter.views import get_display_expertise
 from TutorRegister.presets import EXPERTISE_CHOICES
@@ -12,6 +12,10 @@ from TutorRegister.presets import EXPERTISE_CHOICES
 def view_all_posts(request):
     userType = request.user.usertype.user_type
     sortList = ["-post_date"]
+
+    user_vote_subquery = Vote.objects.filter(
+        post=OuterRef("pk"), user=request.user
+    ).values("value")
 
     posts = (
         Post.objects.select_related("user__usertype")
@@ -24,13 +28,19 @@ def view_all_posts(request):
                 to_attr="ordered_replies",
             )
         )
-        .annotate(reply_count=Count("post_replies"))
         .annotate(
-            upvotes_count=Count("post_react", filter=Q(post_react__value=1)),
-            downvotes_count=Count("post_react", filter=Q(post_react__value=-1)),
+            reply_count=Count("post_replies", distinct=True),
+            upvotes_count=Count(
+                "post_react", filter=Q(post_react__value=1), distinct=True
+            ),
+            downvotes_count=Count(
+                "post_react", filter=Q(post_react__value=-1), distinct=True
+            ),
+            rating=F("upvotes_count") - F("downvotes_count"),
+            views=F("upvotes_count") + F("downvotes_count"),
+            user_vote=Subquery(user_vote_subquery, output_field=IntegerField()),
         )
-        .annotate(rating=F("upvotes_count") - F("downvotes_count"))
-        .annotate(views=F("upvotes_count") + F("downvotes_count"))
+        .distinct()
     )
 
     form = SearchFilterForm(request.GET)
@@ -95,18 +105,25 @@ def view_all_posts(request):
 
 
 def view_post_detail(request, post_id):
+    user_vote_subquery = Vote.objects.filter(
+        post=OuterRef("pk"), user=request.user
+    ).values("value")
+
     post = get_object_or_404(
         Post.objects.annotate(
-            upvotes_count=Count("post_react", filter=Q(post_react__value=1)),
-            downvotes_count=Count("post_react", filter=Q(post_react__value=-1)),
-        ),
+            upvotes_count=Count(
+                "post_react", filter=Q(post_react__value=1), distinct=True
+            ),
+            downvotes_count=Count(
+                "post_react", filter=Q(post_react__value=-1), distinct=True
+            ),
+            user_vote=Subquery(user_vote_subquery, output_field=IntegerField()),
+        ).distinct(),
         pk=post_id,
     )
     replies = Reply.objects.filter(post=post).order_by("-reply_date")
     userType = request.user.usertype.user_type
     num_r = replies.count()
-
-    # post.topics = get_display_topic(post.topics)
 
     paginator = Paginator(replies, 5)
 
@@ -220,19 +237,16 @@ def vote(request, post_id, vote_type):
     elif vote_type == "downvote":
         new_value = -1 if user_react.value != -1 else 0
 
-    user_react.value = new_value
-    user_react.save()
+    if new_value == 0:
+        user_react.delete()
+    else:
+        user_react.value = new_value
+        user_react.save()
 
     return JsonResponse(
         {
             "upvotes_count": post.post_react.filter(value=1).count(),
             "downvotes_count": post.post_react.filter(value=-1).count(),
+            "user_vote": new_value,
         }
     )
-
-
-def get_display_topic(topic):
-    if topic == "{}":
-        return "Other"
-    else:
-        return get_display_expertise(topic)

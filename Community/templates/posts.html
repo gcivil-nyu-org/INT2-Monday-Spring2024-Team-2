@@ -53,26 +53,6 @@
             flex-direction: column;
             position: relative;
         }
-        .post-label {
-            {% comment %} position: absolute; /* Set position to absolute */
-            top: 10px; /* Adjust top position */
-            right: 10px; /* Adjust right position */ {% endcomment %}
-            color: #333;
-            background-color: #edcffa;
-            margin-right: 20px;
-            padding: 6px 24px;
-            border-radius: 10px;
-        }
-        .post-topic {
-            {% comment %} position: absolute; /* Set position to absolute */
-            top: 10px; /* Adjust top position */
-            left: 900px; /* Adjust right position */ {% endcomment %}
-            color: #333;
-            background-color: #edcffa;
-            margin-right: 20px;
-            padding: 6px 24px;
-            border-radius: 10px;
-        }
         .post-title {
             color: #5F0B7C;
             font-weight: bold;
@@ -112,6 +92,9 @@
             position: absolute;
             right: -1100px;
             bottom: 20px;
+        }
+        .label-topic-group {
+            text-decoration: none;
         }
     </style>
 {% endblock %}
@@ -157,11 +140,13 @@
             <div class="row mb-3 post-container">
                 <div class="col">
                 <div class="user-info">
-                    {% if post.user.usertype.user_type == "tutor" %}
-                    <img src="{{ post.user.profilet.image.url }}" alt="User Icon" class="user-icon"> <!-- Assuming 'image' is the field name for the user's image -->
-                    {% else %}
-                    <img src="{{ post.user.profiles.image.url }}" alt="User Icon" class="user-icon">
-                    {% endif %}
+                    <a href="{% url 'TutorFilter:view_profile' user_id=post.user.id %}">
+                        {% if post.user.usertype.user_type == "tutor" %}
+                        <img src="{{ post.user.profilet.image.url }}" alt="User Icon" class="user-icon"> 
+                        {% else %}
+                        <img src="{{ post.user.profiles.image.url }}" alt="User Icon" class="user-icon">
+                        {% endif %}
+                    </a>
                     <div class="user-details">
                         <a href="{% url 'TutorFilter:view_profile' user_id=post.user.id %}" class="user-name">
                             {% if post.user.usertype.user_type == "tutor" %}
@@ -176,7 +161,7 @@
                     </div>
                 </div>
                 </div>
-                <div class="col text-end">
+                <div class="col text-end label-topic-group">
                     <button class="btn btn-primary btn-sm" onclick="updateFilter('label', '{{ post.label }}')" style="margin-top:10px;color:black;background-color:#F3E4F7;border-color:#F3E4F7">{{ post.label|capfirst }}</button> <!-- Move label here -->
                     <button class="btn btn-primary btn-sm" onclick="updateFilter('topic', '{{ post.topics }}')" style="margin-top:10px;color:white;background-color:#AC65BF;border-color:#AC65BF">{{ topic_dict|get_topic:post.topics }}</button>
                 </div>
@@ -186,15 +171,17 @@
                     </a>
                 </div>
                 {% if post.attachment %}
-                <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
-                    <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
-                </a>
+                <div>
+                    <a href="{{ post.attachment.url }}" data-lightbox="post-image" data-title="Post Attachment" style="margin-left: 30px;">
+                        <img src="{{ post.attachment.url }}" alt="attachment" style="width: 200px; height: auto;">
+                    </a>
+                </div>
                 {% endif %}
-                <div style="margin-left: 30px; margin-bottom:5px">{{ post.content }}</div>
+                <div style="margin-left: 30px; padding-right: 50px; margin-bottom:5px">{{ post.content|linebreaks|truncatechars:500 }}</div>
                 <div class="vote-button-group" style="margin-left: 30px;margin-bottom:10px">
-                    <button class="btn btn-outline-success btn-sm" onclick="vote({{ post.id }}, 'upvote')"><i class="fi fi-ss-up"></i></i></button>
+                    <button class="btn btn-sm {% if post.user_vote == 1 %}btn-success{% else %}btn-outline-success{% endif %}" id="upvote-btn-{{ post.id }}" onclick="vote({{ post.id }}, 'upvote')"><i class="fi fi-ss-up"></i></i></button>
                     <span id="upvotes-{{ post.id }}" style="margin: 0px 5px;">{{ post.upvotes_count }}</span>
-                    <button class="btn btn-outline-danger btn-sm" onclick="vote({{ post.id }}, 'downvote')"><i class="fi fi-ss-down"></i></button>
+                    <button class="btn btn-sm {% if post.user_vote == -1 %}btn-danger{% else %}btn-outline-danger{% endif %}" id="downvote-btn-{{ post.id }}" onclick="vote({{ post.id }}, 'downvote')"><i class="fi fi-ss-down"></i></button>
                     <span id="downvotes-{{ post.id }}" style="margin: 0px 5px;">{{ post.downvotes_count }}</span>
                 </div>
                 <div class="small-date" style="margin-left: 30px; margin-bottom:5px">Posted on {{ post.post_date }}</div> <!-- Make the post date smaller -->
@@ -205,7 +192,7 @@
                     {% endif %}
                 </div>
                 <div class="comments-count" onclick="toggleReplies(this)" style="margin-left: 30px;">
-                    {% if post.reply_count == 0 or post.reply_count == 1 %}
+                    {% if post.reply_count == 1 %}
                         {{ post.reply_count }} Comment
                     {% else %}
                         {{ post.reply_count }} Comments
@@ -213,33 +200,37 @@
                 </div> 
                 <!-- New container for replies -->
                 <div class="reply-container">
-                    <label style="margin-bottom: 10px;">Recent Replies</label>
-                    <!-- Reply form -->
-                    {% for reply in post.ordered_replies|slice:3 %}
-                        <div class="reply">
-                            <div class="user-info" style="margin-bottom: 10px;">
-                                {% if reply.user.usertype.user_type == "tutor" %}
-                                <img src="{{ reply.user.profilet.image.url }}" alt="User Icon" class="user-icon">
-                                {% else %}
-                                <img src="{{ reply.user.profiles.image.url }}" alt="User Icon" class="user-icon">
-                                {% endif %}
-                                <div class="user-details">
-                                    <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}" class="user-name">
+                    {% if post.reply_count > 0 %}
+                        <label style="margin-bottom: 10px;">Recent Replies</label>
+                        <!-- Reply form -->
+                        {% for reply in post.ordered_replies|slice:3 %}
+                            <div class="reply">
+                                <div class="user-info" style="margin-bottom: 10px;">
+                                    <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}">
                                         {% if reply.user.usertype.user_type == "tutor" %}
-                                        {{ reply.user.profilet.fname }} {{ reply.user.profilet.lname }}
+                                        <img src="{{ reply.user.profilet.image.url }}" alt="User Icon" class="user-icon">
                                         {% else %}
-                                        {{ reply.user.profiles.fname }} {{ reply.user.profiles.lname }}
+                                        <img src="{{ reply.user.profiles.image.url }}" alt="User Icon" class="user-icon">
                                         {% endif %}
-                                    </a> <!-- Add link to user profile -->
-                                    {% if reply.user.usertype.user_type %}
-                                        <span class="user-type">{{ reply.user.usertype.user_type|capfirst }}</span>
-                                    {% endif %}
+                                    </a>
+                                    <div class="user-details">
+                                        <a href="{% url 'TutorFilter:view_profile' user_id=reply.user.id %}" class="user-name">
+                                            {% if reply.user.usertype.user_type == "tutor" %}
+                                            {{ reply.user.profilet.fname }} {{ reply.user.profilet.lname }}
+                                            {% else %}
+                                            {{ reply.user.profiles.fname }} {{ reply.user.profiles.lname }}
+                                            {% endif %}
+                                        </a> <!-- Add link to user profile -->
+                                        {% if reply.user.usertype.user_type %}
+                                            <span class="user-type">{{ reply.user.usertype.user_type|capfirst }}</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
+                                <div style="margin-left: 30px;">{{ reply.content }}</div>
+                                <div class="small-date" style="margin-left: 30px">Posted on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
                             </div>
-                            <div style="margin-left: 30px;">{{ reply.content }}</div>
-                            <div class="small-date" style="margin-left: 30px">Posted on {{ reply.reply_date }}</div> <!-- Make the reply date smaller -->
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
@@ -333,6 +324,23 @@
                 } else {
                     document.getElementById(`upvotes-${postId}`).innerText = data.upvotes_count;
                     document.getElementById(`downvotes-${postId}`).innerText = data.downvotes_count;
+
+                    // Handle button states
+                    const upvoteBtn = document.getElementById(`upvote-btn-${postId}`);
+                    const downvoteBtn = document.getElementById(`downvote-btn-${postId}`);
+                    
+                    // Reset classes first
+                    upvoteBtn.className = "btn btn-outline-success btn-sm";
+                    downvoteBtn.className = "btn btn-outline-danger btn-sm";
+
+                    // Add active class based on the vote type and new value
+                    if (data.user_vote == 1) {
+                        upvoteBtn.classList.add('btn-success');
+                        upvoteBtn.classList.remove('btn-outline-success');
+                    } else if (data.user_vote == -1) {
+                        downvoteBtn.classList.add('btn-danger');
+                        downvoteBtn.classList.remove('btn-outline-danger');
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));
