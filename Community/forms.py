@@ -56,17 +56,21 @@ class SearchFilterForm(forms.Form):
     search = forms.CharField(
         required=False,
         max_length=320,
-        widget=forms.TextInput(attrs={"placeholder": "Search posts...", "class": "form-control"}),
+        widget=forms.TextInput(
+            attrs={"placeholder": "Search posts...", "class": "form-control"}
+        ),
     )
     label = forms.ChoiceField(
         required=False,
         choices=[("", "None"), ("resource", "Resource"), ("question", "Question")],
         label="Label",
-        widget=forms.Select(attrs={"class": "form-control"})
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
     topic = forms.ChoiceField(
-        required=False, choices=[("", "None")] + EXPERTISE_CHOICES, label="Topic",
-        widget=forms.Select(attrs={"class": "form-control"})
+        required=False,
+        choices=[("", "None")] + EXPERTISE_CHOICES,
+        label="Topic",
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
     sort = forms.ChoiceField(
         required=False,
@@ -77,7 +81,7 @@ class SearchFilterForm(forms.Form):
             ("earliest_post", "Earliest Post"),
         ],
         label="Sort",
-        widget=forms.Select(attrs={"class": "form-control"})
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
     def clean(self):

@@ -135,7 +135,7 @@ def view_post_detail(request, post_id):
         "r_form": form,
         "post": post,
         "num_r": num_r,
-        "topic_dict": EXPERTISE_CHOICES
+        "topic_dict": EXPERTISE_CHOICES,
     }
 
     return render(request, "post_detail.html", context)
