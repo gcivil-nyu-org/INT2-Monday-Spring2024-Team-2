@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("TutorRegister", "0024_alter_post_topics"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

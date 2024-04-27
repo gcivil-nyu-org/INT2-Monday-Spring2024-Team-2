@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import CreatePostForm, CreateReplyForm
+from django.contrib.auth.decorators import login_required
+from .forms import CreatePostForm, CreateReplyForm, SearchFilterForm
 from django.core.paginator import Paginator
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Q, F, IntegerField, OuterRef, Subquery
 from django.http import JsonResponse
 from TutorRegister.models import Post, Reply, Vote
 from TutorFilter.views import get_display_expertise
@@ -10,7 +11,11 @@ from TutorRegister.presets import EXPERTISE_CHOICES
 
 def view_all_posts(request):
     userType = request.user.usertype.user_type
-    labels = ["resource", "question"]
+    sortList = ["-post_date"]
+
+    user_vote_subquery = Vote.objects.filter(
+        post=OuterRef("pk"), user=request.user
+    ).values("value")
 
     posts = (
         Post.objects.select_related("user__usertype")
@@ -23,38 +28,66 @@ def view_all_posts(request):
                 to_attr="ordered_replies",
             )
         )
-        .annotate(reply_count=Count("post_replies"))
-        .order_by("-post_date")
+        .annotate(
+            reply_count=Count("post_replies", distinct=True),
+            upvotes_count=Count(
+                "post_react", filter=Q(post_react__value=1), distinct=True
+            ),
+            downvotes_count=Count(
+                "post_react", filter=Q(post_react__value=-1), distinct=True
+            ),
+            rating=F("upvotes_count") - F("downvotes_count"),
+            views=F("upvotes_count") + F("downvotes_count"),
+            user_vote=Subquery(user_vote_subquery, output_field=IntegerField()),
+        )
+        .distinct()
     )
 
-    label = request.GET.get("label")
+    form = SearchFilterForm(request.GET)
+    if form.is_valid():
+        search = form.cleaned_data.get("search")
+        label = form.cleaned_data.get("label")
+        topic = form.cleaned_data.get("topic")
+        sort = form.cleaned_data.get("sort")
 
-    if label:
-        posts = posts.filter(label=label)
+        if search:
+            searchTokens = search.split()
+            searchFilter = Q(title__icontains=search) | Q(content__icontains=search)
 
-    all_topics = [item[0] for item in EXPERTISE_CHOICES]
-    all_topics.append("{}")
+            for token in searchTokens:
+                searchFilter |= Q(title__icontains=token) | Q(content__icontains=token)
 
-    # Prepare processed topics for display in the dropdown menu
-    processed_topics = [{topic: get_display_topic(topic)} for topic in all_topics]
+            posts = posts.filter(searchFilter)
 
-    topic = request.GET.get("topic")
+        if label:
+            posts = posts.filter(label=label)
 
-    if topic:
-        if topic not in all_topics:
-            for item in processed_topics:
-                if topic in item.values():
-                    topic = list(item.keys())[0]
-                    break
-        posts = posts.filter(topics=topic)
+        if topic:
+            posts = posts.filter(topics=topic)
 
-    for post in posts:
-        post.topics = get_display_topic(post.topics)
+        if sort:
+            if sort == "highest_rating":
+                sortList = ["-rating", "-post_date"]
+            elif sort == "most_viewed":
+                sortList = ["-views", "-post_date"]
+            elif sort == "earliest_post":
+                sortList = ["post_date"]
+
+    posts = posts.order_by(*sortList)
 
     paginator = Paginator(posts, 5)
 
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    # Generating clean URL parameters for pagination links
+    query_params = request.GET.copy()
+    if "page" in query_params:
+        del query_params["page"]
+
+    clean_params = "&".join(
+        f"{key}={value}" for key, value in query_params.items() if value
+    )
 
     context = {
         "baseTemplate": (
@@ -63,20 +96,34 @@ def view_all_posts(request):
             else "Dashboard/base_tutor.html"
         ),
         "posts": page_obj,
-        "labels": labels,
-        "topics": processed_topics,
+        "topic_dict": EXPERTISE_CHOICES,
+        "form": form,
+        "clean_params": clean_params,
     }
-    # return render all posts
+
     return render(request, "posts.html", context)
 
 
 def view_post_detail(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+    user_vote_subquery = Vote.objects.filter(
+        post=OuterRef("pk"), user=request.user
+    ).values("value")
+
+    post = get_object_or_404(
+        Post.objects.annotate(
+            upvotes_count=Count(
+                "post_react", filter=Q(post_react__value=1), distinct=True
+            ),
+            downvotes_count=Count(
+                "post_react", filter=Q(post_react__value=-1), distinct=True
+            ),
+            user_vote=Subquery(user_vote_subquery, output_field=IntegerField()),
+        ).distinct(),
+        pk=post_id,
+    )
     replies = Reply.objects.filter(post=post).order_by("-reply_date")
     userType = request.user.usertype.user_type
     num_r = replies.count()
-
-    post.topics = get_display_topic(post.topics)
 
     paginator = Paginator(replies, 5)
 
@@ -105,11 +152,13 @@ def view_post_detail(request, post_id):
         "r_form": form,
         "post": post,
         "num_r": num_r,
+        "topic_dict": EXPERTISE_CHOICES,
     }
 
     return render(request, "post_detail.html", context)
 
 
+@login_required
 def create_post(request):
     userType = request.user.usertype.user_type
     if request.method == "POST":
@@ -123,15 +172,60 @@ def create_post(request):
         form = CreatePostForm()
 
     context = {
-        "form": form,
         "baseTemplate": (
             "Dashboard/base_student.html"
             if userType == "student"
             else "Dashboard/base_tutor.html"
         ),
+        "form": form,
     }
 
     return render(request, "create_post.html", context)
+
+
+@login_required
+def edit(request, post_id):
+    userType = request.user.usertype.user_type
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.user != post.user:
+        return redirect("Community:post_detail", post_id=post_id)
+
+    if request.method == "POST":
+        form = CreatePostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect("Community:post_detail", post_id=post_id)
+    else:
+        form = CreatePostForm(instance=post)
+
+    context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
+        "form": form,
+    }
+
+    return render(request, "edit_post.html", context)
+
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Check if the current user is the author of the post
+    if request.user == post.user:
+        # If the request method is POST, delete the post
+        if request.method == "POST":
+            post.delete()
+            return JsonResponse({"success": True})
+        else:
+            # If the request method is not POST, return a JSON response indicating authorization
+            return JsonResponse({"authorized": True})
+    else:
+        return JsonResponse({"authorized": False}, status=403)
 
 
 def vote(request, post_id, vote_type):
@@ -143,16 +237,16 @@ def vote(request, post_id, vote_type):
     elif vote_type == "downvote":
         new_value = -1 if user_react.value != -1 else 0
 
-    user_react.value = new_value
-    user_react.save()
-
-    rating = post.get_rating()
-
-    return JsonResponse({"rating": rating})
-
-
-def get_display_topic(topic):
-    if topic == "{}":
-        return "Other"
+    if new_value == 0:
+        user_react.delete()
     else:
-        return get_display_expertise(topic)
+        user_react.value = new_value
+        user_react.save()
+
+    return JsonResponse(
+        {
+            "upvotes_count": post.post_react.filter(value=1).count(),
+            "downvotes_count": post.post_react.filter(value=-1).count(),
+            "user_vote": new_value,
+        }
+    )
