@@ -310,7 +310,7 @@ class TutoringSessionTests(TestCase):
         data = {
             "tutoring_mode": "remote",
             "subject": "math",
-            "date": "2024-04-01",
+            "date": "2025-04-01",
             "offering_rate": 50,
             "message": "Looking forward to the session!",
             "selected_timeslots": json.dumps([{"start": "09:00", "end": "09:30"}]),
