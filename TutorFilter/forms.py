@@ -4,6 +4,8 @@ from TutorRegister.models import ProfileT, Expertise, TutoringSession, Favorite
 from Dashboard.choices import EXPERTISE_CHOICES
 from django.utils import timezone
 from datetime import timedelta
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 
 
 class TutorFilterForm(forms.Form):
@@ -176,9 +178,13 @@ class TutoringSessionRequestForm(forms.ModelForm):
         choices=[], widget=forms.Select(attrs={"class": "form-select"})
     )
 
+    offering_rate = forms.DecimalField(
+        validators=[MinValueValidator(0.01)],
+        widget=forms.NumberInput(attrs={"class": "form-control", "min": "0.01"}),
+    )
+
     def __init__(self, *args, tutor_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-
         available_subject_choices = []
         if tutor_user:
             tutor_profile = ProfileT.objects.filter(user=tutor_user).first()

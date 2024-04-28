@@ -468,17 +468,22 @@ def Requests(request):
 
 
 def AcceptRequest(request, session_id):
-    session = TutoringSession.objects.get(pk=session_id)
-
-    if session.status == "Pending":
-        session.status = "Accepted"
-        session.save()
-    else:
-        # If status is not 'Pending', raise an error message
-        messages.error(
-            request, "This request has been cancelled and cannot be accepted."
+    accepted_session = TutoringSession.objects.get(pk=session_id)
+    accepted_session.status = "Accepted"
+    accepted_session.save()
+    overlapping_sessions = (
+        TutoringSession.objects.filter(
+            tutor_id=accepted_session.tutor_id,
+            date=accepted_session.date,
+            status="Pending",
         )
-
+        .exclude(pk=session_id)
+        .exclude(
+            Q(start_time__gte=accepted_session.end_time)
+            | Q(end_time__lte=accepted_session.start_time)
+        )
+    )
+    overlapping_sessions.update(status="Declined")
     return redirect("Dashboard:requests")
 
 
