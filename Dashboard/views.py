@@ -444,8 +444,6 @@ def AcceptRequest(request, session_id):
             | Q(end_time__lte=accepted_session.start_time)
         )
     )
-    # for session in overlapping_sessions:
-    #     print(f"Session ID: {session.pk}, Tutor ID: {session.tutor_id}, Start: {session.start_time}, End: {session.end_time}, Status: {session.status}")
     overlapping_sessions.update(status="Declined")
     return redirect("Dashboard:requests")
 
