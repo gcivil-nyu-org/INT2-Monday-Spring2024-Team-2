@@ -183,17 +183,8 @@ class TutoringSessionRequestForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control", "min": "0.01"}),
     )
 
-    date = forms.DateField(
-        widget=forms.DateInput(
-            attrs={"type": "date", "class": "form-control", "id": "date_selector"}
-        )
-    )
-
     def __init__(self, *args, tutor_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["date"].widget.attrs["min"] = (
-            timezone.localdate() + timedelta(days=1)
-        ).isoformat()
         available_subject_choices = []
         if tutor_user:
             tutor_profile = ProfileT.objects.filter(user=tutor_user).first()
@@ -222,12 +213,6 @@ class TutoringSessionRequestForm(forms.ModelForm):
 
                 self.fields["tutoring_mode"].choices = mode_choices
 
-    def clean_date(self):
-        date = self.cleaned_data["date"]
-        if date < timezone.localdate() + timedelta(days=1):
-            raise ValidationError("Date cannot be in the past.")
-        return date
-
     class Meta:
         model = TutoringSession
         fields = [
@@ -239,16 +224,20 @@ class TutoringSessionRequestForm(forms.ModelForm):
             "attachment",
         ]
         tomorrow = timezone.localdate() + timedelta(days=1)
+        next_month = timezone.localdate() + timedelta(days=90)
         widgets = {
-            # "date": forms.DateInput(
-            #     attrs={
-            #         "type": "date",
-            #         "min": tomorrow.isoformat(),
-            #         "class": "form-control",
-            #         "id": "date_selector",
-            #     }
-            # ),
-            # "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
+            "date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "min": tomorrow.isoformat(),
+                    "max": next_month.isoformat(),
+                    "class": "form-control",
+                    "id": "date_selector",
+                    "onkeydown": "return false;",  #
+                    "onpaste": "return false;",
+                }
+            ),
+            "offering_rate": forms.NumberInput(attrs={"class": "form-control"}),
             "message": forms.Textarea(
                 attrs={"class": "form-control", "rows": 3, "placeholder": "Message"}
             ),

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db.models.functions import Coalesce
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms.tutor_info import (
@@ -7,8 +8,10 @@ from .forms.tutor_info import (
     TutorImageForm,
     TutorTranscriptForm,
 )
+from django.db.models import Count, F, ExpressionWrapper, FloatField, Value, Case, When
 from .forms.student_info import StudentForm, StudentImageForm
 from .forms.review_form import TutorReviewForm
+from .forms.survey_form import SurveyForm
 from TutorRegister.models import (
     Expertise,
     Availability,
@@ -34,6 +37,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 
 import mimetypes
 
@@ -287,6 +291,41 @@ def UserDashboard(request):
 
 
 @login_required
+def Survey(request, session_id):
+    session = TutoringSession.objects.get(pk=session_id)
+    s_id = session.student_id
+    t_id = session.tutor_id
+    if request.method == "POST":
+        form = SurveyForm(request.POST)
+        print(form.errors)
+        if form.is_valid():
+            survey = form.save(commit=False)
+            survey.session = session
+            survey.reviewer = s_id
+            survey.reviewee = t_id
+            survey.save()
+
+            session.survey_completed = True
+            session.save()
+            return redirect("Dashboard:dashboard")
+
+    else:
+        form = SurveyForm()
+    userType = request.user.usertype.user_type
+    context = {
+        "baseTemplate": (
+            "Dashboard/base_student.html"
+            if userType == "student"
+            else "Dashboard/base_tutor.html"
+        ),
+        "userType": userType,
+        "form": form,
+        "session_id": session_id,
+    }
+    return render(request, "Dashboard/survey.html", context)
+
+
+@login_required
 def ProvideFeedback(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
 
@@ -450,8 +489,16 @@ def AcceptRequest(request, session_id):
 
 def DeclineRequest(request, session_id):
     session = TutoringSession.objects.get(pk=session_id)
-    session.status = "Declined"
-    session.save()
+
+    if session.status == "Pending":
+        session.status = "Declined"
+        session.save()
+    else:
+        # If status is not 'Pending', raise an error message
+        messages.error(
+            request, "This request has been cancelled and cannot be declined."
+        )
+
     return redirect("Dashboard:requests")
 
 
@@ -558,7 +605,34 @@ def VideoCall(request):
 
 @login_required
 def AdminDashboard(request):
-    tutors = ProfileT.objects.order_by("id")
+    tutors = ProfileT.objects.annotate(
+        total_reviewee_count=Count("user__user_reviewee", distinct=True),
+        total_true=ExpressionWrapper(
+            Case(
+                When(
+                    total_reviewee_count__gt=0,
+                    then=100
+                    * (
+                        Count(
+                            "user__user_reviewee__q1",
+                            filter=F("user__user_reviewee__q1"),
+                        )
+                        + Count(
+                            "user__user_reviewee__q2",
+                            filter=F("user__user_reviewee__q2"),
+                        )
+                        + Count(
+                            "user__user_reviewee__q3",
+                            filter=F("user__user_reviewee__q3"),
+                        )
+                    )
+                    / (3 * Count("user__user_reviewee", distinct=True)),
+                ),
+                default=None,
+            ),
+            output_field=FloatField(),
+        ),
+    ).order_by("id")
     expertise = Expertise.objects.all()
     return render(
         request,

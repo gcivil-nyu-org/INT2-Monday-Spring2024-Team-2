@@ -28,6 +28,7 @@ urlpatterns = [
         name="download_transcript",
     ),
     path("provide-feedback/<int:session_id>/", views.ProvideFeedback, name="feedback"),
+    path("survey/<int:session_id>", views.Survey, name="survey"),
     path("videocall/", views.VideoCall, name="video_call"),
     path("admin", views.AdminDashboard, name="admin_dashboard"),
     path(

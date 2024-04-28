@@ -100,6 +100,7 @@ class TutoringSession(models.Model):
     attachment = models.FileField(upload_to="attachments/", null=True, blank=True)
     reviewed_by_student = models.BooleanField(default=False)
     meeting_link = models.CharField(max_length=100, null=True, blank=True)
+    survey_completed = models.BooleanField(default=False, null=True, blank=True)
 
     def human_readable_subject(self):
         return self.subject.replace("_", " ")
@@ -169,6 +170,21 @@ class Vote(models.Model):
 
     class Meta:
         unique_together = ("user", "post")
+
+
+class Survey(models.Model):
+    session = models.ForeignKey(
+        TutoringSession, on_delete=models.CASCADE, related_name="session_survey"
+    )
+    reviewer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_reviewer"
+    )
+    reviewee = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_reviewee"
+    )
+    q1 = models.BooleanField(null=True, blank=True)
+    q2 = models.BooleanField(null=True, blank=True)
+    q3 = models.BooleanField(null=True, blank=True)
 
 
 # Two blank lines before the new function definition
