@@ -1,0 +1,129 @@
+{% extends baseTemplate %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Survey{% endblock %}
+{% block content %}
+
+<div class="container-fluid d-flex justify-content-center align-items-center">
+<div class="card mt-5 rounded-4 shadow d-flex">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+    <h2 class="fw-bold mt-3 text-center" style="color: #600d91">Please fill out the survey</h2>
+    <br>
+    <form id="surveyForm" style="margin:20px" action="{% url 'Dashboard:survey' session_id=session_id %}"  method="post">
+      {% csrf_token %}
+      <p class="fw-bold mt-3">1. Did the tutor start the session promptly at the scheduled time? <span class="text-danger">*</span></p>
+      <div id="AnswerError1" class="text-danger" style="display: none; color: red">Please select an answer.</div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q1" id="q1_yes" value="True" />
+        <label class="form-check-label" for="q1_yes">
+          Yes
+        </label>
+      </div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q1" id="q1_no" value="False" />
+        <label class="form-check-label" for="q1_no">
+          No
+        </label>
+      </div>
+
+      <br>
+
+      <p class="fw-bold mt-3">2. Was the tutor engaged in teaching throughout the entire session? <span class="text-danger">*</span></p>
+      <div id="AnswerError2" class="text-danger" style="display: none; color: red">Please select an answer.</div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q2" id="q2_yes" value="True" />
+        <label class="form-check-label" for="q2_yes">
+          Yes
+        </label>
+      </div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q2" id="q2_no" value="False" />
+        <label class="form-check-label" for="q2_no">
+          No
+        </label>
+      </div>
+
+      <br> 
+
+      <p class="fw-bold">3. Did the tutor conclude the session on time, without leaving early? <span class="text-danger">*</span></p>
+      <div id="AnswerError3" class="text-danger" style="display: none; color: red">Please select an answer.</div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q3" id="q3_yes" value="True"/>
+        <label class="form-check-label" for="q3_yes">
+          Yes
+        </label>
+      </div>
+      <div class="form-check mb-2" style="margin-left:20px">
+        <input class="form-check-input" type="radio" name="q3" id="q3_no" value="False" />
+        <label class="form-check-label" for="q3_no">
+          No
+        </label>
+      </div>
+   
+    <div class="text-center" style="margin-bottom:20px; margin-top:20px">
+      <button type="button" class="btn btn-primary" onclick="validateForm()" style="background-color: #600d91; border-color: #600d91; color:white">Submit</button>
+    </div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Success</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                You have successfully submitted the survey.
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+  function validateForm() {
+      let isValid = true;
+      ['q1', 'q2', 'q3'].forEach((q, index) => {
+          const question = document.getElementsByName(q);
+          const errorDiv = document.getElementById(`AnswerError${index + 1}`);
+          if (![...question].some(input => input.checked)) {
+              errorDiv.style.display = 'block';
+              isValid = false;
+          } else {
+              errorDiv.style.display = 'none';
+          }
+      });
+  
+      if (isValid) {
+          $('#surveyForm').submit(function(event) {
+              event.preventDefault(); // Prevent the default form submission
+              var form = $(this);
+              $.ajax({
+                  type: form.attr('method'),
+                  url: form.attr('action'),
+                  data: form.serialize(),
+                  success: function() {
+                      $('#successModal').modal('show'); // Show the success modal
+                      setTimeout(function() {
+                          window.location.href = "{% url 'Dashboard:dashboard'%}"; // Redirect to the next page after 3 seconds
+                      }, 3000); // 3000 milliseconds = 3 seconds
+                  }
+              });
+          });
+          $('#surveyForm').submit(); // Trigger the form submission
+      }
+  }
+  </script>
+  
+{% endblock %}

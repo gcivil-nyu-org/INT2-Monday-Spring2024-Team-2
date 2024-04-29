@@ -4,6 +4,8 @@ import datetime
 # from django.core.validators import RegexValidator, MinValueValidator
 from django.forms import ModelForm
 from TutorRegister.models import ProfileT, Availability
+from django.core.exceptions import ValidationError
+import re
 
 
 class TutorForm(ModelForm):
@@ -78,6 +80,7 @@ class TutorForm(ModelForm):
             attrs={"class": "form-select", "style": "margin-bottom: 10px;"}
         ),
     )
+    zip = forms.CharField(required=True, max_length=5)
     grade = forms.ChoiceField(
         choices=GRADE_CHOICE,
         widget=forms.Select(
@@ -143,6 +146,29 @@ class TutorForm(ModelForm):
                 attrs={"class": "form-control", "style": "margin-bottom: 10px;"}
             ),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        zip = cleaned_data.get("zip")
+
+        if bool(re.match(r"^\d{5}$", zip)) is False:
+            raise ValidationError({"zip": "The zip code must be a 5-digit number."})
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.zip = self.cleaned_data["zip"]
+
+        if commit:
+            user.save()
+
+        return user
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({"class": "form-control"})
 
 
 class AvailabilityForm(forms.ModelForm):

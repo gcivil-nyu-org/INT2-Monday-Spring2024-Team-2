@@ -31,8 +31,21 @@
             {% endif %}
             {{ student_image_form.image }}
           </div>
-          <div class="mb-3">
-            {{ student_form.as_p }}
+          <div class="form-group">
+            {% for field in student_form %}
+                <div class="mb-3">
+                      <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}: </label>
+                        {{ field }}           
+                     {% if field.help_text and field.name == 'password' %}
+                         <div class="form-text" style="color: #6c757d; font-size: 0.9em; list-style: none; padding-left: 1.2em;">&bull; {{ field.help_text }}</div>
+                    {% elif field.help_text %}
+                        <div class="form-text" style="color: #6c757d;">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback" style="display: block; color: #dc3545;">{{ error }}</div>
+                    {% endfor %}
+                </div>    
+            {% endfor %}
           </div>
           <input type="submit" class="btn btn-primary" style="background-color: #600E90; color: white; border-color: #600E90">
         </form>
@@ -66,63 +79,60 @@
 
 <script>
   function updateImagePreview() {
-      var input = document.getElementById('id_image');
-      if (input.files && input.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function (e) {
-              var img = new Image();
-              img.onload = function() {
-                  // Create a canvas with the desired dimensions
-                  var canvas = document.createElement('canvas');
-                  var ctx = canvas.getContext('2d');
-                  canvas.width = 300;
-                  canvas.height = 300;
-  
-                  // Calculate the scaling factor and dimensions to maintain aspect ratio
-                  var scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-                  var scaledWidth = img.width * scale;
-                  var scaledHeight = img.height * scale;
-  
-                  // Calculate the position to center the image on the canvas
-                  var x = (canvas.width - scaledWidth) / 2;
-                  var y = (canvas.height - scaledHeight) / 2;
-  
-                  // Fill the canvas with a white background
-                  ctx.fillStyle = '#FFFFFF';
-                  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-                  // Draw the resized and centered image
-                  ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-  
-                  // Create a circular mask
-                  ctx.globalCompositeOperation = 'destination-in';
-                  ctx.beginPath();
-                  ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, 2 * Math.PI);
-                  ctx.closePath();
-                  ctx.fill();
-  
-                  // Update the image preview with the canvas data
-                  var imagePreview = document.getElementById('imagePreview');
-                  imagePreview.src = canvas.toDataURL();
-                  imagePreview.style.display = 'block';
-                  $('#imagePreviewModal').modal('show');
-              };
-              img.src = e.target.result;
-          };
-          reader.readAsDataURL(input.files[0]);
-      }
+    var input = document.getElementById('id_image');
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function() {
+          // Create a canvas with fixed dimensions
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          canvas.width = 300;
+          canvas.height = 300;
+
+          // Resize the image to 300x300 pixels directly
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Create a circular mask
+          var maskCanvas = document.createElement('canvas');
+          maskCanvas.width = 300;
+          maskCanvas.height = 300;
+          var maskCtx = maskCanvas.getContext('2d');
+          
+          // Draw an ellipse on the mask canvas
+          maskCtx.beginPath();
+          maskCtx.ellipse(150, 150, 150, 150, 0, 0, 2 * Math.PI);
+          maskCtx.fillStyle = 'black';
+          maskCtx.fill();
+
+          // Use the mask to clip the main image
+          ctx.globalCompositeOperation = 'destination-in';
+          ctx.drawImage(maskCanvas, 0, 0);
+
+          // Update the image preview with the canvas data
+          var imagePreview = document.getElementById('imagePreview');
+          imagePreview.src = canvas.toDataURL();
+          imagePreview.style.display = 'block';
+          $('#imagePreviewModal').modal('show');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
   }
-  
+
   if (window.jQuery) {
-      $(document).ready(function() {
-          $('#id_image').change(updateImagePreview);
-      });
+    $(document).ready(function() {
+        $('#id_image').change(updateImagePreview);
+    });
   } else {
-      document.addEventListener('DOMContentLoaded', function() {
-          document.getElementById('id_image').addEventListener('change', updateImagePreview);
-      });
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('id_image').addEventListener('change', updateImagePreview);
+    });
   }
-  </script>
+</script>
+
   
   
   

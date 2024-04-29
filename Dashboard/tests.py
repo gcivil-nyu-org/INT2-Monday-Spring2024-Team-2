@@ -5,6 +5,7 @@ from django.test import (
     override_settings,
     TransactionTestCase,
 )
+from datetime import timedelta, date
 from django.urls import reverse
 from django.contrib.auth.models import User
 from TutorRegister.models import (
@@ -20,14 +21,17 @@ from .views import (
     StudentInformation,
     Requests,
     TutorFeedback,
+    DeleteRequest,
     AdminDashboard,
     download_attachment,
+    Survey,
 )
 from TutorNYU.views import contact
 from TutorRegister.models import ProfileS
 from .templatetags.custom_filters import remove_prefix
 from .forms.student_info import StudentForm
 from .forms.tutor_info import TutorForm
+from .forms.survey_form import SurveyForm
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -292,6 +296,37 @@ class DeclineRequestTestCase(TestCase):
         super().tearDown()
 
 
+class CancelRequestTestCase(TestCase):
+    def setUp(self):
+        self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.client = Client()
+
+    def test_cancel_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
+        response = self.client.get(
+            reverse("Dashboard:cancel_request", args=(self.session.pk,))
+        )
+        self.assertEqual(response.status_code, 302)
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "Cancelled")
+
+
+class DeleteRequestTestCase(TestCase):
+    def setUp(self):
+        self.session = TutoringSession.objects.get(pk=cache.get("pending_request"))
+        self.session.status = "Declined"
+        self.session.save()
+        self.client = Client()
+
+    def test_delete_request(self):
+        self.client.login(username="test@nyu.edu", password="testpassword")
+        response = self.client.get(
+            reverse("Dashboard:delete_request", args=(self.session.pk,))
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(TutoringSession.objects.filter(pk=self.session.pk).exists())
+
+
 class LogoutTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(pk=cache.get("student"))
@@ -322,6 +357,23 @@ class ProvideFeedbackTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
             TutoringSession.objects.get(pk=self.session.pk).reviewed_by_student
+        )
+
+
+class SurveyTestCase(TestCase):
+    def setUp(self):
+        self.session = TutoringSession.objects.get(pk=cache.get("past_session"))
+        self.client = Client()
+        self.client.login(username="test@example.com", password="testpassword")
+
+    def test_submit_survey(self):
+        response = self.client.post(
+            reverse("Dashboard:survey", args=[self.session.pk]),
+            {"q1": "True", "q2": "True", "q3": "True"},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            TutoringSession.objects.get(pk=self.session.pk).survey_completed
         )
 
 
