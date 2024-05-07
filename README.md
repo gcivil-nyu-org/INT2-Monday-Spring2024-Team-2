@@ -1,15 +1,10 @@
 # TutorNYU
 
-
-## Develop:
-[![Build Status](https://app.travis-ci.com/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2.svg?branch=develop)](https://app.travis-ci.com/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2) [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2/badge.svg?branch=develop)](https://coveralls.io/github/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2?branch=develop)
-
 ## Master:
 [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2.svg?token=6HgZsGCnodk6i6zYsYKA&branch=master)](https://app.travis-ci.com/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2) [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2/badge.svg?branch=master)](https://coveralls.io/github/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2?branch=master)
 
 ## Video Demo:
-[![Video](https://img.youtube.com/vi/GXbiK17f5do/maxresdefault.jpg)](https://www.youtube.com/watch?v=GXbiK17f5do)
-
+[![Video](https://github.com/gcivil-nyu-org/INT2-Monday-Spring2024-Team-2/assets/129098312/c38e3410-9965-4607-b33f-2af806ec43f6)](https://www.youtube.com/watch?v=GXbiK17f5do)
 
 ## Description:
 TutorNYU is a web application designed to bridge the gap between students/parents seeking tutors and college students looking for part-time tutoring opportunities. TutorNYU enables users to find suitable tutors from NYU based on subjects, locations in NYC, budget, schedules and other preferences. TutorNYU facilitates both in-person and virtual tutoring, allowing users to schedule sessions based on tutor availability.
